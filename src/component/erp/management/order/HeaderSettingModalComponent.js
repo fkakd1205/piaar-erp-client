@@ -957,5 +957,12 @@ const defaultHeaderList = [
         "customCellName": "*재고수량",
         "matchedColumnName": "optionStockUnit",
         "mergeYn": "n"
+    },
+    {
+        "cellNumber": 46,
+        "originCellName": "*주문등록일",
+        "customCellName": "*주문등록일",
+        "matchedColumnName": "createdAt",
+        "mergeYn": "n"
     }
 ];

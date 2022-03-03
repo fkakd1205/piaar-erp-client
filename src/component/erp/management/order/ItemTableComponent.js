@@ -1,9 +1,12 @@
-import { useReducer } from 'react';
+import { useReducer, useState } from 'react';
 import styled from 'styled-components';
 import CustomCheckbox from '../../../template/checkbox/CustomCheckbox';
+import CommonModalComponent from '../../../template/modal/CommonModalComponent';
+import ConfirmModalComponent from '../../../template/modal/ConfirmModalComponent';
+import { dateToYYYYMMDD } from '../../../../utils/dateFormatUtils';
 
 const Container = styled.div`
-
+    margin-top: 20px;
 `;
 
 const TableWrapper = styled.div`
@@ -11,7 +14,7 @@ const TableWrapper = styled.div`
     padding: 0 30px;
 
     @media all and (max-width: 992px){
-        padding: 10px 10px;
+        padding: 0 10px;
     }
 `;
 
@@ -91,8 +94,12 @@ const TableBox = styled.div`
 `;
 
 const OperatorWrapper = styled.div`
-    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
     padding: 0 30px;
+    gap: 10px;
 
     @media only screen and (max-width:768px){
         padding: 0 10px;
@@ -101,8 +108,8 @@ const OperatorWrapper = styled.div`
 
 const ButtonBox = styled.div`
     .sold-btn-item{
-        padding: 5px 0;
         width: 150px;
+        height: 34px;
 
         background: #2C73D2;
         border: 1px solid #2C73D2;
@@ -126,6 +133,42 @@ const ButtonBox = styled.div`
             border: 1px solid #2C73D2ee;
         }
     }
+
+    .delete-btn-item{
+        position: relative;
+        width: 34px;
+        height: 34px;
+
+        background: #ff3060;
+        border: 1px solid #ff3060;
+        border-radius: 50%;
+
+        font-size: 16px;
+        font-weight: 600;
+        color: white;
+
+        cursor: pointer;
+
+        transition: all .1s;
+
+        &:hover{
+            transform: scale(1.03);
+        }
+
+        &:active{
+            transform: scale(1);
+            background: #ff3060ee;
+            border: 1px solid #ff3060ee;
+        }
+    }
+
+    .delete-icon-item{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 22px;
+    }
 `;
 
 const initialCheckedItemListState = [];
@@ -140,6 +183,8 @@ const checkedItemListStateReducer = (state, action) => {
 }
 const ItemTableComponent = (props) => {
     const [checkedItemListState, dispatchCheckedItemListState] = useReducer(checkedItemListStateReducer, initialCheckedItemListState);
+    const [salesConfirmModalOpen, setSalesConfirmModalOpen] = useState(false);
+    const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] = useState(false);
 
     const _isCheckedAll = () => {
         if (!props.orderItemListState) {
@@ -190,7 +235,48 @@ const ItemTableComponent = (props) => {
         })
     }
 
-    // TODO : 판매전환 로직 완성해야됨.
+    const _onSalesConfirmModalOpen = () => {
+        if (!checkedItemListState || checkedItemListState.length <= 0) {
+            alert('판매 전환 데이터를 선택해 주세요.');
+            return;
+        }
+        setSalesConfirmModalOpen(true);
+    }
+
+    const _onSalesConfirmModalClose = () => {
+        setSalesConfirmModalOpen(false);
+    }
+
+    const _onDeleteConfirmModalOpen = () => {
+        if (!checkedItemListState || checkedItemListState.length <= 0) {
+            alert('삭제할 데이터를 선택해 주세요.');
+            return;
+        }
+        setDeleteConfirmModalOpen(true);
+    }
+
+    const _onDeleteConfirmModalClose = () => {
+        setDeleteConfirmModalOpen(false);
+    }
+
+    // 판매 전환 서밋
+    const _onSubmitOrderItemListToSales = () => {
+        _onSalesConfirmModalClose();
+        props._onSubmitOrderItemListToSales(checkedItemListState);
+        dispatchCheckedItemListState({
+            type: 'CLEAR'
+        })
+    }
+
+    // 데이터 삭제 서밋
+    const _onSubmitOrderItemListDelete = () => {
+        _onDeleteConfirmModalClose();
+        props._onSubmitOrderItemListDelete(checkedItemListState);
+        dispatchCheckedItemListState({
+            type: 'CLEAR'
+        })
+    }
+
     return (
         <>
             <Container>
@@ -199,7 +285,17 @@ const ItemTableComponent = (props) => {
                         <button
                             type='button'
                             className='sold-btn-item'
+                            onClick={() => _onSalesConfirmModalOpen()}
                         >판매 전환</button>
+                    </ButtonBox>
+                    <ButtonBox>
+                        <button
+                            type='button'
+                            className='delete-btn-item'
+                            onClick={() => _onDeleteConfirmModalOpen()}
+                        >
+                            <img className='delete-icon-item' src='/assets/icon/delete_icon.png' alt='delete button'></img>
+                        </button>
                     </ButtonBox>
                 </OperatorWrapper>
                 {props.headerState &&
@@ -250,8 +346,14 @@ const ItemTableComponent = (props) => {
                                                     ></CustomCheckbox>
                                                 </td>
                                                 {props.headerState?.headerDetail.details.map(r2 => {
+                                                    let matchedColumnName = r2.matchedColumnName;
+                                                    if (matchedColumnName === 'createdAt') {
+                                                        return (
+                                                            <td key={r2.cellNumber}>{dateToYYYYMMDD(r1[matchedColumnName] || new Date())}</td>
+                                                        )
+                                                    }
                                                     return (
-                                                        <td key={r2.cellNumber}>{r1[r2.matchedColumnName]}</td>
+                                                        <td key={r2.cellNumber}>{r1[matchedColumnName]}</td>
                                                     )
                                                 })}
                                             </tr>
@@ -267,6 +369,24 @@ const ItemTableComponent = (props) => {
                     <div style={{ textAlign: 'center', padding: '100px 0', fontWeight: '600' }}>뷰 헤더를 먼저 설정해 주세요.</div>
                 }
             </Container>
+
+            {/* Modal */}
+            <ConfirmModalComponent
+                open={salesConfirmModalOpen}
+                title={'판매 전환 확인 메세지'}
+                message={`[ ${checkedItemListState.length} ] 건의 데이터를 판매 전환 하시겠습니까?`}
+
+                onConfirm={_onSubmitOrderItemListToSales}
+                onClose={_onSalesConfirmModalClose}
+            ></ConfirmModalComponent>
+            <ConfirmModalComponent
+                open={deleteConfirmModalOpen}
+                title={'데이터 삭제 확인 메세지'}
+                message={`[ ${checkedItemListState.length} ] 건의 데이터를 삭제 하시겠습니까?`}
+
+                onConfirm={_onSubmitOrderItemListDelete}
+                onClose={_onDeleteConfirmModalClose}
+            ></ConfirmModalComponent>
         </>
     );
 }
