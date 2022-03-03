@@ -46,7 +46,12 @@ const MainComponent = (props) => {
     }
 
     const __reqSearchOrderItemList = async () => {
-        await erpOrderItemDataConnect().searchList()
+        let params = {
+            salesYn: 'y',
+            releaseYn: 'n'
+        }
+
+        await erpOrderItemDataConnect().searchList(params)
             .then(res => {
                 if (res.status === 200 && res.data.message === 'success') {
                     dispatchOrderItemListState({
