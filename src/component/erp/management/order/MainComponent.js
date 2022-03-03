@@ -136,8 +136,8 @@ const MainComponent = (props) => {
             })
     }
 
-    const __reqChangeSoldYnForOrderItemListInSales = async function (body) {
-        await erpOrderItemDataConnect().changeSoldYnForListInSales(body)
+    const __reqChangeSalesYnForOrderItemListInSales = async function (body) {
+        await erpOrderItemDataConnect().changeSalesYnForListInSales(body)
             .catch(err => {
                 let res = err.response;
                 if (res?.status === 500) {
@@ -208,8 +208,8 @@ const MainComponent = (props) => {
     }
 
     // 판매 전환 서밋
-    const _onSubmit_changeSoldYnForOrderItemListInSales = async (body) => {
-        await __reqChangeSoldYnForOrderItemListInSales(body);
+    const _onSubmit_changeSalesYnForOrderItemListInSales = async (body) => {
+        await __reqChangeSalesYnForOrderItemListInSales(body);
         await __reqSearchOrderItemList();
     }
 
@@ -241,7 +241,7 @@ const MainComponent = (props) => {
                     productOptionListState={productOptionListState}
                     orderItemListState={orderItemListState}
 
-                    _onSubmit_changeSoldYnForOrderItemListInSales={_onSubmit_changeSoldYnForOrderItemListInSales}
+                    _onSubmit_changeSalesYnForOrderItemListInSales={_onSubmit_changeSalesYnForOrderItemListInSales}
                     _onSubmit_deleteOrderItemList={_onSubmit_deleteOrderItemList}
                     _onSubmit_changeOptionCodeForOrderItemListInAll={_onSubmit_changeOptionCodeForOrderItemListInAll}
                 ></ItemTableComponent>

@@ -285,9 +285,9 @@ const ItemTableComponent = (props) => {
     }
 
     // 판매 전환 서밋
-    const _onSubmit_changeSoldYnForOrderItemListInSales = () => {
+    const _onSubmit_changeSalesYnForOrderItemListInSales = () => {
         _onSalesConfirmModalClose();
-        props._onSubmit_changeSoldYnForOrderItemListInSales(checkedItemListState);
+        props._onSubmit_changeSalesYnForOrderItemListInSales(checkedItemListState);
         dispatchCheckedItemListState({
             type: 'CLEAR'
         })
@@ -430,7 +430,7 @@ const ItemTableComponent = (props) => {
                 title={'판매 전환 확인 메세지'}
                 message={`[ ${checkedItemListState.length} ] 건의 데이터를 판매 전환 하시겠습니까?`}
 
-                onConfirm={_onSubmit_changeSoldYnForOrderItemListInSales}
+                onConfirm={_onSubmit_changeSalesYnForOrderItemListInSales}
                 onClose={_onSalesConfirmModalClose}
             ></ConfirmModalComponent>
             <ConfirmModalComponent

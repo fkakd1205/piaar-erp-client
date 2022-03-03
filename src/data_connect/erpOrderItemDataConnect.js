@@ -20,8 +20,8 @@ const erpOrderItemDataConnect = () => {
                 withCredentials: true
             })
         },
-        changeSoldYnForListInSales: async function (body) {
-            return await axios.patch(`${API_SERVER_ADDRESS}/api/v1/erp-order-item/list/sales`, body, {
+        changeSalesYnForListInSales: async function (body) {
+            return await axios.patch(`${API_SERVER_ADDRESS}/api/v1/erp-order-item/list/sales-yn/sales`, body, {
                 withCredentials: true
             })
         },
