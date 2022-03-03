@@ -4,6 +4,7 @@ import CustomCheckbox from '../../../template/checkbox/CustomCheckbox';
 import CommonModalComponent from '../../../template/modal/CommonModalComponent';
 import ConfirmModalComponent from '../../../template/modal/ConfirmModalComponent';
 import { dateToYYYYMMDD } from '../../../../utils/dateFormatUtils';
+import OptionCodeModalComponent from './OptionCodeModalComponent';
 
 const Container = styled.div`
     margin-top: 20px;
@@ -68,6 +69,10 @@ const TableBox = styled.div`
         }
     }
 
+    .option-code-item{
+        cursor: pointer;
+    }
+
     & .fiexed-header {
         position: sticky;
         top: 0;
@@ -106,16 +111,22 @@ const OperatorWrapper = styled.div`
     }
 `;
 
+const ButtonWrapper = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+`;
+
 const ButtonBox = styled.div`
-    .sold-btn-item{
-        width: 150px;
+    .common-btn-item{
+        width: 100px;
         height: 34px;
 
         background: #2C73D2;
         border: 1px solid #2C73D2;
         border-radius: 5px;
 
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 600;
         color: white;
 
@@ -185,6 +196,7 @@ const ItemTableComponent = (props) => {
     const [checkedItemListState, dispatchCheckedItemListState] = useReducer(checkedItemListStateReducer, initialCheckedItemListState);
     const [salesConfirmModalOpen, setSalesConfirmModalOpen] = useState(false);
     const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] = useState(false);
+    const [optionCodeModalOpen, setOptionCodeModalOpen] = useState(false);
 
     const _isCheckedAll = () => {
         if (!props.orderItemListState) {
@@ -259,35 +271,71 @@ const ItemTableComponent = (props) => {
         setDeleteConfirmModalOpen(false);
     }
 
+    const _onOptionCodeModalOpen = (e) => {
+        e.stopPropagation();
+        if (!checkedItemListState || checkedItemListState.length <= 0) {
+            alert('수정 될 데이터를 선택해 주세요.');
+            return;
+        }
+        setOptionCodeModalOpen(true);
+    }
+
+    const _onOptionCodeModalClose = (e) => {
+        setOptionCodeModalOpen(false);
+    }
+
     // 판매 전환 서밋
-    const _onSubmitOrderItemListToSales = () => {
+    const _onSubmit_changeSoldYnForOrderItemListInSales = () => {
         _onSalesConfirmModalClose();
-        props._onSubmitOrderItemListToSales(checkedItemListState);
+        props._onSubmit_changeSoldYnForOrderItemListInSales(checkedItemListState);
         dispatchCheckedItemListState({
             type: 'CLEAR'
         })
     }
 
     // 데이터 삭제 서밋
-    const _onSubmitOrderItemListDelete = () => {
+    const _onSubmit_deleteOrderItemList = () => {
         _onDeleteConfirmModalClose();
-        props._onSubmitOrderItemListDelete(checkedItemListState);
+        props._onSubmit_deleteOrderItemList(checkedItemListState);
         dispatchCheckedItemListState({
             type: 'CLEAR'
         })
+    }
+
+    // 옵션 코드 변경 서밋
+    const _onSubmit_changeOptionCodeForOrderItemListInAll = (optionCode) => {
+        let data = [...checkedItemListState];
+        data = data.map(r => {
+            return {
+                ...r,
+                optionCode: optionCode
+            }
+        })
+
+        props._onSubmit_changeOptionCodeForOrderItemListInAll(data);
+        _onOptionCodeModalClose();
     }
 
     return (
         <>
             <Container>
                 <OperatorWrapper>
-                    <ButtonBox>
-                        <button
-                            type='button'
-                            className='sold-btn-item'
-                            onClick={() => _onSalesConfirmModalOpen()}
-                        >판매 전환</button>
-                    </ButtonBox>
+                    <ButtonWrapper>
+                        <ButtonBox>
+                            <button
+                                type='button'
+                                className='common-btn-item'
+                                onClick={() => _onSalesConfirmModalOpen()}
+                            >판매 전환</button>
+                        </ButtonBox>
+                        <ButtonBox>
+                            <button
+                                type='button'
+                                className='common-btn-item'
+                                onClick={(e) => _onOptionCodeModalOpen(e)}
+                            >옵션 코드 수정</button>
+                        </ButtonBox>
+                    </ButtonWrapper>
                     <ButtonBox>
                         <button
                             type='button'
@@ -352,6 +400,12 @@ const ItemTableComponent = (props) => {
                                                             <td key={r2.cellNumber}>{dateToYYYYMMDD(r1[matchedColumnName] || new Date())}</td>
                                                         )
                                                     }
+
+                                                    if (matchedColumnName === 'optionCode') {
+                                                        return (
+                                                            <td key={r2.cellNumber} className='option-code-item' onClick={_onOptionCodeModalOpen}>{r1[matchedColumnName]}</td>
+                                                        )
+                                                    }
                                                     return (
                                                         <td key={r2.cellNumber}>{r1[matchedColumnName]}</td>
                                                     )
@@ -376,7 +430,7 @@ const ItemTableComponent = (props) => {
                 title={'판매 전환 확인 메세지'}
                 message={`[ ${checkedItemListState.length} ] 건의 데이터를 판매 전환 하시겠습니까?`}
 
-                onConfirm={_onSubmitOrderItemListToSales}
+                onConfirm={_onSubmit_changeSoldYnForOrderItemListInSales}
                 onClose={_onSalesConfirmModalClose}
             ></ConfirmModalComponent>
             <ConfirmModalComponent
@@ -384,9 +438,21 @@ const ItemTableComponent = (props) => {
                 title={'데이터 삭제 확인 메세지'}
                 message={`[ ${checkedItemListState.length} ] 건의 데이터를 삭제 하시겠습니까?`}
 
-                onConfirm={_onSubmitOrderItemListDelete}
+                onConfirm={_onSubmit_deleteOrderItemList}
                 onClose={_onDeleteConfirmModalClose}
             ></ConfirmModalComponent>
+            <CommonModalComponent
+                open={optionCodeModalOpen}
+
+                onClose={_onOptionCodeModalClose}
+            >
+                <OptionCodeModalComponent
+                    checkedItemListState={checkedItemListState}
+                    productOptionListState={props.productOptionListState}
+
+                    onConfirm={(optionCode) => _onSubmit_changeOptionCodeForOrderItemListInAll(optionCode)}
+                ></OptionCodeModalComponent>
+            </CommonModalComponent>
         </>
     );
 }

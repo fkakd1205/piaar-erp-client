@@ -28,6 +28,21 @@ const DateSelectorWrapper = styled.div`
         gap: 10px;
     }
 
+    .select-item{
+        width: 300px;
+        height: 43px;
+        padding: 5px 0;
+        border: 1px solid #e1e1e1;
+        font-size: 14px;
+        &:focus{
+            outline: none;
+        }
+
+        @media all and (max-width:992px) {
+            width: 100%;
+        }
+    }
+
     .date-selector-box{
         width: 300px;
     }
@@ -107,6 +122,10 @@ const ButtonWrapper = styled.div`
         flex-wrap: wrap;
         justify-content: end;
         gap:10px;
+
+        @media all and (max-width:992px) {
+            flex-wrap: nowrap;
+        }
     }
 
     .button-item{
@@ -224,7 +243,6 @@ const SearchOperatorComponent = (props) => {
         }
     }, [query.searchColumnName, query.searchValue])
     const _onChangeStartDateState = (value) => {
-        console.log('hello');
         dispatchStartDateState({
             type: 'SET_DATA',
             payload: value
@@ -253,12 +271,10 @@ const SearchOperatorComponent = (props) => {
             return;
         }
 
-        if (startDateState) {
+        if (startDateState && endDateState) {
             query.startDate = dateToYYYYMMDD(startDateState);
-        }
-
-        if (endDateState) {
-            query.endDate = dateToYYYYMMDD(endDateState)
+            query.endDate = dateToYYYYMMDD(endDateState);
+            query.periodType = 'registration'
         }
 
         if (searchColumnNameState) {
@@ -322,6 +338,13 @@ const SearchOperatorComponent = (props) => {
                 <DateSelectorWrapper>
                     <div className='label-item'>조회기간 (주문등록일)</div>
                     <div className='flex-box'>
+                        <select
+                            className='select-item'
+                            value={'registration'}
+                            onChange={() => { }}
+                        >
+                            <option value='registration'>주문등록일</option>
+                        </select>
                         <div className='date-selector-box'>
                             <CustomDatePicker
                                 valueSize={14}

@@ -8,13 +8,16 @@ import ItemTableComponent from './ItemTableComponent';
 import SearchOperatorComponent from './SearchOperatorComponent';
 import TopOperatorComponent from './TopOperatorComponent';
 import { getEndDate, getStartDate } from '../../../../utils/dateFormatUtils';
+import { productOptionDataConnect } from '../../../../data_connect/productOptionDataConnect';
 
 const Container = styled.div`
     margin-bottom: 150px;
 `;
 
 const initialHeaderState = null;
+const initialProductOptionListState = null;
 const initialOrderItemListState = null;
+
 const headerStateReducer = (state, action) => {
     switch (action.type) {
         case 'INIT_DATA':
@@ -22,6 +25,15 @@ const headerStateReducer = (state, action) => {
         default: return null;
     }
 }
+
+const productOptionListStateReducer = (state, action) => {
+    switch (action.type) {
+        case 'INIT_DATA':
+            return action.payload;
+        default: return null;
+    }
+}
+
 const orderItemListStateReducer = (state, action) => {
     switch (action.type) {
         case 'INIT_DATA':
@@ -35,6 +47,7 @@ const MainComponent = (props) => {
     const query = qs.parse(location.search);
 
     const [headerState, dispatchHeaderState] = useReducer(headerStateReducer, initialHeaderState);
+    const [productOptionListState, dispatchProductOptionListState] = useReducer(productOptionListStateReducer, initialProductOptionListState);
     const [orderItemListState, dispatchOrderItemListState] = useReducer(orderItemListStateReducer, initialOrderItemListState);
 
     const __reqSearchOrderHeaderOne = async () => {
@@ -49,6 +62,21 @@ const MainComponent = (props) => {
             })
             .catch(err => {
                 console.log(err);
+            })
+    }
+
+    const __reqSearchProductOptionList = async () => {
+        await productOptionDataConnect().searchList()
+            .then(res => {
+                if (res.status === 200 && res.data.message === 'success') {
+                    dispatchProductOptionListState({
+                        type: 'INIT_DATA',
+                        payload: res.data.data
+                    })
+                }
+            })
+            .catch(err => {
+                console.log(err.response)
             })
     }
 
@@ -108,8 +136,8 @@ const MainComponent = (props) => {
             })
     }
 
-    const __reqUpdateOrderItemToSales = async function (params) {
-        await erpOrderItemDataConnect().updateListToSales(params)
+    const __reqChangeSoldYnForOrderItemListInSales = async function (body) {
+        await erpOrderItemDataConnect().changeSoldYnForListInSales(body)
             .catch(err => {
                 let res = err.response;
                 if (res?.status === 500) {
@@ -134,17 +162,30 @@ const MainComponent = (props) => {
             })
     }
 
+    const __reqChangeOptionCodeForOrderItemListInAll = async function (body) {
+        await erpOrderItemDataConnect().changeOptionCodeForListInAll(body)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            });
+    }
+
     useEffect(() => {
         __reqSearchOrderHeaderOne();
+        __reqSearchProductOptionList();
     }, []);
 
     useEffect(() => {
-        console.log('helo')
         __reqSearchOrderItemList();
     }, [location]);
 
 
-    const _onSubmitModifiedHeader = async (headerDetails) => {
+    const _onSubmit_ModifiedHeader = async (headerDetails) => {
         let params = null;
         if (!headerState) {
             params = {
@@ -166,15 +207,21 @@ const MainComponent = (props) => {
         await __reqSearchOrderHeaderOne();
     }
 
-    // 판매 전환 서밋 : soldYn = y 로 업데이트
-    const _onSubmitOrderItemListToSales = async (params) => {
-        await __reqUpdateOrderItemToSales(params);
+    // 판매 전환 서밋
+    const _onSubmit_changeSoldYnForOrderItemListInSales = async (body) => {
+        await __reqChangeSoldYnForOrderItemListInSales(body);
         await __reqSearchOrderItemList();
     }
 
     // 데이터 삭제 서밋
-    const _onSubmitOrderItemListDelete = async function (params) {
+    const _onSubmit_deleteOrderItemList = async function (params) {
         await __reqDeleteOrderItemList(params);
+        await __reqSearchOrderItemList();
+    }
+
+    // 옵션 코드 변경
+    const _onSubmit_changeOptionCodeForOrderItemListInAll = async function (data) {
+        await __reqChangeOptionCodeForOrderItemListInAll(data);
         await __reqSearchOrderItemList();
     }
 
@@ -184,17 +231,19 @@ const MainComponent = (props) => {
                 <TopOperatorComponent
                     headerState={headerState}
 
-                    _onSubmitModifiedHeader={_onSubmitModifiedHeader}
+                    _onSubmit_ModifiedHeader={_onSubmit_ModifiedHeader}
                 ></TopOperatorComponent>
                 <SearchOperatorComponent
                     headerState={headerState}
                 ></SearchOperatorComponent>
                 <ItemTableComponent
                     headerState={headerState}
+                    productOptionListState={productOptionListState}
                     orderItemListState={orderItemListState}
 
-                    _onSubmitOrderItemListToSales={_onSubmitOrderItemListToSales}
-                    _onSubmitOrderItemListDelete={_onSubmitOrderItemListDelete}
+                    _onSubmit_changeSoldYnForOrderItemListInSales={_onSubmit_changeSoldYnForOrderItemListInSales}
+                    _onSubmit_deleteOrderItemList={_onSubmit_deleteOrderItemList}
+                    _onSubmit_changeOptionCodeForOrderItemListInAll={_onSubmit_changeOptionCodeForOrderItemListInAll}
                 ></ItemTableComponent>
             </Container>
         </>
