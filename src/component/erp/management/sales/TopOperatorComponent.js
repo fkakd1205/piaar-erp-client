@@ -70,8 +70,8 @@ const TopOperatorComponent = (props) => {
         setHeaderSettingModalOpen(false);
     }
 
-    const _onSubmitModifiedHeader = (headerDetails) => {
-        props._onSubmitModifiedHeader(headerDetails);
+    const _onSubmit_modifiedHeader = (headerDetails) => {
+        props._onSubmit_modifiedHeader(headerDetails);
         _onHeaderSettingModalClose();
     }
 
@@ -101,7 +101,7 @@ const TopOperatorComponent = (props) => {
                 <HeaderSettingModalComponent
                     headerState={props.headerState}
 
-                    _onSubmitModifiedHeader={_onSubmitModifiedHeader}
+                    _onSubmit_modifiedHeader={_onSubmit_modifiedHeader}
                 ></HeaderSettingModalComponent>
             </CommonModalComponent>
         </>

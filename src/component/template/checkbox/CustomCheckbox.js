@@ -1,3 +1,4 @@
+import React, { useMemo } from "react";
 import styled from "styled-components";
 
 const CheckboxContainer = styled.div`
@@ -67,7 +68,10 @@ const Label = styled.span`
 const CustomCheckbox = ({ className, checked, label, size, labelSize, ...props }) => (
     <label>
         <CheckboxContainer className={className}>
-            <HiddenCheckbox checked={checked} {...props} />
+            <HiddenCheckbox
+                checked={checked}
+                {...props}
+            />
             <StyledCheckbox
                 checked={checked}
                 size={size}

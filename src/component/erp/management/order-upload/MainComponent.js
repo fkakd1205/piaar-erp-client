@@ -1,9 +1,11 @@
-import { useReducer, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import styled from 'styled-components';
 import { erpOrderItemDataConnect } from '../../../../data_connect/erpOrderItemDataConnect';
 import OperatorComponent from './OperatorComponent';
 import BackdropLoadingComponent from '../../../template/loading/BackdropLoadingComponent';
 import UploadedDataTableComponent from './UploadedDataTableComponent';
+import axios from 'axios';
+import { dateToYYYYMMDDhhmmss } from '../../../../utils/dateFormatUtils';
 
 const Container = styled.div`
     margin-bottom: 150px;
@@ -26,6 +28,12 @@ const MainComponent = (props) => {
 
     const [backdropLoadingOpen, setBackdropLoadingOpen] = useState(false);
 
+    useEffect(()=>{
+        axios.get(`http://localhost:8081/api/v1/hello`)
+        .then(res => {
+            console.log(dateToYYYYMMDDhhmmss(res.data.data));
+        })
+    },[])
     const __reqUploadExcelFile = async (formData) => {
         await erpOrderItemDataConnect().uploadExcelFile(formData)
             .then(res => {

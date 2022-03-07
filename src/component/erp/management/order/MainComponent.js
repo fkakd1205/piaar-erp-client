@@ -7,7 +7,7 @@ import { erpOrderItemDataConnect } from '../../../../data_connect/erpOrderItemDa
 import ItemTableComponent from './ItemTableComponent';
 import SearchOperatorComponent from './SearchOperatorComponent';
 import TopOperatorComponent from './TopOperatorComponent';
-import { getEndDate, getStartDate } from '../../../../utils/dateFormatUtils';
+import { dateToYYYYMMDDhhmmss, getEndDate, getStartDate } from '../../../../utils/dateFormatUtils';
 import { productOptionDataConnect } from '../../../../data_connect/productOptionDataConnect';
 
 const Container = styled.div`
@@ -65,6 +65,32 @@ const MainComponent = (props) => {
             })
     }
 
+    const __reqCreateOrderHeaderOne = async (params) => {
+        await erpOrderHeaderDataConnect().createOne(params)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            })
+    }
+
+    const __reqUpdateOrderHeaderOne = async (params) => {
+        await erpOrderHeaderDataConnect().updateOne(params)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            })
+    }
+
     const __reqSearchProductOptionList = async () => {
         await productOptionDataConnect().searchList()
             .then(res => {
@@ -110,33 +136,7 @@ const MainComponent = (props) => {
             })
     }
 
-    const __reqCreateOrderHeaderOne = async (params) => {
-        await erpOrderHeaderDataConnect().createOne(params)
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data.memo);
-            })
-    }
-
-    const __reqUpdateOrderHeaderOne = async (params) => {
-        await erpOrderHeaderDataConnect().updateOne(params)
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data.memo);
-            })
-    }
-
-    const __reqChangeSalesYnForOrderItemListInSales = async function (body) {
+    const __reqChangeSalesYnForOrderItemList = async function (body) {
         await erpOrderItemDataConnect().changeSalesYnForListInSales(body)
             .catch(err => {
                 let res = err.response;
@@ -162,8 +162,8 @@ const MainComponent = (props) => {
             })
     }
 
-    const __reqChangeOptionCodeForOrderItemListInAll = async function (body) {
-        await erpOrderItemDataConnect().changeOptionCodeForListInAll(body)
+    const __reqChangeOptionCodeForOrderItemListInBatch = async function (body) {
+        await erpOrderItemDataConnect().changeOptionCodeForListInBatch(body)
             .catch(err => {
                 let res = err.response;
                 if (res?.status === 500) {
@@ -185,7 +185,8 @@ const MainComponent = (props) => {
     }, [location]);
 
 
-    const _onSubmit_ModifiedHeader = async (headerDetails) => {
+    // 헤더 설정 서밋
+    const _onSubmit_modifiedHeader = async (headerDetails) => {
         let params = null;
         if (!headerState) {
             params = {
@@ -208,8 +209,8 @@ const MainComponent = (props) => {
     }
 
     // 판매 전환 서밋
-    const _onSubmit_changeSalesYnForOrderItemListInSales = async (body) => {
-        await __reqChangeSalesYnForOrderItemListInSales(body);
+    const _onSubmit_changeSalesYnForOrderItemList = async (body) => {
+        await __reqChangeSalesYnForOrderItemList(body);
         await __reqSearchOrderItemList();
     }
 
@@ -220,8 +221,8 @@ const MainComponent = (props) => {
     }
 
     // 옵션 코드 변경
-    const _onSubmit_changeOptionCodeForOrderItemListInAll = async function (data) {
-        await __reqChangeOptionCodeForOrderItemListInAll(data);
+    const _onSubmit_changeOptionCodeForOrderItemListInBatch = async function (data) {
+        await __reqChangeOptionCodeForOrderItemListInBatch(data);
         await __reqSearchOrderItemList();
     }
 
@@ -231,7 +232,7 @@ const MainComponent = (props) => {
                 <TopOperatorComponent
                     headerState={headerState}
 
-                    _onSubmit_ModifiedHeader={_onSubmit_ModifiedHeader}
+                    _onSubmit_modifiedHeader={_onSubmit_modifiedHeader}
                 ></TopOperatorComponent>
                 <SearchOperatorComponent
                     headerState={headerState}
@@ -241,9 +242,9 @@ const MainComponent = (props) => {
                     productOptionListState={productOptionListState}
                     orderItemListState={orderItemListState}
 
-                    _onSubmit_changeSalesYnForOrderItemListInSales={_onSubmit_changeSalesYnForOrderItemListInSales}
+                    _onSubmit_changeSalesYnForOrderItemList={_onSubmit_changeSalesYnForOrderItemList}
                     _onSubmit_deleteOrderItemList={_onSubmit_deleteOrderItemList}
-                    _onSubmit_changeOptionCodeForOrderItemListInAll={_onSubmit_changeOptionCodeForOrderItemListInAll}
+                    _onSubmit_changeOptionCodeForOrderItemListInBatch={_onSubmit_changeOptionCodeForOrderItemListInBatch}
                 ></ItemTableComponent>
             </Container>
         </>

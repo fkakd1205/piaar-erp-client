@@ -468,7 +468,7 @@ const HeaderSettingModalComponent = (props) => {
     }
 
     const _onSubmit = () => {
-        props._onSubmitModifiedHeader(createHeaderValueState);
+        props._onSubmit_modifiedHeader(createHeaderValueState);
     }
 
     return (
@@ -956,6 +956,20 @@ const defaultHeaderList = [
         "originCellName": "*재고수량",
         "customCellName": "*재고수량",
         "matchedColumnName": "optionStockUnit",
+        "mergeYn": "n"
+    },
+    {
+        "cellNumber": 46,
+        "originCellName": "*주문등록일",
+        "customCellName": "*주문등록일",
+        "matchedColumnName": "createdAt",
+        "mergeYn": "n"
+    },
+    {
+        "cellNumber": 47,
+        "originCellName": "판매등록일",
+        "customCellName": "판매등록일",
+        "matchedColumnName": "salesAt",
         "mergeYn": "n"
     }
 ];

@@ -1,9 +1,9 @@
-import { useReducer, useState } from 'react';
+import { useCallback, useReducer, useState } from 'react';
 import styled from 'styled-components';
 import CustomCheckbox from '../../../template/checkbox/CustomCheckbox';
 import CommonModalComponent from '../../../template/modal/CommonModalComponent';
 import ConfirmModalComponent from '../../../template/modal/ConfirmModalComponent';
-import { dateToYYYYMMDD } from '../../../../utils/dateFormatUtils';
+import { dateToYYYYMMDD, dateToYYYYMMDDhhmmss, dateToYYYYMMDDhhmmssFile } from '../../../../utils/dateFormatUtils';
 import OptionCodeModalComponent from './OptionCodeModalComponent';
 
 const Container = styled.div`
@@ -192,6 +192,7 @@ const checkedItemListStateReducer = (state, action) => {
         default: return [];
     }
 }
+
 const ItemTableComponent = (props) => {
     const [checkedItemListState, dispatchCheckedItemListState] = useReducer(checkedItemListStateReducer, initialCheckedItemListState);
     const [salesConfirmModalOpen, setSalesConfirmModalOpen] = useState(false);
@@ -199,17 +200,11 @@ const ItemTableComponent = (props) => {
     const [optionCodeModalOpen, setOptionCodeModalOpen] = useState(false);
 
     const _isCheckedAll = () => {
-        if (!props.orderItemListState) {
+        if (!props.orderItemListState || props.orderItemListState?.length <= 0) {
             return false;
         }
 
-        let orderItemIds = [...props.orderItemListState.map(r => r.id)];
-        let checkedItemIds = [...checkedItemListState.map(r => r.id)];
-
-        orderItemIds.sort();
-        checkedItemIds.sort();
-
-        return JSON.stringify(orderItemIds) === JSON.stringify(checkedItemIds);
+        return props.orderItemListState.length === checkedItemListState.length;
     }
 
     const _isCheckedOne = (id) => {
@@ -285,9 +280,18 @@ const ItemTableComponent = (props) => {
     }
 
     // 판매 전환 서밋
-    const _onSubmit_changeSalesYnForOrderItemListInSales = () => {
+    const _onSubmit_changeSalesYnForOrderItemList = () => {
         _onSalesConfirmModalClose();
-        props._onSubmit_changeSalesYnForOrderItemListInSales(checkedItemListState);
+
+        let data = checkedItemListState.map(r=>{
+            return {
+                ...r,
+                salesYn:'y',
+                salesAt:new Date()
+            }
+        })
+
+        props._onSubmit_changeSalesYnForOrderItemList(data);
         dispatchCheckedItemListState({
             type: 'CLEAR'
         })
@@ -303,7 +307,7 @@ const ItemTableComponent = (props) => {
     }
 
     // 옵션 코드 변경 서밋
-    const _onSubmit_changeOptionCodeForOrderItemListInAll = (optionCode) => {
+    const _onSubmit_changeOptionCodeForOrderItemListInBatch = (optionCode) => {
         let data = [...checkedItemListState];
         data = data.map(r => {
             return {
@@ -312,7 +316,7 @@ const ItemTableComponent = (props) => {
             }
         })
 
-        props._onSubmit_changeOptionCodeForOrderItemListInAll(data);
+        props._onSubmit_changeOptionCodeForOrderItemListInBatch(data);
         _onOptionCodeModalClose();
     }
 
@@ -361,13 +365,23 @@ const ItemTableComponent = (props) => {
                                 </colgroup>
                                 <thead>
                                     <tr>
-                                        <th className="fiexed-header">
-                                            <CustomCheckbox
+                                        <th
+                                            className="fiexed-header"
+                                            onClick={() => _onCheckAll()}
+                                            style={{ cursor: 'pointer' }}
+                                        >
+                                            {/* <CustomCheckbox
                                                 checked={_isCheckedAll()}
                                                 size={'16px'}
 
                                                 onChange={() => _onCheckAll()}
-                                            ></CustomCheckbox>
+                                            ></CustomCheckbox> */}
+                                            <input
+                                                type='checkbox'
+                                                checked={_isCheckedAll()}
+
+                                                onChange={() => _onCheckAll()}
+                                            ></input>
                                         </th>
                                         {props.headerState?.headerDetail.details.map((r, index) => {
                                             return (
@@ -376,6 +390,7 @@ const ItemTableComponent = (props) => {
                                         })}
                                     </tr>
                                 </thead>
+
                                 <tbody>
                                     {props.orderItemListState?.map((r1, rowIndex) => {
                                         let checked = _isCheckedOne(r1.id)
@@ -385,25 +400,15 @@ const ItemTableComponent = (props) => {
                                                 className={`${checked && 'tr-active'}`}
                                                 onClick={(e) => _onChangeCheckedListState(e, r1)}
                                             >
-                                                <td>
-                                                    <CustomCheckbox
-                                                        checked={checked}
-                                                        size={'16px'}
-
-                                                        onChange={(e) => _onChangeCheckedListState(e, r1)}
-                                                    ></CustomCheckbox>
+                                                <td style={{ cursor: 'pointer' }}>
+                                                    <input type='checkbox' checked={checked} onChange={(e) => _onChangeCheckedListState(e, r1)}></input>
                                                 </td>
                                                 {props.headerState?.headerDetail.details.map(r2 => {
                                                     let matchedColumnName = r2.matchedColumnName;
                                                     if (matchedColumnName === 'createdAt') {
                                                         return (
-                                                            <td key={r2.cellNumber}>{dateToYYYYMMDD(r1[matchedColumnName] || new Date())}</td>
-                                                        )
-                                                    }
-
-                                                    if (matchedColumnName === 'optionCode') {
-                                                        return (
-                                                            <td key={r2.cellNumber} className='option-code-item' onClick={_onOptionCodeModalOpen}>{r1[matchedColumnName]}</td>
+                                                            // <td key={r2.cellNumber}>{dateToYYYYMMDD(r1[matchedColumnName] || new Date())}</td>
+                                                            <td key={r2.cellNumber}>{dateToYYYYMMDDhhmmss(r1[matchedColumnName] || new Date())}</td>
                                                         )
                                                     }
                                                     return (
@@ -414,11 +419,11 @@ const ItemTableComponent = (props) => {
                                         )
                                     })}
                                 </tbody>
+
                             </table>
                         </TableBox>
                     </TableWrapper>
                 }
-
                 {!props.headerState &&
                     <div style={{ textAlign: 'center', padding: '100px 0', fontWeight: '600' }}>뷰 헤더를 먼저 설정해 주세요.</div>
                 }
@@ -430,7 +435,7 @@ const ItemTableComponent = (props) => {
                 title={'판매 전환 확인 메세지'}
                 message={`[ ${checkedItemListState.length} ] 건의 데이터를 판매 전환 하시겠습니까?`}
 
-                onConfirm={_onSubmit_changeSalesYnForOrderItemListInSales}
+                onConfirm={_onSubmit_changeSalesYnForOrderItemList}
                 onClose={_onSalesConfirmModalClose}
             ></ConfirmModalComponent>
             <ConfirmModalComponent
@@ -450,10 +455,12 @@ const ItemTableComponent = (props) => {
                     checkedItemListState={checkedItemListState}
                     productOptionListState={props.productOptionListState}
 
-                    onConfirm={(optionCode) => _onSubmit_changeOptionCodeForOrderItemListInAll(optionCode)}
+                    onConfirm={(optionCode) => _onSubmit_changeOptionCodeForOrderItemListInBatch(optionCode)}
                 ></OptionCodeModalComponent>
             </CommonModalComponent>
         </>
     );
 }
+
+
 export default ItemTableComponent;
