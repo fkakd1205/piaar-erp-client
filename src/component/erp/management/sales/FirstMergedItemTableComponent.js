@@ -189,7 +189,7 @@ const checkedItemListStateReducer = (state, action) => {
     }
 }
 
-const ItemTableComponent = (props) => {
+const FirstMergedItemTableComponent = (props) => {
     const [checkedItemListState, dispatchCheckedItemListState] = useReducer(checkedItemListStateReducer, initialCheckedItemListState);
     const [salesConfirmModalOpen, setSalesConfirmModalOpen] = useState(false);
 
@@ -275,28 +275,9 @@ const ItemTableComponent = (props) => {
         props._onSubmit_fetchFirstMergeOrderItemList(checkedItemListState);
 
     }
-    // TODO : date time 제대로 넘기고 넘어오는지 체크해야됨. 조회기간 처리해서 제대로 된 데이터가 정상적으로 넘어오는지 체크하자
     return (
         <>
             <Container>
-                <OperatorWrapper>
-                    <ButtonWrapper>
-                        <ButtonBox>
-                            <button
-                                type='button'
-                                className='common-btn-item'
-                                onClick={() => _onSalesConfirmModalOpen()}
-                            >판매 취소</button>
-                        </ButtonBox>
-                        {/* <ButtonBox>
-                            <button
-                                type='button'
-                                className='common-btn-item'
-                                onClick={(e) => _onOptionCodeModalOpen(e)}
-                            >옵션 코드 수정</button>
-                        </ButtonBox> */}
-                    </ButtonWrapper>
-                </OperatorWrapper>
                 {props.headerState &&
                     <TableWrapper>
                         <TableBox>
@@ -365,7 +346,7 @@ const ItemTableComponent = (props) => {
                         </TableBox>
                     </TableWrapper>
                 }
-                <OperatorWrapper>
+                {/* <OperatorWrapper>
                     <div></div>
                     <ButtonBox style={{ marginTop: '10px' }}>
                         <button
@@ -376,9 +357,9 @@ const ItemTableComponent = (props) => {
                             <Ripple color={'#f1f1f1'} duration={1000}></Ripple>
                         </button>
                     </ButtonBox>
-                </OperatorWrapper>
+                </OperatorWrapper> */}
                 {!props.headerState &&
-                    <div style={{ textAlign: 'center', padding: '100px 0', fontWeight: '600' }}>뷰 헤더를 먼저 설정해 주세요.</div>
+                    <div style={{ textAlign: 'center', padding: '100px 0', fontWeight: '600' }}>1차 병합 헤더를 먼저 설정해 주세요.</div>
                 }
             </Container>
 
@@ -394,4 +375,4 @@ const ItemTableComponent = (props) => {
         </>
     );
 }
-export default ItemTableComponent;
+export default FirstMergedItemTableComponent;

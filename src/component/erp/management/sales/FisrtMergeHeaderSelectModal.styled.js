@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import Ripple from '../../../template/button/Ripple';
 
 const Container = styled.div`
 
@@ -39,21 +40,47 @@ const ButtonBox = styled.div`
     }
 `;
 
-const FisrtMergeHeaderSelectModalComponent = (props) => {
-    return (
-        <>
-            <Container>
-                <HeaderWrapper>
-                    <div></div>
-                    <HeaderTitleBox>1차 병합 헤더 선택</HeaderTitleBox>
-                    <div></div>
-                </HeaderWrapper>
-                <div style={{ textAlign: 'center', padding: '30px 0' }}>선택 가능한 헤더가 없습니다.</div>
-                <ButtonBox>
-                    <button className='button-item' onClick={props._onAddModeOpen}>NEW</button>
-                </ButtonBox>
-            </Container>
-        </>
-    );
+const ListWrapper = styled.div`
+`;
+
+const ListBox = styled.div`
+    padding: 10px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+
+    &:hover{
+        background: #e1e1e160;
+    }
+
+    .flex-box{
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .justify-between{
+        justify-content: space-between;
+    }
+
+    .flex-gap{
+        gap:5px
+    }
+
+    .button-item{
+        position: relative;
+        overflow: hidden;
+        padding: 3px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+`;
+
+export {
+    Container,
+    HeaderWrapper,
+    HeaderTitleBox,
+    ButtonBox,
+    ListWrapper,
+    ListBox
 }
-export default FisrtMergeHeaderSelectModalComponent;

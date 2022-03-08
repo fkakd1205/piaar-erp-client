@@ -34,6 +34,11 @@ const erpOrderItemDataConnect = () => {
             return await axios.post(`${API_SERVER_ADDRESS}/api/v1/erp-order-items/batch-delete`, params, {
                 withCredentials: true
             })
+        },
+        fetchFirstMerge: async function (firstMergeHeaderId, body) {
+            return await axios.post(`${API_SERVER_ADDRESS}/api/v1/erp-order-items/erp-first-merge-headers/${firstMergeHeaderId}/action-merge`, body, {
+                withCredentials: true
+            })
         }
     }
 }

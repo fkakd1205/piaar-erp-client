@@ -11,38 +11,11 @@ import { getEndDate, getStartDate } from '../../../../utils/dateFormatUtils';
 import { productOptionDataConnect } from '../../../../data_connect/productOptionDataConnect';
 import FirstMergeOperatorComponent from './FirstMergeOperatorComponent';
 import { erpFirstMergeHeaderDataConnect } from '../../../../data_connect/erpFirstMergeHeaderDataConnect';
+import FirstMergedItemTableComponent from './FirstMergedItemTableComponent';
 
 const Container = styled.div`
     margin-bottom: 150px;
 `;
-
-const initialHeaderState = null;
-const initialProductOptionListState = null;
-const initialOrderItemListState = null;
-
-const headerStateReducer = (state, action) => {
-    switch (action.type) {
-        case 'INIT_DATA':
-            return action.payload;
-        default: return null;
-    }
-}
-
-const productOptionListStateReducer = (state, action) => {
-    switch (action.type) {
-        case 'INIT_DATA':
-            return action.payload;
-        default: return null;
-    }
-}
-
-const orderItemListStateReducer = (state, action) => {
-    switch (action.type) {
-        case 'INIT_DATA':
-            return action.payload;
-        default: return null;
-    }
-}
 
 const MainComponent = (props) => {
     const location = useLocation();
@@ -51,6 +24,9 @@ const MainComponent = (props) => {
     const [headerState, dispatchHeaderState] = useReducer(headerStateReducer, initialHeaderState);
     const [productOptionListState, dispatchProductOptionListState] = useReducer(productOptionListStateReducer, initialProductOptionListState);
     const [orderItemListState, dispatchOrderItemListState] = useReducer(orderItemListStateReducer, initialOrderItemListState);
+    const [firstMergeHeaderListState, dispatchFirstMergeHeaderListState] = useReducer(firstMergeHeaderListStateReducer, initialFirstMergeHeaderListState);
+    const [firstMergeHeaderState, dispatchFirstMergeHeaderState] = useReducer(firstMergeHeaderStateReducer, initialFirstMergeHeaderState);
+    const [firstMergedItemListState, dispatchFirstMergedItemListState] = useReducer(firstMergedItemListStateReducer, initialFirstMergedItemListState);
 
     const __reqSearchOrderHeaderOne = async () => {
         await erpSalesHeaderDataConnect().searchOne()
@@ -190,9 +166,74 @@ const MainComponent = (props) => {
             })
     }
 
+    const __reqSearchFirstMergeHeaderList = async () => {
+        await erpFirstMergeHeaderDataConnect().searchList()
+            .then(res => {
+                if (res.status === 200 && res.data.message === 'success') {
+                    dispatchFirstMergeHeaderListState({
+                        type: 'INIT_DATA',
+                        payload: res.data.data
+                    })
+                }
+            })
+            .catch(err => {
+                let res = err.response;
+                console.log(res);
+            })
+    }
+
+    // TODO : make api for delete of first merge header.
+    const __reqDeleteFirstMergeHeader = async (id) => {
+        await erpFirstMergeHeaderDataConnect().deleteOne(id)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            })
+    }
+
+    const __reqUpdateFirstMergeHeader = async (body) => {
+        await erpFirstMergeHeaderDataConnect().updateOne(body)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            })
+    }
+
+    const __reqFetchFirstMerge = async (firstMergeHeaderId, body) => {
+        await erpOrderItemDataConnect().fetchFirstMerge(firstMergeHeaderId, body)
+            .then(res => {
+                if (res.status === 200 && res.data.message === 'success') {
+                    dispatchFirstMergedItemListState({
+                        type: 'INIT_DATA',
+                        payload: res.data.data
+                    })
+                }
+            })
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            })
+    }
+
     useEffect(() => {
         __reqSearchOrderHeaderOne();
         __reqSearchProductOptionList();
+        __reqSearchFirstMergeHeaderList();
     }, []);
 
     useEffect(() => {
@@ -231,7 +272,44 @@ const MainComponent = (props) => {
     // 1차 병합 해더 생성
     const _onSubmit_createFirstMergeHeader = async (body) => {
         await __reqCreateFirstMergeHeaderOne(body);
+        await __reqSearchFirstMergeHeaderList();
     }
+
+    // 1 차 병합 헤더 삭제
+    const _onSubmit_deleteFirstMergeHeader = async (id) => {
+        await __reqDeleteFirstMergeHeader(id);
+        await __reqSearchFirstMergeHeaderList();
+        dispatchFirstMergeHeaderState({
+            type: 'CLEAR'
+        })
+    }
+
+    // 1차 병합 헤더 수정
+    const _onSubmit_updateFirstMergeHeader = async (body) => {
+        await __reqUpdateFirstMergeHeader(body);
+        await __reqSearchFirstMergeHeaderList();
+        dispatchFirstMergeHeaderState({
+            type: 'CLEAR'
+        })
+    }
+
+    // 1차 데이터 병합
+    const _onSubmit_fetchFirstMergeOrderItemList = async (checkedOrderItemList) => {
+        if (!firstMergeHeaderState) {
+            alert('1차 병합 헤더를 먼저 선택해 주세요.');
+            return;
+        }
+
+        await __reqFetchFirstMerge(firstMergeHeaderState?.id, checkedOrderItemList);
+    }
+
+    const _onChangeFirstMergeHeaderState = (data) => {
+        dispatchFirstMergeHeaderState({
+            type: 'INIT_DATA',
+            payload: data
+        })
+    }
+
     return (
         <>
             <Container>
@@ -248,14 +326,86 @@ const MainComponent = (props) => {
                     orderItemListState={orderItemListState}
 
                     _onSubmit_changeSalesYnForOrderItemList={_onSubmit_changeSalesYnForOrderItemList}
+                    _onSubmit_createFirstMergeHeader={_onSubmit_createFirstMergeHeader}
+                    _onSubmit_deleteFirstMergeHeader={_onSubmit_deleteFirstMergeHeader}
+                    _onSubmit_fetchFirstMergeOrderItemList={_onSubmit_fetchFirstMergeOrderItemList}
                 ></ItemTableComponent>
                 <FirstMergeOperatorComponent
-                    headerState={headerState}
+                    firstMergeHeaderListState={firstMergeHeaderListState}
+                    firstMergeHeaderState={firstMergeHeaderState}
 
                     _onSubmit_createFirstMergeHeader={_onSubmit_createFirstMergeHeader}
+                    _onSubmit_deleteFirstMergeHeader={_onSubmit_deleteFirstMergeHeader}
+                    _onSubmit_updateFirstMergeHeader={_onSubmit_updateFirstMergeHeader}
+                    _onChangeFirstMergeHeaderState={_onChangeFirstMergeHeaderState}
                 ></FirstMergeOperatorComponent>
+                <FirstMergedItemTableComponent
+                    headerState={firstMergeHeaderState}
+                    orderItemListState={firstMergedItemListState}
+                ></FirstMergedItemTableComponent>
             </Container>
         </>
     );
 }
 export default MainComponent;
+
+const initialHeaderState = null;
+const initialProductOptionListState = null;
+const initialOrderItemListState = null;
+const initialFirstMergeHeaderListState = null;
+const initialFirstMergeHeaderState = null;
+const initialFirstMergedItemListState = null;
+
+const headerStateReducer = (state, action) => {
+    switch (action.type) {
+        case 'INIT_DATA':
+            return action.payload;
+        default: return null;
+    }
+}
+
+const productOptionListStateReducer = (state, action) => {
+    switch (action.type) {
+        case 'INIT_DATA':
+            return action.payload;
+        default: return null;
+    }
+}
+
+const orderItemListStateReducer = (state, action) => {
+    switch (action.type) {
+        case 'INIT_DATA':
+            return action.payload;
+        default: return null;
+    }
+}
+
+const firstMergeHeaderListStateReducer = (state, action) => {
+    switch (action.type) {
+        case 'INIT_DATA':
+            return action.payload;
+        case 'CLEAR':
+            return null;
+        default: return null;
+    }
+}
+
+const firstMergeHeaderStateReducer = (state, action) => {
+    switch (action.type) {
+        case 'INIT_DATA':
+            return action.payload;
+        case 'CLEAR':
+            return null;
+        default: return null;
+    }
+}
+
+const firstMergedItemListStateReducer = (state, action) => {
+    switch (action.type) {
+        case 'INIT_DATA':
+            return action.payload;
+        case 'CLEAR':
+            return null;
+        default: return null;
+    }
+}
