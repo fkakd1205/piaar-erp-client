@@ -11,7 +11,8 @@ import { getEndDate, getStartDate } from '../../../../utils/dateFormatUtils';
 import { productOptionDataConnect } from '../../../../data_connect/productOptionDataConnect';
 import FirstMergeOperatorComponent from './FirstMergeOperatorComponent';
 import { erpFirstMergeHeaderDataConnect } from '../../../../data_connect/erpFirstMergeHeaderDataConnect';
-import FirstMergedItemTableComponent from './FirstMergedItemTableComponent';
+import FirstMergedItemTableComponent from './FirstMergedItemTable.component';
+import SecondMergeOperatorComponent from './SecondMergeOperator.component';
 
 const Container = styled.div`
     margin-bottom: 150px;
@@ -182,7 +183,6 @@ const MainComponent = (props) => {
             })
     }
 
-    // TODO : make api for delete of first merge header.
     const __reqDeleteFirstMergeHeader = async (id) => {
         await erpFirstMergeHeaderDataConnect().deleteOne(id)
             .catch(err => {
@@ -219,6 +219,19 @@ const MainComponent = (props) => {
                     })
                 }
             })
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            })
+    }
+
+    const __reqCreateSecondMergeHeaderOne = async (body) => {
+        await erpFirstMergeHeaderDataConnect().createOne(body)
             .catch(err => {
                 let res = err.response;
                 if (res?.status === 500) {
@@ -310,6 +323,11 @@ const MainComponent = (props) => {
         })
     }
 
+    // 2차 병합 헤더 생성
+    const _onSubmit_createSecondMergeHeader = async (body) => {
+        await __reqCreateSecondMergeHeaderOne(body)
+    }
+
     return (
         <>
             <Container>
@@ -343,6 +361,9 @@ const MainComponent = (props) => {
                     headerState={firstMergeHeaderState}
                     orderItemListState={firstMergedItemListState}
                 ></FirstMergedItemTableComponent>
+                <SecondMergeOperatorComponent
+                    _onSubmit_createSecondMergeHeader={_onSubmit_createSecondMergeHeader}
+                ></SecondMergeOperatorComponent>
             </Container>
         </>
     );

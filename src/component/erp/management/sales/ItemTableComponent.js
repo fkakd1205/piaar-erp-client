@@ -115,6 +115,8 @@ const ButtonWrapper = styled.div`
 
 const ButtonBox = styled.div`
     .common-btn-item{
+        position: relative;
+        overflow: hidden;
         width: 100px;
         height: 34px;
 
@@ -267,7 +269,7 @@ const ItemTableComponent = (props) => {
     }
 
     const _onSubmit_fetchFirstMergeOrderItemList = () => {
-        if(!checkedItemListState || checkedItemListState?.length <= 0){
+        if (!checkedItemListState || checkedItemListState?.length <= 0) {
             alert('병합할 데이터를 먼저 선택해 주세요.');
             return;
         }
@@ -372,7 +374,7 @@ const ItemTableComponent = (props) => {
                             className='common-btn-item'
                             onClick={_onSubmit_fetchFirstMergeOrderItemList}
                         >
-                            병합 하기
+                            1차 병합 하기
                             <Ripple color={'#f1f1f1'} duration={1000}></Ripple>
                         </button>
                     </ButtonBox>

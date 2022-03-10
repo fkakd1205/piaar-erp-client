@@ -67,8 +67,8 @@ const Ripple = props => {
 
         setRippleArray([...rippleArray, newRipple]);
     };
-
     return (
+        
         <RippleContainer duration={duration} color={color} scale={scale} onMouseDown={addRipple}>
             {rippleArray.length > 0 &&
                 rippleArray.map((ripple, index) => {
