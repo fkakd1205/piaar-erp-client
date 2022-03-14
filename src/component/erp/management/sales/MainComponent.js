@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from 'react';
+import { useCallback, useEffect, useReducer, useState } from 'react';
 import styled from 'styled-components';
 import qs from 'query-string';
 import { erpSalesHeaderDataConnect } from '../../../../data_connect/erpSalesHeaderDataConnect';
@@ -22,6 +22,7 @@ const MainComponent = (props) => {
     const location = useLocation();
     const query = qs.parse(location.search);
 
+    const [test, setTest] = useState(0);
     const [headerState, dispatchHeaderState] = useReducer(headerStateReducer, initialHeaderState);
     const [productOptionListState, dispatchProductOptionListState] = useReducer(productOptionListStateReducer, initialProductOptionListState);
     const [orderItemListState, dispatchOrderItemListState] = useReducer(orderItemListStateReducer, initialOrderItemListState);
@@ -282,6 +283,12 @@ const MainComponent = (props) => {
         await __reqSearchOrderItemList();
     }
 
+    // 옵션 코드 변경
+    const _onSubmit_changeOptionCodeForOrderItemListInBatch = async function (data) {
+        await __reqChangeOptionCodeForOrderItemListInBatch(data);
+        await __reqSearchOrderItemList();
+    }
+
     // 1차 병합 해더 생성
     const _onSubmit_createFirstMergeHeader = async (body) => {
         await __reqCreateFirstMergeHeaderOne(body);
@@ -330,6 +337,7 @@ const MainComponent = (props) => {
 
     return (
         <>
+            <button onClick={() => setTest(test + 1)}>test</button>
             <Container>
                 <TopOperatorComponent
                     headerState={headerState}
@@ -342,8 +350,10 @@ const MainComponent = (props) => {
                 <ItemTableComponent
                     headerState={headerState}
                     orderItemListState={orderItemListState}
+                    productOptionListState={productOptionListState}
 
                     _onSubmit_changeSalesYnForOrderItemList={_onSubmit_changeSalesYnForOrderItemList}
+                    _onSubmit_changeOptionCodeForOrderItemListInBatch={_onSubmit_changeOptionCodeForOrderItemListInBatch}
                     _onSubmit_createFirstMergeHeader={_onSubmit_createFirstMergeHeader}
                     _onSubmit_deleteFirstMergeHeader={_onSubmit_deleteFirstMergeHeader}
                     _onSubmit_fetchFirstMergeOrderItemList={_onSubmit_fetchFirstMergeOrderItemList}

@@ -2,9 +2,9 @@ import { useCallback, useReducer, useState } from 'react';
 import styled from 'styled-components';
 import { dateToYYYYMMDDhhmmss } from '../../../../utils/dateFormatUtils';
 import Ripple from '../../../template/button/Ripple';
-import CustomCheckbox from '../../../template/checkbox/CustomCheckbox';
+import CommonModalComponent from '../../../template/modal/CommonModalComponent';
 import ConfirmModalComponent from '../../../template/modal/ConfirmModalComponent';
-import FirstMergeOperatorComponent from './FirstMergeOperatorComponent';
+import OptionCodeModalComponent from './OptionCodeModalComponent';
 
 const Container = styled.div`
     margin-top: 20px;
@@ -194,6 +194,7 @@ const checkedItemListStateReducer = (state, action) => {
 const ItemTableComponent = (props) => {
     const [checkedItemListState, dispatchCheckedItemListState] = useReducer(checkedItemListStateReducer, initialCheckedItemListState);
     const [salesConfirmModalOpen, setSalesConfirmModalOpen] = useState(false);
+    const [optionCodeModalOpen, setOptionCodeModalOpen] = useState(false);
 
     const _isCheckedAll = () => {
         if (!props.orderItemListState || props.orderItemListState?.length <= 0) {
@@ -250,6 +251,33 @@ const ItemTableComponent = (props) => {
         setSalesConfirmModalOpen(false);
     }
 
+    const _onOptionCodeModalOpen = (e) => {
+        e.stopPropagation();
+        if (!checkedItemListState || checkedItemListState.length <= 0) {
+            alert('수정 될 데이터를 선택해 주세요.');
+            return;
+        }
+        setOptionCodeModalOpen(true);
+    }
+
+    const _onOptionCodeModalClose = (e) => {
+        setOptionCodeModalOpen(false);
+    }
+
+    // 옵션 코드 변경 서밋
+    const _onSubmit_changeOptionCodeForOrderItemListInBatch = (optionCode) => {
+        let data = [...checkedItemListState];
+        data = data.map(r => {
+            return {
+                ...r,
+                optionCode: optionCode
+            }
+        })
+
+        props._onSubmit_changeOptionCodeForOrderItemListInBatch(data);
+        _onOptionCodeModalClose();
+    }
+
     // 판매 전환 서밋
     const _onSubmit_changeSalesYnForOrderItemList = () => {
         _onSalesConfirmModalClose();
@@ -277,7 +305,7 @@ const ItemTableComponent = (props) => {
         props._onSubmit_fetchFirstMergeOrderItemList(checkedItemListState);
 
     }
-    // TODO : date time 제대로 넘기고 넘어오는지 체크해야됨. 조회기간 처리해서 제대로 된 데이터가 정상적으로 넘어오는지 체크하자
+
     return (
         <>
             <Container>
@@ -290,13 +318,13 @@ const ItemTableComponent = (props) => {
                                 onClick={() => _onSalesConfirmModalOpen()}
                             >판매 취소</button>
                         </ButtonBox>
-                        {/* <ButtonBox>
+                        <ButtonBox>
                             <button
                                 type='button'
                                 className='common-btn-item'
                                 onClick={(e) => _onOptionCodeModalOpen(e)}
                             >옵션 코드 수정</button>
-                        </ButtonBox> */}
+                        </ButtonBox>
                     </ButtonWrapper>
                 </OperatorWrapper>
                 {props.headerState &&
@@ -393,6 +421,18 @@ const ItemTableComponent = (props) => {
                 onConfirm={_onSubmit_changeSalesYnForOrderItemList}
                 onClose={_onSalesConfirmModalClose}
             ></ConfirmModalComponent>
+            <CommonModalComponent
+                open={optionCodeModalOpen}
+
+                onClose={_onOptionCodeModalClose}
+            >
+                <OptionCodeModalComponent
+                    checkedItemListState={checkedItemListState}
+                    productOptionListState={props.productOptionListState}
+
+                    onConfirm={(optionCode) => _onSubmit_changeOptionCodeForOrderItemListInBatch(optionCode)}
+                ></OptionCodeModalComponent>
+            </CommonModalComponent>
         </>
     );
 }

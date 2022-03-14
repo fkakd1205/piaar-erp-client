@@ -294,7 +294,7 @@ const SearchOperatorComponent = (props) => {
         if (periodTypeState && startDateState && endDateState) {
             query.startDate = dateToYYYYMMDD(startDateState);
             query.endDate = dateToYYYYMMDD(endDateState);
-            query.periodTypeState = periodTypeState
+            query.periodType = periodTypeState
         }
 
         if (searchColumnNameState) {

@@ -244,7 +244,7 @@ const OptionCodeModalComponent = (props) => {
                     <>
                         <div style={{ textAlign: 'center', marginTop: '10px', padding: '30px 0', fontSize: '14px', fontWeight: '600' }}>
                             <div>변경될 옵션 코드 : [{selectedProductOption?.option.code}]</div>
-                            <div>[{props.checkedOrderItemListState?.length}]건 데이터를 정말로 수정 하시겠습니까?</div>
+                            <div>[{props.checkedItemListState?.length}]건 데이터를 정말로 수정 하시겠습니까?</div>
                         </div>
                         <ButtonWrapper>
                             <div className='flex-box'>

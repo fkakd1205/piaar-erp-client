@@ -67,6 +67,7 @@ const Label = styled.span`
 
 const CustomCheckbox = ({ className, checked, label, size, labelSize, ...props }) => (
     <label>
+        
         <CheckboxContainer className={className}>
             <HiddenCheckbox
                 checked={checked}
@@ -89,4 +90,4 @@ const CustomCheckbox = ({ className, checked, label, size, labelSize, ...props }
     </label>
 )
 
-export default CustomCheckbox;
+export default React.memo(CustomCheckbox);

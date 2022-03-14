@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import CommonModalComponent from '../../../template/modal/CommonModalComponent';
 import HeaderSettingModalComponent from './HeaderSettingModalComponent';
@@ -62,6 +62,7 @@ const BoardBox = styled.div`
 const TopOperatorComponent = (props) => {
     const [headerSettingModalOpen, setHeaderSettingModalOpen] = useState(false);
 
+
     const _onHeaderSettingModalOpen = () => {
         setHeaderSettingModalOpen(true);
     }
@@ -77,6 +78,7 @@ const TopOperatorComponent = (props) => {
 
     return (
         <>
+            {console.log('hello')}
             <Container>
                 <BoardWrapper>
                     <BoardBox>

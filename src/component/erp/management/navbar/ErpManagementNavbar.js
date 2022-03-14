@@ -11,7 +11,8 @@ const Container = styled.div`
 
 const DesktopNavbarBox = styled.div`
     display:flex;
-    justify-content: end;
+    justify-content: flex-end;
+    -webkit-justify-content:flex-end;
     align-items: center;
     overflow: auto;
 

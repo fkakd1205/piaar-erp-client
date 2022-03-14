@@ -109,6 +109,8 @@ const ButtonWrapper = styled.div`
 
 const ButtonBox = styled.div`
     .common-btn-item{
+        position:relative;
+        overflow: hidden;
         width: 100px;
         height: 34px;
 

@@ -12,12 +12,18 @@ const Container = styled.div`
 `;
 
 const DateSelectorWrapper = styled.div`
-    padding: 0 30px;
+    padding: 0 20px;
 
     .label-item{
+        margin: 0 10px;
         font-size: 14px;
         font-weight: 600;
         color: #444;
+
+        @media all and (max-width:992px) {
+            margin: 10px 0 0 0;
+            width: 100%;
+        }
     }
 
     .flex-box{
@@ -25,26 +31,40 @@ const DateSelectorWrapper = styled.div`
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: 10px;
+        /* gap: 10px; */
     }
 
     .select-item{
         width: 300px;
         height: 43px;
-        padding: 5px 0;
+        padding: 5px;
+        margin: 0 10px;
         border: 1px solid #e1e1e1;
+        border-radius: 0;
         font-size: 14px;
+        -webkit-appearance: none;
+        -moz-appearance: none; 
+        appearance: none;
+        background:url('/assets/icon/down_arrow_gray_icon.png') no-repeat right 5px center;
+
         &:focus{
             outline: none;
         }
 
         @media all and (max-width:992px) {
+            margin: 10px 0 0 0;
             width: 100%;
         }
     }
 
     .date-selector-box{
         width: 300px;
+        margin: 0 10px;
+
+        @media all and (max-width:992px) {
+            margin: 10px 0 0 0;
+            width: 100%;
+        }
     }
 
     @media all and (max-width:992px) {
@@ -57,14 +77,18 @@ const DateSelectorWrapper = styled.div`
 `;
 
 const DetailSearchWrapper = styled.div`
-    padding: 0 30px;
+    padding: 0 20px;
     margin-top: 20px;
 
     
     .label-item{
+        margin: 0 10px;
         font-size: 14px;
         font-weight: 600;
         color: #444;
+        @media all and (max-width:992px) {
+            margin: 0 0;
+        }
     }
 
     .flex-box{
@@ -72,25 +96,33 @@ const DetailSearchWrapper = styled.div`
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: 10px;
     }
 
     .select-item{
+        margin: 0 10px;
         width: 300px;
         height: 43px;
-        padding: 5px 0;
+        padding: 5px;
         border: 1px solid #e1e1e1;
+        border-radius: 0;
         font-size: 14px;
+        -webkit-appearance: none;
+        -moz-appearance: none; 
+        appearance: none;
+        background:url('/assets/icon/down_arrow_gray_icon.png') no-repeat right 5px center;
+
         &:focus{
             outline: none;
         }
 
         @media all and (max-width:992px) {
             width: 100%;
+            margin: 10px 0 0 0;
         }
     }
 
     .input-item{
+        margin: 0 10px;
         width: 300px;
         height: 43px;
         border: 1px solid #e1e1e1;
@@ -104,6 +136,7 @@ const DetailSearchWrapper = styled.div`
 
         @media all and (max-width:992px) {
             width: 100%;
+            margin: 10px 0 0 0;
         }
     }
 
@@ -120,8 +153,8 @@ const ButtonWrapper = styled.div`
     .flex-box{
         display: flex;
         flex-wrap: wrap;
-        justify-content: end;
-        gap:10px;
+        justify-content: flex-end;
+        /* gap:10px; */
 
         @media all and (max-width:992px) {
             flex-wrap: nowrap;
@@ -129,7 +162,8 @@ const ButtonWrapper = styled.div`
     }
 
     .button-item{
-        padding: 5px 0;
+        margin: 0 10px;
+        padding: 5px;
         width: 150px;
         background: #2C73D2;
         border: 1px solid #2C73D2;
@@ -147,7 +181,7 @@ const ButtonWrapper = styled.div`
     }
 
     @media all and (max-width:992px) {
-        padding: 0 10px;
+        padding: 0;
     }
 `;
 

@@ -1,10 +1,12 @@
-import { useCallback, useReducer, useState } from 'react';
+import React, { useCallback, useMemo, useReducer, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import CustomCheckbox from '../../../template/checkbox/CustomCheckbox';
 import CommonModalComponent from '../../../template/modal/CommonModalComponent';
 import ConfirmModalComponent from '../../../template/modal/ConfirmModalComponent';
 import { dateToYYYYMMDD, dateToYYYYMMDDhhmmss, dateToYYYYMMDDhhmmssFile } from '../../../../utils/dateFormatUtils';
 import OptionCodeModalComponent from './OptionCodeModalComponent';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import InfiniteScrollObserver from '../../../template/observer/InfiniteScrollObserver';
 
 const Container = styled.div`
     margin-top: 20px;
@@ -20,7 +22,7 @@ const TableWrapper = styled.div`
 `;
 
 const TableBox = styled.div`
-    height: 80vh;
+    height: 400px;
 	overflow: auto;
     border: 1px solid #309FFF40;
 
@@ -38,7 +40,7 @@ const TableBox = styled.div`
         background: #309FFF;
         color: white;
         padding: 10px;
-        font-size: 14px;
+        font-size: 12px;
     }
 
     table tbody tr{
@@ -56,7 +58,7 @@ const TableBox = styled.div`
         vertical-align: middle !important;
         border-bottom: 1px solid #309FFF20;
         text-align: center;
-        font-size: 12px;
+        font-size: 11px;
         color: #444;
         font-weight: 500;
         line-height: 1.5;
@@ -104,7 +106,7 @@ const OperatorWrapper = styled.div`
     justify-content: space-between;
     align-items: center;
     padding: 0 30px;
-    gap: 10px;
+    -webkit-gap: 10px;
 
     @media only screen and (max-width:768px){
         padding: 0 10px;
@@ -182,133 +184,96 @@ const ButtonBox = styled.div`
     }
 `;
 
-const initialCheckedItemListState = [];
-const checkedItemListStateReducer = (state, action) => {
-    switch (action.type) {
-        case 'SET_DATA':
-            return action.payload;
-        case 'CLEAR':
-            return [];
-        default: return [];
-    }
-}
-
 const ItemTableComponent = (props) => {
-    const [checkedItemListState, dispatchCheckedItemListState] = useReducer(checkedItemListStateReducer, initialCheckedItemListState);
+    const [viewSize, dispatchViewSize] = useReducer(viewSizeReducer, initialViewSize);
     const [salesConfirmModalOpen, setSalesConfirmModalOpen] = useState(false);
     const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] = useState(false);
     const [optionCodeModalOpen, setOptionCodeModalOpen] = useState(false);
 
-    const _isCheckedAll = () => {
+    useEffect(() => {
+        if (!props.orderItemListState || props.orderItemListState?.length <= 0) {
+            return;
+        }
+
+        dispatchViewSize({
+            type: 'SET_DATA',
+            payload: 20
+        })
+    }, [props.orderItemListState])
+
+    const _isCheckedAll = useCallback(() => {
         if (!props.orderItemListState || props.orderItemListState?.length <= 0) {
             return false;
         }
 
-        return props.orderItemListState.length === checkedItemListState.length;
-    }
+        return props.orderItemListState.length === props.checkedOrderItemListState.length;
+    }, [props.checkedOrderItemListState.length, props.orderItemListState])
 
-    const _isCheckedOne = (id) => {
-        return checkedItemListState.some(r => r.id === id);
-    }
+    const _isCheckedOne = useCallback((id) => {
+        return props.checkedOrderItemListState.some(r => r.id === id);
+    }, [props.checkedOrderItemListState])
 
-    const _onCheckAll = () => {
-        if (_isCheckedAll()) {
-            dispatchCheckedItemListState({
-                type: 'CLEAR'
-            })
-        } else {
-            let data = [...props.orderItemListState];
-            dispatchCheckedItemListState({
-                type: 'SET_DATA',
-                payload: data
-            })
-        }
-    }
-
-    const _onChangeCheckedListState = (e, selectedData) => {
-        e.preventDefault();
-        let data = [...checkedItemListState];
-        let selectedId = selectedData.id;
-
-        if (_isCheckedOne(selectedId)) {
-            data = data.filter(r => r.id !== selectedId);
-        } else {
-            data.push(selectedData);
-        }
-
-        dispatchCheckedItemListState({
-            type: 'SET_DATA',
-            payload: data
-        })
-    }
-
-    const _onSalesConfirmModalOpen = () => {
-        if (!checkedItemListState || checkedItemListState.length <= 0) {
+    const _onSalesConfirmModalOpen = useCallback(() => {
+        if (!props.checkedOrderItemListState || props.checkedOrderItemListState.length <= 0) {
             alert('판매 전환 데이터를 선택해 주세요.');
             return;
         }
         setSalesConfirmModalOpen(true);
-    }
+    }, [props.checkedOrderItemListState])
 
-    const _onSalesConfirmModalClose = () => {
+    const _onSalesConfirmModalClose = useCallback(() => {
         setSalesConfirmModalOpen(false);
-    }
+    }, [])
 
-    const _onDeleteConfirmModalOpen = () => {
-        if (!checkedItemListState || checkedItemListState.length <= 0) {
+    const _onDeleteConfirmModalOpen = useCallback(() => {
+        if (!props.checkedOrderItemListState || props.checkedOrderItemListState.length <= 0) {
             alert('삭제할 데이터를 선택해 주세요.');
             return;
         }
         setDeleteConfirmModalOpen(true);
-    }
+    }, [props.checkedOrderItemListState])
 
-    const _onDeleteConfirmModalClose = () => {
+    const _onDeleteConfirmModalClose = useCallback(() => {
         setDeleteConfirmModalOpen(false);
-    }
+    }, [])
 
-    const _onOptionCodeModalOpen = (e) => {
+    const _onOptionCodeModalOpen = useCallback((e) => {
         e.stopPropagation();
-        if (!checkedItemListState || checkedItemListState.length <= 0) {
+        if (!props.checkedOrderItemListState || props.checkedOrderItemListState.length <= 0) {
             alert('수정 될 데이터를 선택해 주세요.');
             return;
         }
         setOptionCodeModalOpen(true);
-    }
+    }, [props.checkedOrderItemListState])
 
-    const _onOptionCodeModalClose = (e) => {
+    const _onOptionCodeModalClose = useCallback((e) => {
         setOptionCodeModalOpen(false);
-    }
+    }, []);
 
     // 판매 전환 서밋
-    const _onSubmit_changeSalesYnForOrderItemList = () => {
+    const _onSubmit_changeSalesYnForOrderItemList = useCallback(() => {
         _onSalesConfirmModalClose();
 
-        let data = checkedItemListState.map(r=>{
+        let data = props.checkedOrderItemListState.map(r => {
             return {
                 ...r,
-                salesYn:'y',
-                salesAt:new Date()
+                salesYn: 'y',
+                salesAt: new Date()
             }
         })
 
         props._onSubmit_changeSalesYnForOrderItemList(data);
-        dispatchCheckedItemListState({
-            type: 'CLEAR'
-        })
-    }
+    }, [_onSalesConfirmModalClose, props]);
 
     // 데이터 삭제 서밋
-    const _onSubmit_deleteOrderItemList = () => {
+    const _onSubmit_deleteOrderItemList = useCallback(() => {
         _onDeleteConfirmModalClose();
-        props._onSubmit_deleteOrderItemList(checkedItemListState);
-        dispatchCheckedItemListState({
-            type: 'CLEAR'
-        })
-    }
+        props._onSubmit_deleteOrderItemList(props.checkedOrderItemListState);
+    }, [_onDeleteConfirmModalClose, props])
 
     // 옵션 코드 변경 서밋
-    const _onSubmit_changeOptionCodeForOrderItemListInBatch = (optionCode) => {
-        let data = [...checkedItemListState];
+    const _onSubmit_changeOptionCodeForOrderItemListInBatch = useCallback((optionCode) => {
+        let data = [...props.checkedOrderItemListState];
         data = data.map(r => {
             return {
                 ...r,
@@ -318,8 +283,15 @@ const ItemTableComponent = (props) => {
 
         props._onSubmit_changeOptionCodeForOrderItemListInBatch(data);
         _onOptionCodeModalClose();
-    }
+    }, [_onOptionCodeModalClose, props]);
 
+    const fetchMoreOrderItems = async () => {
+        let newSize = viewSize + 20;
+        dispatchViewSize({
+            type: 'SET_DATA',
+            payload: newSize
+        })
+    }
     return (
         <>
             <Container>
@@ -350,15 +322,15 @@ const ItemTableComponent = (props) => {
                         </button>
                     </ButtonBox>
                 </OperatorWrapper>
-                {props.headerState &&
+                {(props.headerState && props.orderItemListState) &&
                     <TableWrapper>
                         <TableBox>
                             <table cellSpacing="0">
                                 <colgroup>
-                                    <col width={'100px'}></col>
+                                    <col width={'50px'}></col>
                                     {props.headerState?.headerDetail.details.map((r, index) => {
                                         return (
-                                            <col key={index} width={'300px'}></col>
+                                            <col key={index} width={'200px'}></col>
                                         );
                                     })}
 
@@ -367,20 +339,14 @@ const ItemTableComponent = (props) => {
                                     <tr>
                                         <th
                                             className="fiexed-header"
-                                            onClick={() => _onCheckAll()}
+                                            onClick={() => props._onChange_checkAllCheckedOrderListState()}
                                             style={{ cursor: 'pointer' }}
                                         >
-                                            {/* <CustomCheckbox
-                                                checked={_isCheckedAll()}
-                                                size={'16px'}
-
-                                                onChange={() => _onCheckAll()}
-                                            ></CustomCheckbox> */}
                                             <input
                                                 type='checkbox'
                                                 checked={_isCheckedAll()}
 
-                                                onChange={() => _onCheckAll()}
+                                                onChange={() => props._onChange_checkAllCheckedOrderListState()}
                                             ></input>
                                         </th>
                                         {props.headerState?.headerDetail.details.map((r, index) => {
@@ -392,35 +358,55 @@ const ItemTableComponent = (props) => {
                                 </thead>
 
                                 <tbody>
-                                    {props.orderItemListState?.map((r1, rowIndex) => {
-                                        let checked = _isCheckedOne(r1.id)
-                                        return (
-                                            <tr
-                                                key={rowIndex}
-                                                className={`${checked && 'tr-active'}`}
-                                                onClick={(e) => _onChangeCheckedListState(e, r1)}
-                                            >
-                                                <td style={{ cursor: 'pointer' }}>
-                                                    <input type='checkbox' checked={checked} onChange={(e) => _onChangeCheckedListState(e, r1)}></input>
-                                                </td>
-                                                {props.headerState?.headerDetail.details.map(r2 => {
-                                                    let matchedColumnName = r2.matchedColumnName;
-                                                    if (matchedColumnName === 'createdAt') {
-                                                        return (
-                                                            // <td key={r2.cellNumber}>{dateToYYYYMMDD(r1[matchedColumnName] || new Date())}</td>
-                                                            <td key={r2.cellNumber}>{dateToYYYYMMDDhhmmss(r1[matchedColumnName] || new Date())}</td>
-                                                        )
-                                                    }
-                                                    return (
-                                                        <td key={r2.cellNumber}>{r1[matchedColumnName]}</td>
-                                                    )
-                                                })}
-                                            </tr>
-                                        )
-                                    })}
-                                </tbody>
+                                    {props.orderItemListState &&
+                                        <>
+                                            {props.orderItemListState?.slice(0, viewSize).map((r1, rowIndex) => {
+                                                let checked = _isCheckedOne(r1.id)
+                                                return (
+                                                    <tr
+                                                        key={rowIndex}
+                                                        className={`${checked && 'tr-active'}`}
+                                                        onClick={(e) => props._onChange_checkOneCheckedOrderListState(e, r1)}
+                                                    >
+                                                        <td style={{ cursor: 'pointer' }}>
+                                                            <input type='checkbox' checked={checked} onChange={(e) => props._onChange_checkOneCheckedOrderListState(e, r1)}></input>
+                                                        </td>
+                                                        {props.headerState?.headerDetail.details.map(r2 => {
+                                                            let matchedColumnName = r2.matchedColumnName;
+                                                            if (matchedColumnName === 'createdAt') {
+                                                                return (
+                                                                    <td key={r2.cellNumber}>{dateToYYYYMMDDhhmmss(r1[matchedColumnName] || new Date())}</td>
+                                                                )
+                                                            }
+                                                            return (
+                                                                <td key={r2.cellNumber}>{r1[matchedColumnName]}</td>
+                                                            )
+                                                        })}
+                                                    </tr>
+                                                )
 
+                                            })}
+                                        </>
+                                    }
+                                </tbody>
                             </table>
+                            <InfiniteScrollObserver
+                                elementTagType={'div'}
+                                totalSize={props.orderItemListState.length}
+                                startOffset={0}
+                                endOffset={viewSize}
+                                fetchData={fetchMoreOrderItems}
+                                loadingElementTag={
+                                    <p style={{ textAlign: 'center' }}>
+                                        로딩중...
+                                    </p>
+                                }
+                                endElementTag={
+                                    <p style={{ textAlign: 'center' }}>
+                                        마지막 데이터 입니다.
+                                    </p>
+                                }
+                            />
                         </TableBox>
                     </TableWrapper>
                 }
@@ -433,7 +419,7 @@ const ItemTableComponent = (props) => {
             <ConfirmModalComponent
                 open={salesConfirmModalOpen}
                 title={'판매 전환 확인 메세지'}
-                message={`[ ${checkedItemListState.length} ] 건의 데이터를 판매 전환 하시겠습니까?`}
+                message={`[ ${props.checkedOrderItemListState.length} ] 건의 데이터를 판매 전환 하시겠습니까?`}
 
                 onConfirm={_onSubmit_changeSalesYnForOrderItemList}
                 onClose={_onSalesConfirmModalClose}
@@ -441,7 +427,7 @@ const ItemTableComponent = (props) => {
             <ConfirmModalComponent
                 open={deleteConfirmModalOpen}
                 title={'데이터 삭제 확인 메세지'}
-                message={`[ ${checkedItemListState.length} ] 건의 데이터를 삭제 하시겠습니까?`}
+                message={`[ ${props.checkedOrderItemListState.length} ] 건의 데이터를 삭제 하시겠습니까?`}
 
                 onConfirm={_onSubmit_deleteOrderItemList}
                 onClose={_onDeleteConfirmModalClose}
@@ -452,7 +438,7 @@ const ItemTableComponent = (props) => {
                 onClose={_onOptionCodeModalClose}
             >
                 <OptionCodeModalComponent
-                    checkedItemListState={checkedItemListState}
+                    checkedOrderItemListState={props.checkedOrderItemListState}
                     productOptionListState={props.productOptionListState}
 
                     onConfirm={(optionCode) => _onSubmit_changeOptionCodeForOrderItemListInBatch(optionCode)}
@@ -464,3 +450,13 @@ const ItemTableComponent = (props) => {
 
 
 export default ItemTableComponent;
+
+const initialViewSize = 20;
+
+const viewSizeReducer = (state, action) => {
+    switch (action.type) {
+        case 'SET_DATA':
+            return action.payload;
+        default: return 20;
+    }
+}

@@ -17,37 +17,6 @@ const checkedItemListStateReducer = (state, action) => {
 
 const FirstMergedItemTableComponent = (props) => {
     const [checkedItemListState, dispatchCheckedItemListState] = useReducer(checkedItemListStateReducer, initialCheckedItemListState);
-    const [salesConfirmModalOpen, setSalesConfirmModalOpen] = useState(false);
-
-    const _onSalesConfirmModalOpen = () => {
-        if (!checkedItemListState || checkedItemListState.length <= 0) {
-            alert('판매 취소 데이터를 선택해 주세요.');
-            return;
-        }
-        setSalesConfirmModalOpen(true);
-    }
-
-    const _onSalesConfirmModalClose = () => {
-        setSalesConfirmModalOpen(false);
-    }
-
-    // 판매 전환 서밋
-    const _onSubmit_changeSalesYnForOrderItemList = () => {
-        _onSalesConfirmModalClose();
-
-        let data = checkedItemListState.map(r => {
-            return {
-                ...r,
-                salesYn: 'n',
-                salesAt: null
-            }
-        })
-
-        props._onSubmit_changeSalesYnForOrderItemList(data);
-        dispatchCheckedItemListState({
-            type: 'CLEAR'
-        })
-    }
 
     const _onSubmit_fetchFirstMergeOrderItemList = () => {
         if (!checkedItemListState || checkedItemListState?.length <= 0) {
@@ -128,16 +97,6 @@ const FirstMergedItemTableComponent = (props) => {
                     <div style={{ textAlign: 'center', padding: '100px 0', fontWeight: '600' }}>1차 병합 헤더를 먼저 설정해 주세요.</div>
                 }
             </Container>
-
-            {/* Modal */}
-            <ConfirmModalComponent
-                open={salesConfirmModalOpen}
-                title={'판매 취소 확인 메세지'}
-                message={`[ ${checkedItemListState.length} ] 건의 데이터를 판매 취소 하시겠습니까?`}
-
-                onConfirm={_onSubmit_changeSalesYnForOrderItemList}
-                onClose={_onSalesConfirmModalClose}
-            ></ConfirmModalComponent>
         </>
     );
 }
