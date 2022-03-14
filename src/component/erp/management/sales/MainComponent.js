@@ -91,6 +91,7 @@ const MainComponent = (props) => {
         let endDate = query.endDate ? getEndDate(query.endDate) : null;
         let searchColumnName = query.searchColumnName || null;
         let searchValue = query.searchValue || null;
+        let periodType = query.periodType || null;
 
         let params = {
             salesYn: 'y',
@@ -98,7 +99,8 @@ const MainComponent = (props) => {
             startDate: startDate,
             endDate: endDate,
             searchColumnName: searchColumnName,
-            searchValue: searchValue
+            searchValue: searchValue,
+            periodType: periodType
         }
 
         await erpOrderItemDataConnect().searchList(params)
