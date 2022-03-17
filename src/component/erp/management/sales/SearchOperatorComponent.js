@@ -3,12 +3,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import qs from 'query-string';
 import { dateToYYYYMMDD, getStartDate } from '../../../../utils/dateFormatUtils';
-import CustomDatePicker from '../../../template/date-picker/CustomDatePicker';
+import CustomDatePicker from '../../../module/date-picker/CustomDatePicker';
 
 const Container = styled.div`
     margin-top: 20px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #e1e1e1;
 `;
 
 const DateSelectorWrapper = styled.div`

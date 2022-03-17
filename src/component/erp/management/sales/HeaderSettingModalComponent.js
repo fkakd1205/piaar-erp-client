@@ -1,6 +1,6 @@
 import { useEffect, useReducer } from 'react';
 import styled from 'styled-components';
-import CustomCheckbox from '../../../template/checkbox/CustomCheckbox';
+import CustomCheckbox from '../../../module/checkbox/CustomCheckbox';
 import { v4 as uuidv4 } from 'uuid';
 
 const Container = styled.div`
@@ -971,5 +971,12 @@ const defaultHeaderList = [
         "customCellName": "판매등록일",
         "matchedColumnName": "salesAt",
         "mergeYn": "n"
-    }
+    },
+    {
+        "cellNumber": 48,
+        "originCellName": "운송코드",
+        "customCellName": "운송코드",
+        "matchedColumnName": "freightCode",
+        "mergeYn": "n"
+    },
 ];

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import Ripple from '../../../template/button/Ripple';
+import Ripple from '../../../module/button/Ripple';
 import { ButtonBox, Container, HeaderTitleBox, HeaderWrapper, ListBox, ListWrapper } from './SecondMergeHeaderSelectModal.styled';
 
 const SecondMergeHeaderSelectModalComponent = (props) => {
@@ -10,7 +10,7 @@ const SecondMergeHeaderSelectModalComponent = (props) => {
         e.stopPropagation();
         setDisabledBtn(true)
         if (window.confirm('정말로 삭제 하시겠습니까?')) {
-            // props._onSubmit_deleteFirstMergeHeader(data.id);
+            props._onSubmit_deleteSecondMergeHeader(data.id);
         }
         setDisabledBtn(false);
     }

@@ -1,10 +1,12 @@
-import { useCallback, useReducer, useState } from 'react';
+import React, { useCallback, useMemo, useReducer, useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { dateToYYYYMMDDhhmmss } from '../../../../utils/dateFormatUtils';
-import Ripple from '../../../template/button/Ripple';
-import CommonModalComponent from '../../../template/modal/CommonModalComponent';
-import ConfirmModalComponent from '../../../template/modal/ConfirmModalComponent';
+import CustomCheckbox from '../../../module/checkbox/CustomCheckbox';
+import CommonModalComponent from '../../../module/modal/CommonModalComponent';
+import ConfirmModalComponent from '../../../module/modal/ConfirmModalComponent';
+import { dateToYYYYMMDD, dateToYYYYMMDDhhmmss, dateToYYYYMMDDhhmmssFile } from '../../../../utils/dateFormatUtils';
 import OptionCodeModalComponent from './OptionCodeModalComponent';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import InfiniteScrollObserver from '../../../module/observer/InfiniteScrollObserver';
 
 const Container = styled.div`
     margin-top: 20px;
@@ -15,12 +17,12 @@ const TableWrapper = styled.div`
     padding: 0 30px;
 
     @media all and (max-width: 992px){
-        padding: 10px 10px;
+        padding: 0 10px;
     }
 `;
 
 const TableBox = styled.div`
-    height: 500px;
+    height: 300px;
 	overflow: auto;
     border: 1px solid #309FFF40;
 
@@ -38,7 +40,7 @@ const TableBox = styled.div`
         background: #309FFF;
         color: white;
         padding: 10px;
-        font-size: 14px;
+        font-size: 12px;
     }
 
     table tbody tr{
@@ -56,7 +58,7 @@ const TableBox = styled.div`
         vertical-align: middle !important;
         border-bottom: 1px solid #309FFF20;
         text-align: center;
-        font-size: 12px;
+        font-size: 11px;
         color: #444;
         font-weight: 500;
         line-height: 1.5;
@@ -67,6 +69,10 @@ const TableBox = styled.div`
             color: white;
             font-weight: 600;
         }
+    }
+
+    .option-code-item{
+        cursor: pointer;
     }
 
     & .fiexed-header {
@@ -100,7 +106,7 @@ const OperatorWrapper = styled.div`
     justify-content: space-between;
     align-items: center;
     padding: 0 30px;
-    gap: 10px;
+    -webkit-gap: 10px;
 
     @media only screen and (max-width:768px){
         padding: 0 10px;
@@ -115,8 +121,6 @@ const ButtonWrapper = styled.div`
 
 const ButtonBox = styled.div`
     .common-btn-item{
-        position: relative;
-        overflow: hidden;
         width: 100px;
         height: 34px;
 
@@ -180,162 +184,52 @@ const ButtonBox = styled.div`
     }
 `;
 
-const initialCheckedItemListState = [];
-const checkedItemListStateReducer = (state, action) => {
-    switch (action.type) {
-        case 'SET_DATA':
-            return action.payload;
-        case 'CLEAR':
-            return [];
-        default: return [];
-    }
-}
-
 const ItemTableComponent = (props) => {
-    const [checkedItemListState, dispatchCheckedItemListState] = useReducer(checkedItemListStateReducer, initialCheckedItemListState);
-    const [salesConfirmModalOpen, setSalesConfirmModalOpen] = useState(false);
-    const [optionCodeModalOpen, setOptionCodeModalOpen] = useState(false);
+    const [viewSize, dispatchViewSize] = useReducer(viewSizeReducer, initialViewSize);
 
-    const _isCheckedAll = () => {
+    useEffect(() => {
+        if (!props.orderItemListState || props.orderItemListState?.length <= 0) {
+            return;
+        }
+
+        dispatchViewSize({
+            type: 'SET_DATA',
+            payload: 50
+        })
+    }, [props.orderItemListState])
+
+    const _isCheckedAll = useCallback(() => {
         if (!props.orderItemListState || props.orderItemListState?.length <= 0) {
             return false;
         }
 
-        return props.orderItemListState.length === checkedItemListState.length;
-    }
+        return props.orderItemListState.length === props.checkedOrderItemListState.length;
+    }, [props.checkedOrderItemListState.length, props.orderItemListState])
 
-    const _isCheckedOne = (id) => {
-        return checkedItemListState.some(r => r.id === id);
-    }
+    const _isCheckedOne = useCallback((id) => {
+        return props.checkedOrderItemListState.some(r => r.id === id);
+    }, [props.checkedOrderItemListState])
 
-    const _onCheckAll = () => {
-        if (_isCheckedAll()) {
-            dispatchCheckedItemListState({
-                type: 'CLEAR'
-            })
-        } else {
-            let data = [...props.orderItemListState];
-            dispatchCheckedItemListState({
-                type: 'SET_DATA',
-                payload: data
-            })
-        }
-    }
 
-    const _onChangeCheckedListState = useCallback((e, selectedData) => {
-        e.preventDefault();
-        let data = [...checkedItemListState];
-        let selectedId = selectedData.id;
-
-        if (_isCheckedOne(selectedId)) {
-            data = data.filter(r => r.id !== selectedId);
-        } else {
-            data.push(selectedData);
-        }
-
-        dispatchCheckedItemListState({
+    const fetchMoreOrderItems = async () => {
+        let newSize = viewSize + 20;
+        dispatchViewSize({
             type: 'SET_DATA',
-            payload: data
-        })
-    }, [checkedItemListState])
-
-    const _onSalesConfirmModalOpen = () => {
-        if (!checkedItemListState || checkedItemListState.length <= 0) {
-            alert('판매 취소 데이터를 선택해 주세요.');
-            return;
-        }
-        setSalesConfirmModalOpen(true);
-    }
-
-    const _onSalesConfirmModalClose = () => {
-        setSalesConfirmModalOpen(false);
-    }
-
-    const _onOptionCodeModalOpen = (e) => {
-        e.stopPropagation();
-        if (!checkedItemListState || checkedItemListState.length <= 0) {
-            alert('수정 될 데이터를 선택해 주세요.');
-            return;
-        }
-        setOptionCodeModalOpen(true);
-    }
-
-    const _onOptionCodeModalClose = (e) => {
-        setOptionCodeModalOpen(false);
-    }
-
-    // 옵션 코드 변경 서밋
-    const _onSubmit_changeOptionCodeForOrderItemListInBatch = (optionCode) => {
-        let data = [...checkedItemListState];
-        data = data.map(r => {
-            return {
-                ...r,
-                optionCode: optionCode
-            }
-        })
-
-        props._onSubmit_changeOptionCodeForOrderItemListInBatch(data);
-        _onOptionCodeModalClose();
-    }
-
-    // 판매 전환 서밋
-    const _onSubmit_changeSalesYnForOrderItemList = () => {
-        _onSalesConfirmModalClose();
-
-        let data = checkedItemListState.map(r => {
-            return {
-                ...r,
-                salesYn: 'n',
-                salesAt: null
-            }
-        })
-
-        props._onSubmit_changeSalesYnForOrderItemList(data);
-        dispatchCheckedItemListState({
-            type: 'CLEAR'
+            payload: newSize
         })
     }
-
-    const _onSubmit_fetchFirstMergeOrderItemList = () => {
-        if (!checkedItemListState || checkedItemListState?.length <= 0) {
-            alert('병합할 데이터를 먼저 선택해 주세요.');
-            return;
-        }
-
-        props._onSubmit_fetchFirstMergeOrderItemList(checkedItemListState);
-
-    }
-
     return (
         <>
             <Container>
-                <OperatorWrapper>
-                    <ButtonWrapper>
-                        <ButtonBox>
-                            <button
-                                type='button'
-                                className='common-btn-item'
-                                onClick={() => _onSalesConfirmModalOpen()}
-                            >판매 취소</button>
-                        </ButtonBox>
-                        <ButtonBox>
-                            <button
-                                type='button'
-                                className='common-btn-item'
-                                onClick={(e) => _onOptionCodeModalOpen(e)}
-                            >옵션 코드 수정</button>
-                        </ButtonBox>
-                    </ButtonWrapper>
-                </OperatorWrapper>
-                {props.headerState &&
+                {(props.headerState && props.orderItemListState) &&
                     <TableWrapper>
                         <TableBox>
                             <table cellSpacing="0">
                                 <colgroup>
-                                    <col width={'100px'}></col>
+                                    <col width={'50px'}></col>
                                     {props.headerState?.headerDetail.details.map((r, index) => {
                                         return (
-                                            <col key={index} width={'300px'}></col>
+                                            <col key={index} width={'200px'}></col>
                                         );
                                     })}
 
@@ -344,14 +238,14 @@ const ItemTableComponent = (props) => {
                                     <tr>
                                         <th
                                             className="fiexed-header"
-                                            onClick={() => _onCheckAll()}
+                                            onClick={() => props._onChange_checkAllCheckedOrderListState()}
                                             style={{ cursor: 'pointer' }}
                                         >
                                             <input
                                                 type='checkbox'
                                                 checked={_isCheckedAll()}
 
-                                                onChange={() => _onCheckAll()}
+                                                onChange={() => props._onChange_checkAllCheckedOrderListState()}
                                             ></input>
                                         </th>
                                         {props.headerState?.headerDetail.details.map((r, index) => {
@@ -363,77 +257,75 @@ const ItemTableComponent = (props) => {
                                 </thead>
 
                                 <tbody>
-                                    {props.orderItemListState?.map((r1, rowIndex) => {
-                                        let checked = _isCheckedOne(r1.id)
-                                        return (
-                                            <tr
-                                                key={rowIndex}
-                                                className={`${checked && 'tr-active'}`}
-                                                onClick={(e) => _onChangeCheckedListState(e, r1)}
-                                            >
-                                                <td style={{ cursor: 'pointer' }}>
-                                                    <input type='checkbox' checked={checked} onChange={(e) => _onChangeCheckedListState(e, r1)}></input>
-                                                </td>
-                                                {props.headerState?.headerDetail.details.map(r2 => {
-                                                    let matchedColumnName = r2.matchedColumnName;
-                                                    if (matchedColumnName === 'createdAt') {
-                                                        return (
-                                                            // <td key={r2.cellNumber}>{dateToYYYYMMDD(r1[matchedColumnName] || new Date())}</td>
-                                                            <td key={r2.cellNumber}>{dateToYYYYMMDDhhmmss(r1[matchedColumnName] || new Date())}</td>
-                                                        )
-                                                    }
-                                                    return (
-                                                        <td key={r2.cellNumber}>{r1[matchedColumnName]}</td>
-                                                    )
-                                                })}
-                                            </tr>
-                                        )
-                                    })}
-                                </tbody>
+                                    {props.orderItemListState &&
+                                        <>
+                                            {props.orderItemListState?.slice(0, viewSize).map((r1, rowIndex) => {
+                                                let checked = _isCheckedOne(r1.id)
+                                                return (
+                                                    <tr
+                                                        key={rowIndex}
+                                                        className={`${checked && 'tr-active'}`}
+                                                        onClick={(e) => props._onChange_checkOneCheckedOrderListState(e, r1)}
+                                                    >
+                                                        <td style={{ cursor: 'pointer' }}>
+                                                            <input type='checkbox' checked={checked} onChange={(e) => props._onChange_checkOneCheckedOrderListState(e, r1)}></input>
+                                                        </td>
+                                                        {props.headerState?.headerDetail.details.map(r2 => {
+                                                            let matchedColumnName = r2.matchedColumnName;
+                                                            if (matchedColumnName === 'createdAt') {
+                                                                return (
+                                                                    <td key={r2.cellNumber}>{dateToYYYYMMDDhhmmss(r1[matchedColumnName] || new Date())}</td>
+                                                                )
+                                                            }
+                                                            return (
+                                                                <td key={r2.cellNumber}>{r1[matchedColumnName]}</td>
+                                                            )
+                                                        })}
+                                                    </tr>
+                                                )
 
+                                            })}
+                                        </>
+                                    }
+                                </tbody>
                             </table>
+                            <InfiniteScrollObserver
+                                elementTagType={'div'}
+                                totalSize={props.orderItemListState.length}
+                                startOffset={0}
+                                endOffset={viewSize}
+                                fetchData={fetchMoreOrderItems}
+                                loadingElementTag={
+                                    <p style={{ textAlign: 'center', fontSize:'14px', fontWeight:'600', color:'#444' }}>
+                                        로딩중...
+                                    </p>
+                                }
+                                endElementTag={
+                                    <p style={{ textAlign: 'center', fontSize:'14px', fontWeight:'600', color:'#444' }}>
+                                        마지막 데이터 입니다.
+                                    </p>
+                                }
+                            />
                         </TableBox>
                     </TableWrapper>
                 }
-                <OperatorWrapper>
-                    <div></div>
-                    <ButtonBox style={{ marginTop: '10px' }}>
-                        <button
-                            className='common-btn-item'
-                            onClick={_onSubmit_fetchFirstMergeOrderItemList}
-                        >
-                            1차 병합 하기
-                            <Ripple color={'#f1f1f1'} duration={1000}></Ripple>
-                        </button>
-                    </ButtonBox>
-                </OperatorWrapper>
                 {!props.headerState &&
                     <div style={{ textAlign: 'center', padding: '100px 0', fontWeight: '600' }}>뷰 헤더를 먼저 설정해 주세요.</div>
                 }
             </Container>
-
-            {/* Modal */}
-            <ConfirmModalComponent
-                open={salesConfirmModalOpen}
-                title={'판매 취소 확인 메세지'}
-                message={`[ ${checkedItemListState.length} ] 건의 데이터를 판매 취소 하시겠습니까?`}
-
-                onConfirm={_onSubmit_changeSalesYnForOrderItemList}
-                onClose={_onSalesConfirmModalClose}
-            ></ConfirmModalComponent>
-            <CommonModalComponent
-                open={optionCodeModalOpen}
-
-                onClose={_onOptionCodeModalClose}
-            >
-                <OptionCodeModalComponent
-                    checkedItemListState={checkedItemListState}
-                    productOptionListState={props.productOptionListState}
-
-                    onConfirm={(optionCode) => _onSubmit_changeOptionCodeForOrderItemListInBatch(optionCode)}
-                ></OptionCodeModalComponent>
-            </CommonModalComponent>
         </>
     );
 }
+
+
 export default ItemTableComponent;
+
+const initialViewSize = 50;
+
+const viewSizeReducer = (state, action) => {
+    switch (action.type) {
+        case 'SET_DATA':
+            return action.payload;
+        default: return 50;
+    }
+}

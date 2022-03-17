@@ -1,6 +1,6 @@
 import { useEffect, useReducer } from 'react';
 import styled from 'styled-components';
-import CustomCheckbox from '../../../template/checkbox/CustomCheckbox';
+import CustomCheckbox from '../../../module/checkbox/CustomCheckbox';
 import { v4 as uuidv4 } from 'uuid';
 
 const Container = styled.div`

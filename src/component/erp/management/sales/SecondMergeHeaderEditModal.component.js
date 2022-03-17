@@ -1,12 +1,31 @@
-import { useReducer } from 'react';
-import styled from 'styled-components';
+import { useEffect, useReducer, useState } from 'react';
 import Ripple from '../../../module/button/Ripple';
 import CustomCheckbox from '../../../module/checkbox/CustomCheckbox';
-import { Container, CreateHeaderTableBox, CreateHeaderTableWrapper, DefaultHeaderTableBox, DefaultHeaderTableWrapper, DefaultHeaderTh, HeaderControlBox, HeaderTitleBox, HeaderWrapper, InfoText, InputBox, OperatorWrapper } from './FirstMergeHeaderAddModal.styled';
+import CommonModalComponent from '../../../module/modal/CommonModalComponent';
+import { Container, CreateHeaderTableBox, CreateHeaderTableWrapper, DefaultHeaderTableBox, DefaultHeaderTableWrapper, DefaultHeaderTh, HeaderControlBox, HeaderTitleBox, HeaderWrapper, InfoText, InputBox, OperatorWrapper, ViewDetailSelectBox } from './SecondMergeHeaderEditModal.styled';
 
-const FirstMergeHeaderAddModalComponent = (props) => {
+const SecondMergeHeaderEditModalComponent = (props) => {
     const [createHeaderTitleState, dispatchCreateHeaderTitleState] = useReducer(createHeaderTitleStateReducer, initialCreateHeaderTitleState);
     const [createHeaderValueState, dispatchCreateHeaderValueState] = useReducer(createHeaderValueStateReducer, initialCreateHeaderValueState);
+
+    const [addViewDetailModalOpen, setAddViewDetailModalOpen] = useState(false);
+    const [selectedHeaderValue, setSelectedHeaderValue] = useState(null);
+
+    useEffect(() => {
+        if (!props.updateHeaderState) {
+            return;
+        }
+
+        dispatchCreateHeaderTitleState({
+            type: 'SET_DATA',
+            payload: props.updateHeaderState.title
+        })
+        dispatchCreateHeaderValueState({
+            type: 'SET_DATA',
+            payload: props.updateHeaderState?.headerDetail?.details
+        })
+
+    }, [props.updateHeaderState])
 
     const _onChangeCreateHeaderTitleState = (e) => {
         dispatchCreateHeaderTitleState({
@@ -118,7 +137,9 @@ const FirstMergeHeaderAddModalComponent = (props) => {
                 if (data.indexOf(r) === index) {
                     return {
                         ...r,
-                        [name]: e.target.checked ? 'y' : 'n'
+                        [name]: e.target.checked ? 'y' : 'n',
+                        splitter: e.target.checked === false ? '-' : r.splitter,
+                        viewDetails: e.target.checked === false ? [{ matchedColumnName: r.matchedColumnName }] : [...r.viewDetails]
                     }
                 } else {
                     return r;
@@ -143,20 +164,88 @@ const FirstMergeHeaderAddModalComponent = (props) => {
         })
     }
 
+    const _onAddViewDetailModalOpen = (headerValue) => {
+        setSelectedHeaderValue(headerValue);
+        setAddViewDetailModalOpen(true);
+    }
+
+    const _onAddViewDetailModalClose = () => {
+        setSelectedHeaderValue(null);
+        setAddViewDetailModalOpen(false);
+    }
+
+    const _onAddViewDetail = (matchedColumnName) => {
+        let headerValue = { ...selectedHeaderValue };
+        let viewDetails = [...headerValue.viewDetails];
+
+        if (viewDetails.some(r => r.matchedColumnName === matchedColumnName)) {
+            alert('동일한 데이터를 두번 이상 나열 할 수 없습니다.')
+            return;
+        }
+
+        viewDetails.push({
+            matchedColumnName: matchedColumnName
+        })
+
+        headerValue = {
+            ...headerValue,
+            viewDetails: viewDetails
+        }
+        let newData = createHeaderValueState.map(r => {
+            if (r.matchedColumnName === headerValue.matchedColumnName) {
+                return headerValue
+            } else {
+                return r;
+            }
+        })
+
+        dispatchCreateHeaderValueState({
+            type: 'SET_DATA',
+            payload: newData
+        });
+
+        _onAddViewDetailModalClose();
+    }
+
+    const _onDeleteViewDetail = (selectedHeader, matchedColumnName) => {
+        let header = createHeaderValueState.filter(r => r.matchedColumnName === selectedHeader.matchedColumnName)[0];
+
+        if (header.viewDetails.length <= 1) {
+            alert('뷰 데이터는 하나 이상이어야 합니다.');
+            return;
+        }
+
+        let newViewDetails = [...header.viewDetails].filter(r => r.matchedColumnName !== matchedColumnName);
+
+        let newHeader = {
+            ...header,
+            viewDetails: newViewDetails
+        }
+
+        let newData = createHeaderValueState.map(r => {
+            if (r.matchedColumnName === newHeader.matchedColumnName) {
+                return newHeader;
+            } else {
+                return r;
+            }
+        })
+
+        dispatchCreateHeaderValueState({
+            type: 'SET_DATA',
+            payload: newData
+        })
+    }
+
     const _onSubmit = () => {
         let body = {
-            cid: null,
-            id: null,
+            ...props.updateHeaderState,
             title: createHeaderTitleState,
             headerDetail: {
                 details: createHeaderValueState
-            },
-            createdAt: null,
-            createdBy: null,
-            updatedAt: null
+            }
         }
 
-        props._onSubmit_createFirstMergeHeader(body)
+        props._onSubmit_updateSecondMergeHeader(body)
     }
 
     return (
@@ -167,14 +256,14 @@ const FirstMergeHeaderAddModalComponent = (props) => {
                         <button
                             type='button'
                             className='button-item'
-                            onClick={props._onAddModeClose}
+                            onClick={props._onEditModeClose}
                         >
                             <div className='icon-item'>
                                 <img src='/assets/icon/left_arrow_icon.png' alt=''></img>
                             </div>
                         </button>
                     </HeaderControlBox>
-                    <HeaderTitleBox>1차 병합 헤더 생성</HeaderTitleBox>
+                    <HeaderTitleBox>2차 병합 헤더 수정</HeaderTitleBox>
                     <HeaderControlBox>
                         <button
                             type='button'
@@ -343,17 +432,19 @@ const FirstMergeHeaderAddModalComponent = (props) => {
                                                             key={index}
                                                             scope="col"
                                                         >
-                                                            수량 병합
                                                         </td>
                                                     )
                                                 }
-
                                                 return (
                                                     <td
                                                         key={index}
                                                         scope="col"
                                                     >
                                                         <div>
+                                                            <div className='td-label'>고정값</div>
+                                                            <input type='text' className='input-item' name='fixedValue' value={r.fixedValue} onChange={(e) => _onChangeCreateHeaderValue(e, index)}></input>
+                                                        </div>
+                                                        <div style={{ marginTop: '15px' }}>
                                                             <div className='td-label'>병합 여부</div>
                                                             <CustomCheckbox
                                                                 checked={r.mergeYn === 'y'}
@@ -379,31 +470,87 @@ const FirstMergeHeaderAddModalComponent = (props) => {
                                                         </td>
                                                     )
                                                 }
+
                                                 return (
                                                     <td
                                                         key={index}
                                                         scope="col"
+                                                        style={{ verticalAlign: 'top' }}
                                                     >
-                                                        <div>
-                                                            <div className='td-label'>고정값</div>
-                                                            <input type='text' className='input-item' name='fixedValue' value={r.fixedValue} onChange={(e) => _onChangeCreateHeaderValue(e, index)}></input>
-                                                        </div>
+                                                        {r.mergeYn === 'y' &&
+                                                            <div>
+                                                                <div>
+                                                                    <div className='td-label'>구분자</div>
+                                                                    <input type='text' className='input-item' name='splitter' value={r.splitter} onChange={(e) => _onChangeCreateHeaderValue(e, index)}></input>
+                                                                </div>
+                                                                <div style={{ marginTop: '15px' }}>
+                                                                    <div className='td-label'>뷰 데이터</div>
+                                                                    {r.viewDetails.map((viewDetail, index) => {
+                                                                        let originCellName = defaultHeaderList.filter(f => f.matchedColumnName === viewDetail.matchedColumnName)[0].originCellName;
+
+                                                                        return (
+                                                                            <div
+                                                                                key={index}
+                                                                                className='flex-box'
+                                                                                style={{ justifyContent: 'space-between', padding: '5px 10px', marginTop: '10px', border: '1px solid #e9e9e9' }}
+                                                                            >
+                                                                                <div style={{ fontWeight: '600' }}>{originCellName}</div>
+                                                                                <div>
+                                                                                    <button
+                                                                                        style={{ padding: '3px 8px', background: '#fb5858', border: '1px solid #fb5858', borderRadius: '3px', color: 'white', cursor: 'pointer' }}
+                                                                                        onClick={() => _onDeleteViewDetail(r, viewDetail.matchedColumnName)}
+                                                                                    >삭제</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        )
+                                                                    })}
+                                                                    <div>
+                                                                        <button
+                                                                            style={{ padding: '3px 8px', background: '#2C73D2', border: '1px solid #2C73D2', borderRadius: '3px', color: 'white', cursor: 'pointer', marginTop: '10px' }}
+                                                                            onClick={() => _onAddViewDetailModalOpen(r)}
+                                                                        >추가</button>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                        }
                                                     </td>
                                                 )
                                             })}
                                         </tr>
+
                                     </tbody>
                                 </table>
                             </CreateHeaderTableBox>
                         </CreateHeaderTableWrapper>
                     </>
                 }
-
             </Container>
+
+            {/* Modal */}
+            <CommonModalComponent
+                open={addViewDetailModalOpen}
+
+                onClose={_onAddViewDetailModalClose}
+            >
+                <div>
+                    {defaultHeaderList.map((r, index) => {
+                        return (
+                            <ViewDetailSelectBox
+                                key={index}
+                                onClick={() => _onAddViewDetail(r.matchedColumnName)}
+                            >
+                                {r.originCellName}
+                                <Ripple color={'#e1e1e1'} duration={1000} />
+                            </ViewDetailSelectBox>
+                        )
+                    })}
+                </div>
+            </CommonModalComponent>
         </>
     );
 }
-export default FirstMergeHeaderAddModalComponent;
+export default SecondMergeHeaderEditModalComponent;
 
 const initialCreateHeaderValueState = [];
 const initialCreateHeaderTitleState = '';
@@ -433,7 +580,13 @@ const defaultHeaderList = [
         "customCellName": "피아르 고유번호",
         "matchedColumnName": "uniqueCode",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "uniqueCode"
+            }
+        ]
     },
     {
         "cellNumber": 1,
@@ -441,7 +594,13 @@ const defaultHeaderList = [
         "customCellName": "주문번호1",
         "matchedColumnName": "orderNumber1",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "orderNumber1"
+            }
+        ]
     },
     {
         "cellNumber": 2,
@@ -449,7 +608,13 @@ const defaultHeaderList = [
         "customCellName": "주문번호2",
         "matchedColumnName": "orderNumber2",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "orderNumber2"
+            }
+        ]
     },
     {
         "cellNumber": 3,
@@ -457,7 +622,13 @@ const defaultHeaderList = [
         "customCellName": "주문번호3",
         "matchedColumnName": "orderNumber3",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "orderNumber3"
+            }
+        ]
     },
     {
         "cellNumber": 4,
@@ -465,7 +636,13 @@ const defaultHeaderList = [
         "customCellName": "상품명",
         "matchedColumnName": "prodName",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "prodName"
+            }
+        ]
     },
     {
         "cellNumber": 5,
@@ -473,7 +650,13 @@ const defaultHeaderList = [
         "customCellName": "옵션명",
         "matchedColumnName": "optionName",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "optionName"
+            }
+        ]
     },
     {
         "cellNumber": 6,
@@ -481,7 +664,13 @@ const defaultHeaderList = [
         "customCellName": "수량",
         "matchedColumnName": "unit",
         "fixedValue": '',
-        "mergeYn": "y"
+        "mergeYn": "y",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "unit"
+            }
+        ]
     },
     {
         "cellNumber": 7,
@@ -489,7 +678,13 @@ const defaultHeaderList = [
         "customCellName": "수취인명",
         "matchedColumnName": "receiver",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "receiver"
+            }
+        ]
     },
     {
         "cellNumber": 8,
@@ -497,7 +692,13 @@ const defaultHeaderList = [
         "customCellName": "전화번호1",
         "matchedColumnName": "receiverContact1",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "receiverContact1"
+            }
+        ]
     },
     {
         "cellNumber": 9,
@@ -505,7 +706,13 @@ const defaultHeaderList = [
         "customCellName": "전화번호2",
         "matchedColumnName": "receiverContact2",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "receiverContact2"
+            }
+        ]
     },
     {
         "cellNumber": 10,
@@ -513,7 +720,13 @@ const defaultHeaderList = [
         "customCellName": "주소",
         "matchedColumnName": "destination",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "destination"
+            }
+        ]
     },
     {
         "cellNumber": 11,
@@ -521,7 +734,13 @@ const defaultHeaderList = [
         "customCellName": "우편번호",
         "matchedColumnName": "zipCode",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "zipCode"
+            }
+        ]
     },
     {
         "cellNumber": 12,
@@ -529,7 +748,13 @@ const defaultHeaderList = [
         "customCellName": "배송방식",
         "matchedColumnName": "transportType",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "transportType"
+            }
+        ]
     },
     {
         "cellNumber": 13,
@@ -537,7 +762,13 @@ const defaultHeaderList = [
         "customCellName": "배송메세지",
         "matchedColumnName": "deliveryMessage",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "deliveryMessage"
+            }
+        ]
     },
     {
         "cellNumber": 14,
@@ -545,7 +776,13 @@ const defaultHeaderList = [
         "customCellName": "상품고유번호1",
         "matchedColumnName": "prodUniqueNumber1",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "prodUniqueNumber1"
+            }
+        ]
     },
     {
         "cellNumber": 15,
@@ -553,7 +790,13 @@ const defaultHeaderList = [
         "customCellName": "상품고유번호2",
         "matchedColumnName": "prodUniqueNumber2",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "prodUniqueNumber2"
+            }
+        ]
     },
     {
         "cellNumber": 16,
@@ -561,7 +804,13 @@ const defaultHeaderList = [
         "customCellName": "옵션고유번호1",
         "matchedColumnName": "optionUniqueNumber1",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "optionUniqueNumber1"
+            }
+        ]
     },
     {
         "cellNumber": 17,
@@ -569,7 +818,13 @@ const defaultHeaderList = [
         "customCellName": "옵션고유번호2",
         "matchedColumnName": "optionUniqueNumber2",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "optionUniqueNumber2"
+            }
+        ]
     },
     {
         "cellNumber": 18,
@@ -577,7 +832,13 @@ const defaultHeaderList = [
         "customCellName": "피아르 상품코드",
         "matchedColumnName": "prodCode",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "prodCode"
+            }
+        ]
     },
     {
         "cellNumber": 19,
@@ -585,7 +846,13 @@ const defaultHeaderList = [
         "customCellName": "피아르 옵션코드",
         "matchedColumnName": "optionCode",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "optionCode"
+            }
+        ]
     },
     {
         "cellNumber": 20,
@@ -593,7 +860,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모1",
         "matchedColumnName": "managementMemo1",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo1"
+            }
+        ]
     },
     {
         "cellNumber": 21,
@@ -601,7 +874,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모2",
         "matchedColumnName": "managementMemo2",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo2"
+            }
+        ]
     },
     {
         "cellNumber": 22,
@@ -609,7 +888,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모3",
         "matchedColumnName": "managementMemo3",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo3"
+            }
+        ]
     },
     {
         "cellNumber": 23,
@@ -617,7 +902,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모4",
         "matchedColumnName": "managementMemo4",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo4"
+            }
+        ]
     },
     {
         "cellNumber": 24,
@@ -625,7 +916,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모5",
         "matchedColumnName": "managementMemo5",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo5"
+            }
+        ]
     },
     {
         "cellNumber": 25,
@@ -633,7 +930,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모6",
         "matchedColumnName": "managementMemo6",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo6"
+            }
+        ]
     },
     {
         "cellNumber": 26,
@@ -641,7 +944,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모7",
         "matchedColumnName": "managementMemo7",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo7"
+            }
+        ]
     },
     {
         "cellNumber": 27,
@@ -649,7 +958,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모8",
         "matchedColumnName": "managementMemo8",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo8"
+            }
+        ]
     },
     {
         "cellNumber": 28,
@@ -657,7 +972,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모9",
         "matchedColumnName": "managementMemo9",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo9"
+            }
+        ]
     },
     {
         "cellNumber": 29,
@@ -665,7 +986,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모10",
         "matchedColumnName": "managementMemo10",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo10"
+            }
+        ]
     },
     {
         "cellNumber": 30,
@@ -673,7 +1000,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모11",
         "matchedColumnName": "managementMemo11",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo11"
+            }
+        ]
     },
     {
         "cellNumber": 31,
@@ -681,7 +1014,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모12",
         "matchedColumnName": "managementMemo12",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo12"
+            }
+        ]
     },
     {
         "cellNumber": 32,
@@ -689,7 +1028,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모13",
         "matchedColumnName": "managementMemo13",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo13"
+            }
+        ]
     },
     {
         "cellNumber": 33,
@@ -697,7 +1042,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모14",
         "matchedColumnName": "managementMemo14",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo14"
+            }
+        ]
     },
     {
         "cellNumber": 34,
@@ -705,7 +1056,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모15",
         "matchedColumnName": "managementMemo15",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo15"
+            }
+        ]
     },
     {
         "cellNumber": 35,
@@ -713,7 +1070,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모16",
         "matchedColumnName": "managementMemo16",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo16"
+            }
+        ]
     },
     {
         "cellNumber": 36,
@@ -721,7 +1084,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모17",
         "matchedColumnName": "managementMemo17",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo17"
+            }
+        ]
     },
     {
         "cellNumber": 37,
@@ -729,7 +1098,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모18",
         "matchedColumnName": "managementMemo18",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo18"
+            }
+        ]
     },
     {
         "cellNumber": 38,
@@ -737,7 +1112,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모19",
         "matchedColumnName": "managementMemo19",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo19"
+            }
+        ]
     },
     {
         "cellNumber": 39,
@@ -745,7 +1126,13 @@ const defaultHeaderList = [
         "customCellName": "관리메모20",
         "matchedColumnName": "managementMemo20",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "managementMemo20"
+            }
+        ]
     },
     {
         "cellNumber": 40,
@@ -753,7 +1140,13 @@ const defaultHeaderList = [
         "customCellName": "*카테고리명",
         "matchedColumnName": "categoryName",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "categoryName"
+            }
+        ]
     },
     {
         "cellNumber": 41,
@@ -761,7 +1154,13 @@ const defaultHeaderList = [
         "customCellName": "*상품명",
         "matchedColumnName": "prodDefaultName",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "prodDefaultName"
+            }
+        ]
     },
     {
         "cellNumber": 42,
@@ -769,7 +1168,13 @@ const defaultHeaderList = [
         "customCellName": "*상품관리명",
         "matchedColumnName": "prodManagementName",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "prodManagementName"
+            }
+        ]
     },
     {
         "cellNumber": 43,
@@ -777,7 +1182,13 @@ const defaultHeaderList = [
         "customCellName": "*옵션명",
         "matchedColumnName": "optionDefaultName",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "optionDefaultName"
+            }
+        ]
     },
     {
         "cellNumber": 44,
@@ -785,7 +1196,13 @@ const defaultHeaderList = [
         "customCellName": "*옵션관리명",
         "matchedColumnName": "optionManagementName",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "optionManagementName"
+            }
+        ]
     },
     {
         "cellNumber": 45,
@@ -793,7 +1210,13 @@ const defaultHeaderList = [
         "customCellName": "*재고수량",
         "matchedColumnName": "optionStockUnit",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "optionStockUnit"
+            }
+        ]
     },
     {
         "cellNumber": 46,
@@ -801,6 +1224,12 @@ const defaultHeaderList = [
         "customCellName": "*주문등록일",
         "matchedColumnName": "createdAt",
         "fixedValue": '',
-        "mergeYn": "n"
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "createdAt"
+            }
+        ]
     }
 ];

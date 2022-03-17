@@ -10,6 +10,7 @@ import TopOperatorComponent from './TopOperatorComponent';
 import { dateToYYYYMMDDhhmmss, getEndDate, getStartDate } from '../../../../utils/dateFormatUtils';
 import { productOptionDataConnect } from '../../../../data_connect/productOptionDataConnect';
 import CheckedItemTableComponent from './CheckedItemTableComponent';
+import axios from 'axios';
 
 const Container = styled.div`
     margin-bottom: 150px;
@@ -19,7 +20,6 @@ const MainComponent = (props) => {
     const location = useLocation();
     const query = qs.parse(location.search);
 
-    const [test, setTest] = useState(1)
     const [headerState, dispatchHeaderState] = useReducer(headerStateReducer, initialHeaderState);
     const [productOptionListState, dispatchProductOptionListState] = useReducer(productOptionListStateReducer, initialProductOptionListState);
     const [orderItemListState, dispatchOrderItemListState] = useReducer(orderItemListStateReducer, initialOrderItemListState);
@@ -190,6 +190,12 @@ const MainComponent = (props) => {
         })
     }, [checkedOrderItemListState])
 
+    const _onCheckedOrderItemListClear = () => {
+        dispatchCheckedOrderItemListState({
+            type: 'CLEAR'
+        })
+    }
+
     // 헤더 설정 서밋
     const _onSubmit_modifiedHeader = async (headerDetails) => {
         let params = null;
@@ -216,24 +222,21 @@ const MainComponent = (props) => {
     // 판매 전환 서밋
     const _onSubmit_changeSalesYnForOrderItemList = async (body) => {
         await __reqChangeSalesYnForOrderItemList(body);
-        dispatchCheckedOrderItemListState({
-            type: 'CLEAR'
-        })
+        _onCheckedOrderItemListClear();
         await __reqSearchOrderItemList();
     }
 
     // 데이터 삭제 서밋
     const _onSubmit_deleteOrderItemList = async function (params) {
         await __reqDeleteOrderItemList(params);
-        dispatchCheckedOrderItemListState({
-            type: 'CLEAR'
-        })
+        _onCheckedOrderItemListClear();
         await __reqSearchOrderItemList();
     }
 
     // 옵션 코드 변경
     const _onSubmit_changeOptionCodeForOrderItemListInBatch = async function (data) {
         await __reqChangeOptionCodeForOrderItemListInBatch(data);
+        _onCheckedOrderItemListClear();
         await __reqSearchOrderItemList();
     }
 
@@ -248,9 +251,6 @@ const MainComponent = (props) => {
                 <SearchOperatorComponent
                     headerState={headerState}
                 ></SearchOperatorComponent>
-                <div>
-                    {checkedOrderItemListState.length}
-                </div>
                 <ItemTableComponent
                     headerState={headerState}
                     productOptionListState={productOptionListState}
@@ -259,13 +259,16 @@ const MainComponent = (props) => {
 
                     _onChange_checkAllCheckedOrderListState={_onChange_checkAllCheckedOrderListState}
                     _onChange_checkOneCheckedOrderListState={_onChange_checkOneCheckedOrderListState}
-                    _onSubmit_changeSalesYnForOrderItemList={_onSubmit_changeSalesYnForOrderItemList}
-                    _onSubmit_deleteOrderItemList={_onSubmit_deleteOrderItemList}
-                    _onSubmit_changeOptionCodeForOrderItemListInBatch={_onSubmit_changeOptionCodeForOrderItemListInBatch}
                 ></ItemTableComponent>
                 <CheckedItemTableComponent
                     headerState={headerState}
+                    productOptionListState={productOptionListState}
                     checkedOrderItemListState={checkedOrderItemListState}
+
+                    _onCheckedOrderItemListClear={_onCheckedOrderItemListClear}
+                    _onSubmit_changeSalesYnForOrderItemList={_onSubmit_changeSalesYnForOrderItemList}
+                    _onSubmit_deleteOrderItemList={_onSubmit_deleteOrderItemList}
+                    _onSubmit_changeOptionCodeForOrderItemListInBatch={_onSubmit_changeOptionCodeForOrderItemListInBatch}
                 ></CheckedItemTableComponent>
             </Container>
         </>

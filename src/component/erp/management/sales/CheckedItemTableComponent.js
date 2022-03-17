@@ -15,6 +15,10 @@ const TitleBox = styled.div`
     padding: 0 30px;
     font-size: 18px;
     font-weight: 600;
+    
+    @media all and (max-width: 992px){
+        padding: 0 10px;
+    }
 `;
 
 const TableWrapper = styled.div`
@@ -205,7 +209,7 @@ const CheckedItemTableComponent = (props) => {
     }
 
     const _onSalesConfirmModalOpen = useCallback(() => {
-        if (!props.checkedOrderItemListState || props.checkedOrderItemListState?.length <= 0) {
+        if (!props.checkedOrderItemListState || props.checkedOrderItemListState.length <= 0) {
             alert('판매 전환 데이터를 선택해 주세요.');
             return;
         }
@@ -217,7 +221,7 @@ const CheckedItemTableComponent = (props) => {
     }, [])
 
     const _onDeleteConfirmModalOpen = useCallback(() => {
-        if (!props.checkedOrderItemListState || props.checkedOrderItemListState?.length <= 0) {
+        if (!props.checkedOrderItemListState || props.checkedOrderItemListState.length <= 0) {
             alert('삭제할 데이터를 선택해 주세요.');
             return;
         }
@@ -230,7 +234,7 @@ const CheckedItemTableComponent = (props) => {
 
     const _onOptionCodeModalOpen = useCallback((e) => {
         e.stopPropagation();
-        if (!props.checkedOrderItemListState || props.checkedOrderItemListState?.length <= 0) {
+        if (!props.checkedOrderItemListState || props.checkedOrderItemListState.length <= 0) {
             alert('수정 될 데이터를 선택해 주세요.');
             return;
         }
@@ -252,8 +256,8 @@ const CheckedItemTableComponent = (props) => {
         let data = props.checkedOrderItemListState.map(r => {
             return {
                 ...r,
-                salesYn: 'y',
-                salesAt: new Date()
+                salesYn: 'n',
+                salesAt: null
             }
         })
 
@@ -302,7 +306,7 @@ const CheckedItemTableComponent = (props) => {
                                 type='button'
                                 className='common-btn-item'
                                 onClick={() => _onSalesConfirmModalOpen()}
-                            >판매 전환</button>
+                            >판매 전환 취소</button>
                         </ButtonBox>
                         <ButtonBox>
                             <button
@@ -314,11 +318,9 @@ const CheckedItemTableComponent = (props) => {
                         <ButtonBox>
                             <button
                                 type='button'
-                                className='delete-btn-item'
-                                onClick={() => _onDeleteConfirmModalOpen()}
-                            >
-                                <img className='delete-icon-item' src='/assets/icon/delete_icon.png' alt='delete button'></img>
-                            </button>
+                                className='common-btn-item'
+                                onClick={() => props._onChange_openExcelDownloadModal()}
+                            >엑셀 다운로드</button>
                         </ButtonBox>
                     </ButtonWrapper>
                 </OperatorWrapper>
@@ -374,12 +376,12 @@ const CheckedItemTableComponent = (props) => {
                                 endOffset={viewSize}
                                 fetchData={fetchMoreOrderItems}
                                 loadingElementTag={
-                                    <p style={{ textAlign: 'center', fontSize:'14px', fontWeight:'600', color:'#444' }}>
+                                    <p style={{ textAlign: 'center', fontSize: '14px', fontWeight: '600', color: '#444' }}>
                                         로딩중...
                                     </p>
                                 }
                                 endElementTag={
-                                    <p style={{ textAlign: 'center', fontSize:'14px', fontWeight:'600', color:'#444' }}>
+                                    <p style={{ textAlign: 'center', fontSize: '14px', fontWeight: '600', color: '#444' }}>
                                         마지막 데이터 입니다.
                                     </p>
                                 }

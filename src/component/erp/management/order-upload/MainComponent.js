@@ -2,7 +2,7 @@ import { useEffect, useReducer, useState } from 'react';
 import styled from 'styled-components';
 import { erpOrderItemDataConnect } from '../../../../data_connect/erpOrderItemDataConnect';
 import OperatorComponent from './OperatorComponent';
-import BackdropLoadingComponent from '../../../template/loading/BackdropLoadingComponent';
+import BackdropLoadingComponent from '../../../module/loading/BackdropLoadingComponent';
 import UploadedDataTableComponent from './UploadedDataTableComponent';
 import axios from 'axios';
 import { dateToYYYYMMDDhhmmss } from '../../../../utils/dateFormatUtils';

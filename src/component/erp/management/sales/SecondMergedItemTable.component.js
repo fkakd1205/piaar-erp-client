@@ -2,9 +2,9 @@ import { useCallback, useReducer, useState } from 'react';
 import { dateToYYYYMMDDhhmmss } from '../../../../utils/dateFormatUtils';
 import Ripple from '../../../module/button/Ripple';
 import ConfirmModalComponent from '../../../module/modal/ConfirmModalComponent';
-import { ButtonBox, Container, OperatorWrapper, TableBox, TableWrapper } from './FirstMergedItemTable.styled';
+import { ButtonBox, Container, OperatorWrapper, TableBox, TableWrapper } from './SecondMergedItemTable.styled';
 
-const FirstMergedItemTableComponent = (props) => {
+const SecondMergedItemTableComponent = (props) => {
     return (
         <>
             <Container>
@@ -57,10 +57,10 @@ const FirstMergedItemTableComponent = (props) => {
                     </TableWrapper>
                 }
                 {!props.headerState &&
-                    <div style={{ textAlign: 'center', padding: '100px 0', fontWeight: '600' }}>1차 병합 헤더를 먼저 설정해 주세요.</div>
+                    <div style={{ textAlign: 'center', padding: '100px 0', fontWeight: '600' }}>2차 병합 헤더를 먼저 설정해 주세요.</div>
                 }
             </Container>
         </>
     );
 }
-export default FirstMergedItemTableComponent;
+export default SecondMergedItemTableComponent;

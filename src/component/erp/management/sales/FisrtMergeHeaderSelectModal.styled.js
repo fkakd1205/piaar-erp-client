@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import Ripple from '../../../template/button/Ripple';
+import Ripple from '../../../module/button/Ripple';
 
 const Container = styled.div`
 

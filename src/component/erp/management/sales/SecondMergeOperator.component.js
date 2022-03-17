@@ -1,11 +1,12 @@
 import { useState, useReducer, useMemo } from 'react';
 import styled from 'styled-components';
-import CommonModalComponent from '../../../template/modal/CommonModalComponent';
+import CommonModalComponent from '../../../module/modal/CommonModalComponent';
 import SecondMergeHeaderSelectModalComponent from './SecondMergeHeaderSelectModal.component';
 import SecondMergeHeaderAddModalComponent from './SecondMergeHeaderAddModal.component';
 import FirstMergeHeaderEditModalComponent from './FirstMergeHeaderEditModal.component';
-import Ripple from '../../../template/button/Ripple';
+import Ripple from '../../../module/button/Ripple';
 import { ButtonBox, Container, FlexWrapper } from './SecondMergeOperator.styled';
+import SecondMergeHeaderEditModalComponent from './SecondMergeHeaderEditModal.component';
 
 const SecondMergeOperatorComponent = (props) => {
     const [updateHeaderState, dispatchUpdateHeaderState] = useReducer(updateHeaderStateReducer, initialUpdateHeaderState);
@@ -45,7 +46,7 @@ const SecondMergeOperatorComponent = (props) => {
     }
 
     const _onSelectHeader = (data) => {
-        props._onChangeFirstMergeHeaderState(data);
+        props._onChangeSecondMergeHeaderState(data);
         _onModalClose();
     }
 
@@ -63,17 +64,22 @@ const SecondMergeOperatorComponent = (props) => {
         _onAddModeClose();
     }
 
-    const _onSubmit_deleteFirstMergeHeader = (id) => {
-        props._onSubmit_deleteFirstMergeHeader(id);
+    const _onSubmit_fetchSecondMergeOrderItemList = () => {
+        props._onSubmit_fetchSecondMergeOrderItemList();
     }
 
-    const _onSubmit_updateFirstMergeHeader = (body) => {
-        props._onSubmit_updateFirstMergeHeader(body);
+    const _onSubmit_deleteSecondMergeHeader = (id) => {
+        props._onSubmit_deleteSecondMergeHeader(id);
+    }
+
+    const _onSubmit_updateSecondMergeHeader = (body) => {
+        props._onSubmit_updateSecondMergeHeader(body);
         _onEditModalClose();
     }
 
     return (
         <>
+            {/* {props.firstMergedItemListState && */}
             <Container>
                 <FlexWrapper>
                     <ButtonBox>
@@ -86,13 +92,22 @@ const SecondMergeOperatorComponent = (props) => {
                             className='button-item'
                             onClick={_onModalOpen}
                         >
-                            {props.firstMergeHeaderState?.title ? props.firstMergeHeaderState?.title : '2차 병합 헤더 선택'}
+                            {props.secondMergeHeaderState?.title ? props.secondMergeHeaderState?.title : '2차 병합 헤더 선택'}
                             <Ripple color={'#2C73D2'} duration={1000}></Ripple>
+                        </button>
+                    </ButtonBox>
+                    <ButtonBox>
+                        <button
+                            className='fill-button-item'
+                            onClick={_onSubmit_fetchSecondMergeOrderItemList}
+                        >
+                            2차 병합 하기
+                            <Ripple color={'#e1e1e1'} duration={1000}></Ripple>
                         </button>
                     </ButtonBox>
                 </FlexWrapper>
             </Container>
-
+            {/* } */}
             {/* Modal */}
             <CommonModalComponent
                 open={modalOpen}
@@ -104,9 +119,9 @@ const SecondMergeOperatorComponent = (props) => {
                         <>
                             {(!addModeOpen && !editModalOpen) &&
                                 <SecondMergeHeaderSelectModalComponent
-                                    firstMergeHeaderListState={props.firstMergeHeaderListState}
+                                    secondMergeHeaderListState={props.secondMergeHeaderListState}
 
-                                    _onSubmit_deleteFirstMergeHeader={_onSubmit_deleteFirstMergeHeader}
+                                    _onSubmit_deleteSecondMergeHeader={_onSubmit_deleteSecondMergeHeader}
                                     _onAddModeOpen={_onAddModeOpen}
                                     _onEditModalOpen={_onEditModalOpen}
                                     _onSelectHeader={_onSelectHeader}
@@ -122,13 +137,13 @@ const SecondMergeOperatorComponent = (props) => {
                             }
 
                             {editModalOpen &&
-                                <FirstMergeHeaderEditModalComponent
+                                <SecondMergeHeaderEditModalComponent
                                     updateHeaderState={updateHeaderState}
 
                                     _onEditModeClose={_onEditModalClose}
-                                    _onSubmit_updateFirstMergeHeader={_onSubmit_updateFirstMergeHeader}
+                                    _onSubmit_updateSecondMergeHeader={_onSubmit_updateSecondMergeHeader}
                                 >
-                                </FirstMergeHeaderEditModalComponent>
+                                </SecondMergeHeaderEditModalComponent>
                             }
                         </>
                     }

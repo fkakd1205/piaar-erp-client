@@ -1,7 +1,7 @@
 import { useReducer, useState } from 'react';
-import Ripple from '../../../template/button/Ripple';
-import CustomCheckbox from '../../../template/checkbox/CustomCheckbox';
-import CommonModalComponent from '../../../template/modal/CommonModalComponent';
+import Ripple from '../../../module/button/Ripple';
+import CustomCheckbox from '../../../module/checkbox/CustomCheckbox';
+import CommonModalComponent from '../../../module/modal/CommonModalComponent';
 import { Container, CreateHeaderTableBox, CreateHeaderTableWrapper, DefaultHeaderTableBox, DefaultHeaderTableWrapper, DefaultHeaderTh, HeaderControlBox, HeaderTitleBox, HeaderWrapper, InfoText, InputBox, OperatorWrapper, ViewDetailSelectBox } from './SecondMergeHeaderAddModal.styled';
 
 const SecondMergeHeaderAddModalComponent = (props) => {
@@ -518,9 +518,10 @@ const SecondMergeHeaderAddModalComponent = (props) => {
                 onClose={_onAddViewDetailModalClose}
             >
                 <div>
-                    {defaultHeaderList.map(r => {
+                    {defaultHeaderList.map((r, index) => {
                         return (
                             <ViewDetailSelectBox
+                                key={index}
                                 onClick={() => _onAddViewDetail(r.matchedColumnName)}
                             >
                                 {r.originCellName}

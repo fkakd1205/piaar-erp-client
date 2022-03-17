@@ -1,10 +1,10 @@
 import { useState, useReducer, useMemo } from 'react';
 import styled from 'styled-components';
-import CommonModalComponent from '../../../template/modal/CommonModalComponent';
+import CommonModalComponent from '../../../module/modal/CommonModalComponent';
 import FisrtMergeHeaderSelectModalComponent from './FisrtMergeHeaderSelectModal.component';
 import FirstMergeHeaderAddModalComponent from './FirstMergeHeaderAddModal.component';
 import FirstMergeHeaderEditModalComponent from './FirstMergeHeaderEditModal.component';
-import Ripple from '../../../template/button/Ripple';
+import Ripple from '../../../module/button/Ripple';
 
 const Container = styled.div`
     margin-top: 20px;
@@ -51,14 +51,14 @@ const ButtonBox = styled.div`
     .fill-button-item{
         position: relative;
         overflow: hidden;
+        width: 200px;
+        min-height: 34px;
         background: #2C73D2;
         border: 1px solid #2C73D2;
         border-radius: 5px;
-        width: 200px;
-        min-height: 34px;
-        font-size: 13px;
-        color:white;
+        font-size: 14px;
         font-weight: 600;
+        color: white;
         cursor: pointer;
     }
 `;
@@ -105,6 +105,10 @@ const FirstMergeOperatorComponent = (props) => {
         _onModalClose();
     }
 
+    const _onSubmit_fetchFirstMergeOrderItemList = () => {
+        props._onSubmit_fetchFirstMergeOrderItemList();
+    }
+
     const _onSubmit_createFirstMergeHeader = (body) => {
         props._onSubmit_createFirstMergeHeader(body)
         _onAddModeClose();
@@ -135,6 +139,15 @@ const FirstMergeOperatorComponent = (props) => {
                         >
                             {props.firstMergeHeaderState?.title ? props.firstMergeHeaderState?.title : '1차 병합 헤더 선택'}
                             <Ripple color={'#2C73D2'} duration={1000}></Ripple>
+                        </button>
+                    </ButtonBox>
+                    <ButtonBox>
+                        <button
+                            className='fill-button-item'
+                            onClick={_onSubmit_fetchFirstMergeOrderItemList}
+                        >
+                            1차 병합 하기
+                            <Ripple color={'#e1e1e1'} duration={1000}></Ripple>
                         </button>
                     </ButtonBox>
                 </FlexWrapper>

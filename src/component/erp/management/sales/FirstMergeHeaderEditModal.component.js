@@ -1,7 +1,7 @@
 import { useEffect, useReducer } from 'react';
 import styled from 'styled-components';
-import Ripple from '../../../template/button/Ripple';
-import CustomCheckbox from '../../../template/checkbox/CustomCheckbox';
+import Ripple from '../../../module/button/Ripple';
+import CustomCheckbox from '../../../module/checkbox/CustomCheckbox';
 import { Container, CreateHeaderTableBox, CreateHeaderTableWrapper, DefaultHeaderTableBox, DefaultHeaderTableWrapper, DefaultHeaderTh, HeaderControlBox, HeaderTitleBox, HeaderWrapper, InfoText, InputBox, OperatorWrapper } from './FirstMergeHeaderEditModal.styled';
 
 const FirstMergeHeaderAddModalComponent = (props) => {

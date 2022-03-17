@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import CommonModalComponent from '../../../template/modal/CommonModalComponent';
+import CommonModalComponent from '../../../module/modal/CommonModalComponent';
 import HeaderSettingModalComponent from './HeaderSettingModalComponent';
 
 const Container = styled.div`

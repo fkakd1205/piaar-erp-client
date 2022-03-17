@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo, useReducer, useState, useEffect } from 'react';
 import styled from 'styled-components';
-import CustomCheckbox from '../../../template/checkbox/CustomCheckbox';
-import CommonModalComponent from '../../../template/modal/CommonModalComponent';
-import ConfirmModalComponent from '../../../template/modal/ConfirmModalComponent';
+import CustomCheckbox from '../../../module/checkbox/CustomCheckbox';
+import CommonModalComponent from '../../../module/modal/CommonModalComponent';
+import ConfirmModalComponent from '../../../module/modal/ConfirmModalComponent';
 import { dateToYYYYMMDD, dateToYYYYMMDDhhmmss, dateToYYYYMMDDhhmmssFile } from '../../../../utils/dateFormatUtils';
 import OptionCodeModalComponent from './OptionCodeModalComponent';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import InfiniteScrollObserver from '../../../template/observer/InfiniteScrollObserver';
+import InfiniteScrollObserver from '../../../module/observer/InfiniteScrollObserver';
 
 const Container = styled.div`
     margin-top: 20px;
@@ -22,7 +22,7 @@ const TableWrapper = styled.div`
 `;
 
 const TableBox = styled.div`
-    height: 400px;
+    height: 300px;
 	overflow: auto;
     border: 1px solid #309FFF40;
 
@@ -186,9 +186,6 @@ const ButtonBox = styled.div`
 
 const ItemTableComponent = (props) => {
     const [viewSize, dispatchViewSize] = useReducer(viewSizeReducer, initialViewSize);
-    const [salesConfirmModalOpen, setSalesConfirmModalOpen] = useState(false);
-    const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] = useState(false);
-    const [optionCodeModalOpen, setOptionCodeModalOpen] = useState(false);
 
     useEffect(() => {
         if (!props.orderItemListState || props.orderItemListState?.length <= 0) {
@@ -197,7 +194,7 @@ const ItemTableComponent = (props) => {
 
         dispatchViewSize({
             type: 'SET_DATA',
-            payload: 20
+            payload: 50
         })
     }, [props.orderItemListState])
 
@@ -213,77 +210,6 @@ const ItemTableComponent = (props) => {
         return props.checkedOrderItemListState.some(r => r.id === id);
     }, [props.checkedOrderItemListState])
 
-    const _onSalesConfirmModalOpen = useCallback(() => {
-        if (!props.checkedOrderItemListState || props.checkedOrderItemListState.length <= 0) {
-            alert('판매 전환 데이터를 선택해 주세요.');
-            return;
-        }
-        setSalesConfirmModalOpen(true);
-    }, [props.checkedOrderItemListState])
-
-    const _onSalesConfirmModalClose = useCallback(() => {
-        setSalesConfirmModalOpen(false);
-    }, [])
-
-    const _onDeleteConfirmModalOpen = useCallback(() => {
-        if (!props.checkedOrderItemListState || props.checkedOrderItemListState.length <= 0) {
-            alert('삭제할 데이터를 선택해 주세요.');
-            return;
-        }
-        setDeleteConfirmModalOpen(true);
-    }, [props.checkedOrderItemListState])
-
-    const _onDeleteConfirmModalClose = useCallback(() => {
-        setDeleteConfirmModalOpen(false);
-    }, [])
-
-    const _onOptionCodeModalOpen = useCallback((e) => {
-        e.stopPropagation();
-        if (!props.checkedOrderItemListState || props.checkedOrderItemListState.length <= 0) {
-            alert('수정 될 데이터를 선택해 주세요.');
-            return;
-        }
-        setOptionCodeModalOpen(true);
-    }, [props.checkedOrderItemListState])
-
-    const _onOptionCodeModalClose = useCallback((e) => {
-        setOptionCodeModalOpen(false);
-    }, []);
-
-    // 판매 전환 서밋
-    const _onSubmit_changeSalesYnForOrderItemList = useCallback(() => {
-        _onSalesConfirmModalClose();
-
-        let data = props.checkedOrderItemListState.map(r => {
-            return {
-                ...r,
-                salesYn: 'y',
-                salesAt: new Date()
-            }
-        })
-
-        props._onSubmit_changeSalesYnForOrderItemList(data);
-    }, [_onSalesConfirmModalClose, props]);
-
-    // 데이터 삭제 서밋
-    const _onSubmit_deleteOrderItemList = useCallback(() => {
-        _onDeleteConfirmModalClose();
-        props._onSubmit_deleteOrderItemList(props.checkedOrderItemListState);
-    }, [_onDeleteConfirmModalClose, props])
-
-    // 옵션 코드 변경 서밋
-    const _onSubmit_changeOptionCodeForOrderItemListInBatch = useCallback((optionCode) => {
-        let data = [...props.checkedOrderItemListState];
-        data = data.map(r => {
-            return {
-                ...r,
-                optionCode: optionCode
-            }
-        })
-
-        props._onSubmit_changeOptionCodeForOrderItemListInBatch(data);
-        _onOptionCodeModalClose();
-    }, [_onOptionCodeModalClose, props]);
 
     const fetchMoreOrderItems = async () => {
         let newSize = viewSize + 20;
@@ -295,33 +221,6 @@ const ItemTableComponent = (props) => {
     return (
         <>
             <Container>
-                <OperatorWrapper>
-                    <ButtonWrapper>
-                        <ButtonBox>
-                            <button
-                                type='button'
-                                className='common-btn-item'
-                                onClick={() => _onSalesConfirmModalOpen()}
-                            >판매 전환</button>
-                        </ButtonBox>
-                        <ButtonBox>
-                            <button
-                                type='button'
-                                className='common-btn-item'
-                                onClick={(e) => _onOptionCodeModalOpen(e)}
-                            >옵션 코드 수정</button>
-                        </ButtonBox>
-                    </ButtonWrapper>
-                    <ButtonBox>
-                        <button
-                            type='button'
-                            className='delete-btn-item'
-                            onClick={() => _onDeleteConfirmModalOpen()}
-                        >
-                            <img className='delete-icon-item' src='/assets/icon/delete_icon.png' alt='delete button'></img>
-                        </button>
-                    </ButtonBox>
-                </OperatorWrapper>
                 {(props.headerState && props.orderItemListState) &&
                     <TableWrapper>
                         <TableBox>
@@ -397,12 +296,12 @@ const ItemTableComponent = (props) => {
                                 endOffset={viewSize}
                                 fetchData={fetchMoreOrderItems}
                                 loadingElementTag={
-                                    <p style={{ textAlign: 'center' }}>
+                                    <p style={{ textAlign: 'center', fontSize:'14px', fontWeight:'600', color:'#444' }}>
                                         로딩중...
                                     </p>
                                 }
                                 endElementTag={
-                                    <p style={{ textAlign: 'center' }}>
+                                    <p style={{ textAlign: 'center', fontSize:'14px', fontWeight:'600', color:'#444' }}>
                                         마지막 데이터 입니다.
                                     </p>
                                 }
@@ -414,36 +313,6 @@ const ItemTableComponent = (props) => {
                     <div style={{ textAlign: 'center', padding: '100px 0', fontWeight: '600' }}>뷰 헤더를 먼저 설정해 주세요.</div>
                 }
             </Container>
-
-            {/* Modal */}
-            <ConfirmModalComponent
-                open={salesConfirmModalOpen}
-                title={'판매 전환 확인 메세지'}
-                message={`[ ${props.checkedOrderItemListState.length} ] 건의 데이터를 판매 전환 하시겠습니까?`}
-
-                onConfirm={_onSubmit_changeSalesYnForOrderItemList}
-                onClose={_onSalesConfirmModalClose}
-            ></ConfirmModalComponent>
-            <ConfirmModalComponent
-                open={deleteConfirmModalOpen}
-                title={'데이터 삭제 확인 메세지'}
-                message={`[ ${props.checkedOrderItemListState.length} ] 건의 데이터를 삭제 하시겠습니까?`}
-
-                onConfirm={_onSubmit_deleteOrderItemList}
-                onClose={_onDeleteConfirmModalClose}
-            ></ConfirmModalComponent>
-            <CommonModalComponent
-                open={optionCodeModalOpen}
-
-                onClose={_onOptionCodeModalClose}
-            >
-                <OptionCodeModalComponent
-                    checkedOrderItemListState={props.checkedOrderItemListState}
-                    productOptionListState={props.productOptionListState}
-
-                    onConfirm={(optionCode) => _onSubmit_changeOptionCodeForOrderItemListInBatch(optionCode)}
-                ></OptionCodeModalComponent>
-            </CommonModalComponent>
         </>
     );
 }
@@ -451,12 +320,12 @@ const ItemTableComponent = (props) => {
 
 export default ItemTableComponent;
 
-const initialViewSize = 20;
+const initialViewSize = 50;
 
 const viewSizeReducer = (state, action) => {
     switch (action.type) {
         case 'SET_DATA':
             return action.payload;
-        default: return 20;
+        default: return 50;
     }
 }

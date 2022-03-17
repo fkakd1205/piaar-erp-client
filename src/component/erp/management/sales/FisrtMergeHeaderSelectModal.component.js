@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import Ripple from '../../../template/button/Ripple';
+import Ripple from '../../../module/button/Ripple';
 import { ButtonBox, Container, HeaderTitleBox, HeaderWrapper, ListBox, ListWrapper } from './FisrtMergeHeaderSelectModal.styled';
 
 const FisrtMergeHeaderSelectModalComponent = (props) => {
