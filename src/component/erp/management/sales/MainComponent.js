@@ -7,17 +7,12 @@ import ItemTableComponent from './ItemTableComponent';
 import TopOperatorComponent from './TopOperatorComponent';
 import SearchOperatorComponent from './SearchOperatorComponent';
 import { useLocation } from 'react-router-dom';
-import { getEndDate, getStartDate } from '../../../../utils/dateFormatUtils';
+import { dateToYYYYMMDDhhmmss, dateToYYYYMMDDhhmmssFile, getEndDate, getStartDate } from '../../../../utils/dateFormatUtils';
 import { productOptionDataConnect } from '../../../../data_connect/productOptionDataConnect';
-import FirstMergeOperatorComponent from './FirstMergeOperatorComponent';
-import { erpFirstMergeHeaderDataConnect } from '../../../../data_connect/erpFirstMergeHeaderDataConnect';
-import FirstMergedItemTableComponent from './FirstMergedItemTable.component';
-import SecondMergeOperatorComponent from './SecondMergeOperator.component';
-import SecondMergedItemTableComponent from './SecondMergedItemTable.component';
 import CheckedItemTableComponent from './CheckedItemTableComponent';
-import { erpSecondMergeHeaderDataConnect } from '../../../../data_connect/erpSecondMergeHeaderDataConnect';
 import ExcelDownloadModalComponent from './excel-download-modal/ExcelDownloadModal.component';
 import CommonModalComponent from '../../../module/modal/CommonModalComponent';
+import { erpDownloadExcelHeaderDataConnect } from '../../../../data_connect/erpDownloadExcelHeaderDataConnect';
 
 const Container = styled.div`
     margin-bottom: 150px;
@@ -31,12 +26,7 @@ const MainComponent = (props) => {
     const [headerState, dispatchHeaderState] = useReducer(headerStateReducer, initialHeaderState);
     const [productOptionListState, dispatchProductOptionListState] = useReducer(productOptionListStateReducer, initialProductOptionListState);
     const [orderItemListState, dispatchOrderItemListState] = useReducer(orderItemListStateReducer, initialOrderItemListState);
-    const [firstMergeHeaderListState, dispatchFirstMergeHeaderListState] = useReducer(firstMergeHeaderListStateReducer, initialFirstMergeHeaderListState);
-    const [firstMergeHeaderState, dispatchFirstMergeHeaderState] = useReducer(firstMergeHeaderStateReducer, initialFirstMergeHeaderState);
-    const [firstMergedItemListState, dispatchFirstMergedItemListState] = useReducer(firstMergedItemListStateReducer, initialFirstMergedItemListState);
-    const [secondMergeHeaderListState, dispatchSecondMergeHeaderListState] = useReducer(secondMergeHeaderListStateReducer, initialSecondMergeHeaderListState);
-    const [secondMergeHeaderState, dispatchSecondMergeHeaderState] = useReducer(secondMergeHeaderStateReducer, initialSecondMergeHeaderState);
-    const [secondMergedItemListState, dispatchSecondMergedItemListState] = useReducer(secondMergedItemListStateReducer, initialSecondMergedItemListState);
+    const [excelFormHeaderList, dispatchExcelFormHeaderList] = useReducer(excelFormHeaderListReducer, initialExcelFormHeaderList);
 
     const [excelDownloadModalOpen, setExcelDownloadModalOpen] = useState(false);
 
@@ -168,100 +158,11 @@ const MainComponent = (props) => {
             });
     }
 
-    const __reqCreateFirstMergeHeaderOne = async (body) => {
-        await erpFirstMergeHeaderDataConnect().createOne(body)
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data.memo);
-            })
-    }
-
-    const __reqSearchFirstMergeHeaderList = async () => {
-        await erpFirstMergeHeaderDataConnect().searchList()
-            .then(res => {
-                if (res.status === 200 && res.data.message === 'success') {
-                    dispatchFirstMergeHeaderListState({
-                        type: 'INIT_DATA',
-                        payload: res.data.data
-                    })
-                }
-            })
-            .catch(err => {
-                let res = err.response;
-                console.log(res);
-            })
-    }
-
-    const __reqDeleteFirstMergeHeader = async (id) => {
-        await erpFirstMergeHeaderDataConnect().deleteOne(id)
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data.memo);
-            })
-    }
-
-    const __reqUpdateFirstMergeHeader = async (body) => {
-        await erpFirstMergeHeaderDataConnect().updateOne(body)
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data.memo);
-            })
-    }
-
-    const __reqFetchFirstMerge = async (firstMergeHeaderId, body) => {
-        await erpOrderItemDataConnect().fetchFirstMerge(firstMergeHeaderId, body)
-            .then(res => {
-                if (res.status === 200 && res.data.message === 'success') {
-                    dispatchFirstMergedItemListState({
-                        type: 'INIT_DATA',
-                        payload: res.data.data
-                    })
-                }
-            })
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data.memo);
-            })
-    }
-
-    const __reqCreateSecondMergeHeaderOne = async (body) => {
-        await erpSecondMergeHeaderDataConnect().createOne(body)
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data.memo);
-            })
-    }
-
     const __reqSearchSecondMergeHeaderList = async () => {
-        await erpSecondMergeHeaderDataConnect().searchList()
+        await erpDownloadExcelHeaderDataConnect().searchList()
             .then(res => {
                 if (res.status === 200 && res.data.message === 'success') {
-                    dispatchSecondMergeHeaderListState({
+                    dispatchExcelFormHeaderList({
                         type: 'INIT_DATA',
                         payload: res.data.data
                     })
@@ -273,40 +174,19 @@ const MainComponent = (props) => {
             })
     }
 
-    const __reqDeleteSecondMergeHeader = async (id) => {
-        await erpSecondMergeHeaderDataConnect().deleteOne(id)
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data.memo);
-            })
-    }
-
-    const __reqUpdateSecondMergeHeader = async (body) => {
-        await erpSecondMergeHeaderDataConnect().updateOne(body)
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data.memo);
-            })
-    }
-
-    const __reqFetchSecondMerge = async (secondMergeHeaderId, body) => {
-        await erpOrderItemDataConnect().fetchSecondMerge(secondMergeHeaderId, body)
+    const __reqActionDownloadForDownloadOrderItems = async (id, downloadOrderItemsBody) => {
+        await erpDownloadExcelHeaderDataConnect().actionDownloadForDownloadOrderItems(id, downloadOrderItemsBody)
             .then(res => {
                 if (res.status === 200 && res.data.message === 'success') {
-                    dispatchSecondMergedItemListState({
-                        type: 'INIT_DATA',
-                        payload: res.data.data
-                    })
+                    const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
+                    const link = document.createElement('a');
+                    link.href = url;
+
+                    let date = dateToYYYYMMDDhhmmssFile(new Date());
+
+                    link.setAttribute('download', date + '_판매데이터_엑셀.xlsx');
+                    document.body.appendChild(link);
+                    link.click();
                 }
             })
             .catch(err => {
@@ -323,7 +203,6 @@ const MainComponent = (props) => {
     useEffect(() => {
         __reqSearchOrderHeaderOne();
         __reqSearchProductOptionList();
-        __reqSearchFirstMergeHeaderList();
         __reqSearchSecondMergeHeaderList();
     }, []);
 
@@ -403,107 +282,9 @@ const MainComponent = (props) => {
         await __reqSearchOrderItemList();
     }
 
-    // 1차 병합 해더 생성
-    const _onSubmit_createFirstMergeHeader = async (body) => {
-        await __reqCreateFirstMergeHeaderOne(body);
-        await __reqSearchFirstMergeHeaderList();
-    }
-
-    // 1 차 병합 헤더 삭제
-    const _onSubmit_deleteFirstMergeHeader = async (id) => {
-        await __reqDeleteFirstMergeHeader(id);
-        await __reqSearchFirstMergeHeaderList();
-        dispatchFirstMergeHeaderState({
-            type: 'CLEAR'
-        })
-    }
-
-    // 1차 병합 헤더 수정
-    const _onSubmit_updateFirstMergeHeader = async (body) => {
-        await __reqUpdateFirstMergeHeader(body);
-        await __reqSearchFirstMergeHeaderList();
-        dispatchFirstMergeHeaderState({
-            type: 'CLEAR'
-        })
-    }
-
-    // 1차 데이터 병합
-    const _onSubmit_fetchFirstMergeOrderItemList = async () => {
-        if (!checkedOrderItemListState || checkedOrderItemListState?.length <= 0) {
-            alert('병합 데이터를 선택해 주세요.');
-            return;
-        }
-
-        if (!firstMergeHeaderState) {
-            alert('1차 병합 헤더를 먼저 선택해 주세요.');
-            return;
-        }
-
-        await __reqFetchFirstMerge(firstMergeHeaderState?.id, checkedOrderItemListState);
-    }
-
-    // 1차 병합 헤더 선택
-    const _onChangeFirstMergeHeaderState = (data) => {
-        dispatchFirstMergeHeaderState({
-            type: 'INIT_DATA',
-            payload: data
-        })
-        dispatchFirstMergedItemListState({
-            type: 'CLEAR'
-        })
-        dispatchSecondMergedItemListState({
-            type: 'CLEAR'
-        })
-    }
-
-    // 2차 병합 헤더 생성
-    const _onSubmit_createSecondMergeHeader = async (body) => {
-        await __reqCreateSecondMergeHeaderOne(body)
-        await __reqSearchSecondMergeHeaderList();
-    }
-
-    // 2차 병합 헤더 선택
-    const _onChangeSecondMergeHeaderState = (data) => {
-        dispatchSecondMergeHeaderState({
-            type: 'INIT_DATA',
-            payload: data
-        })
-        dispatchSecondMergedItemListState({
-            type: 'CLEAR'
-        })
-    }
-
-    // 2 차 병합 헤더 삭제
-    const _onSubmit_deleteSecondMergeHeader = async (id) => {
-        await __reqDeleteSecondMergeHeader(id);
-        await __reqSearchSecondMergeHeaderList();
-        dispatchSecondMergeHeaderState({
-            type: 'CLEAR'
-        })
-    }
-
-    // 2차 병합 헤더 수정
-    const _onSubmit_updateSecondMergeHeader = async (body) => {
-        await __reqUpdateSecondMergeHeader(body);
-        await __reqSearchSecondMergeHeaderList();
-        dispatchSecondMergeHeaderState({
-            type: 'CLEAR'
-        })
-    }
-
-    // 2차 데이터 병합
-    const _onSubmit_fetchSecondMergeOrderItemList = async () => {
-        if (!firstMergedItemListState || firstMergedItemListState?.length <= 0) {
-            alert('1차 병합이 선행 되어야 합니다.');
-            return;
-        }
-
-        if (!secondMergeHeaderState) {
-            alert('2차 병합 헤더를 먼저 선택해 주세요.');
-            return;
-        }
-
-        await __reqFetchSecondMerge(secondMergeHeaderState?.id, firstMergedItemListState);
+    // 엑셀 다운로드
+    const _onSubmit_downloadOrderItemsExcel = async (downloadExcelHeader, downloadOrderItemList) => {
+        await __reqActionDownloadForDownloadOrderItems(downloadExcelHeader.id, downloadOrderItemList);
     }
 
     const _onChange_openExcelDownloadModal = () => {
@@ -522,6 +303,11 @@ const MainComponent = (props) => {
 
                     _onSubmit_modifiedHeader={_onSubmit_modifiedHeader}
                 ></TopOperatorComponent>
+                {/* <PageHeaderComponent
+                    headerState={headerState}
+
+                    _onSubmit_modifiedHeader={_onSubmit_modifiedHeader}
+                ></PageHeaderComponent> */}
                 <SearchOperatorComponent
                     headerState={headerState}
                 ></SearchOperatorComponent>
@@ -544,34 +330,6 @@ const MainComponent = (props) => {
                     _onSubmit_changeOptionCodeForOrderItemListInBatch={_onSubmit_changeOptionCodeForOrderItemListInBatch}
                     _onChange_openExcelDownloadModal={_onChange_openExcelDownloadModal}
                 ></CheckedItemTableComponent>
-                {/* <FirstMergeOperatorComponent
-                    firstMergeHeaderListState={firstMergeHeaderListState}
-                    firstMergeHeaderState={firstMergeHeaderState}
-
-                    _onSubmit_fetchFirstMergeOrderItemList={_onSubmit_fetchFirstMergeOrderItemList}
-                    _onSubmit_createFirstMergeHeader={_onSubmit_createFirstMergeHeader}
-                    _onSubmit_deleteFirstMergeHeader={_onSubmit_deleteFirstMergeHeader}
-                    _onSubmit_updateFirstMergeHeader={_onSubmit_updateFirstMergeHeader}
-                    _onChangeFirstMergeHeaderState={_onChangeFirstMergeHeaderState}
-                ></FirstMergeOperatorComponent>
-                <FirstMergedItemTableComponent
-                    headerState={firstMergeHeaderState}
-                    orderItemListState={firstMergedItemListState}
-                ></FirstMergedItemTableComponent>
-                <SecondMergeOperatorComponent
-                    secondMergeHeaderListState={secondMergeHeaderListState}
-                    secondMergeHeaderState={secondMergeHeaderState}
-
-                    _onSubmit_fetchSecondMergeOrderItemList={_onSubmit_fetchSecondMergeOrderItemList}
-                    _onSubmit_createSecondMergeHeader={_onSubmit_createSecondMergeHeader}
-                    _onSubmit_deleteSecondMergeHeader={_onSubmit_deleteSecondMergeHeader}
-                    _onSubmit_updateSecondMergeHeader={_onSubmit_updateSecondMergeHeader}
-                    _onChangeSecondMergeHeaderState={_onChangeSecondMergeHeaderState}
-                ></SecondMergeOperatorComponent>
-                <SecondMergedItemTableComponent
-                    headerState={secondMergeHeaderState}
-                    orderItemListState={secondMergedItemListState}
-                ></SecondMergedItemTableComponent> */}
             </Container>
 
             {/* Modal */}
@@ -584,6 +342,9 @@ const MainComponent = (props) => {
                 <ExcelDownloadModalComponent
                     headerState={headerState}
                     checkedOrderItemListState={checkedOrderItemListState}
+                    excelFormHeaderList={excelFormHeaderList}
+
+                    _onSubmit_downloadOrderItemsExcel={_onSubmit_downloadOrderItemsExcel}
                 ></ExcelDownloadModalComponent>
             </CommonModalComponent>
         </>
@@ -595,12 +356,7 @@ const initialHeaderState = null;
 const initialProductOptionListState = null;
 const initialOrderItemListState = null;
 const initialCheckedOrderItemListState = [];
-const initialFirstMergeHeaderListState = null;
-const initialFirstMergeHeaderState = null;
-const initialFirstMergedItemListState = null;
-const initialSecondMergeHeaderListState = null;
-const initialSecondMergeHeaderState = null;
-const initialSecondMergedItemListState = null;
+const initialExcelFormHeaderList = null;
 
 const headerStateReducer = (state, action) => {
     switch (action.type) {
@@ -636,57 +392,7 @@ const checkedOrderItemListStateReducer = (state, action) => {
     }
 }
 
-const firstMergeHeaderListStateReducer = (state, action) => {
-    switch (action.type) {
-        case 'INIT_DATA':
-            return action.payload;
-        case 'CLEAR':
-            return null;
-        default: return null;
-    }
-}
-
-const firstMergeHeaderStateReducer = (state, action) => {
-    switch (action.type) {
-        case 'INIT_DATA':
-            return action.payload;
-        case 'CLEAR':
-            return null;
-        default: return null;
-    }
-}
-
-const firstMergedItemListStateReducer = (state, action) => {
-    switch (action.type) {
-        case 'INIT_DATA':
-            return action.payload;
-        case 'CLEAR':
-            return null;
-        default: return null;
-    }
-}
-
-const secondMergeHeaderListStateReducer = (state, action) => {
-    switch (action.type) {
-        case 'INIT_DATA':
-            return action.payload;
-        case 'CLEAR':
-            return null;
-        default: return null;
-    }
-}
-
-const secondMergeHeaderStateReducer = (state, action) => {
-    switch (action.type) {
-        case 'INIT_DATA':
-            return action.payload;
-        case 'CLEAR':
-            return null;
-        default: return null;
-    }
-}
-
-const secondMergedItemListStateReducer = (state, action) => {
+const excelFormHeaderListReducer = (state, action) => {
     switch (action.type) {
         case 'INIT_DATA':
             return action.payload;

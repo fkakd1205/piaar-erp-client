@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { dateToYYYYMMDDhhmmss } from '../../../../../utils/dateFormatUtils';
-import { Container, TableBox, TableWrapper } from './ExcelDownloadModal.styled';
+import { Container, PreviewTableWrapper, TableBox, TableWrapper } from './ExcelDownloadModal.styled';
 
 const Colgroup = ({ headerState }) => {
     return (
@@ -86,27 +86,25 @@ const TableBody = ({ headerState, downloadOrderItemList, isCheckedItem, _onActio
 }
 const PreviewTableView = (props) => {
     return (
-        <Container>
-            <TableWrapper>
-                <TableBox>
-                    <table cellSpacing="0">
-                        <Colgroup
-                            headerState={props.headerState}
-                        ></Colgroup>
-                        <TableHead
-                            headerState={props.headerState}
-                        ></TableHead>
-                        <TableBody
-                            headerState={props.headerState}
-                            downloadOrderItemList={props.downloadOrderItemList}
-                            isCheckedItem={props.isCheckedItem}
+        <PreviewTableWrapper>
+            <TableBox>
+                <table cellSpacing="0">
+                    <Colgroup
+                        headerState={props.headerState}
+                    ></Colgroup>
+                    <TableHead
+                        headerState={props.headerState}
+                    ></TableHead>
+                    <TableBody
+                        headerState={props.headerState}
+                        downloadOrderItemList={props.downloadOrderItemList}
+                        isCheckedItem={props.isCheckedItem}
 
-                            _onAction_checkItem={props._onAction_checkItem}
-                        ></TableBody>
-                    </table>
-                </TableBox>
-            </TableWrapper>
-        </Container>
+                        _onAction_checkItem={props._onAction_checkItem}
+                    ></TableBody>
+                </table>
+            </TableBox>
+        </PreviewTableWrapper>
     );
 }
 export default PreviewTableView;

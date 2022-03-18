@@ -1,6 +1,6 @@
 import { useEffect, useReducer } from 'react';
 import styled from 'styled-components';
-import { erpSecondMergeHeaderDataConnect } from '../../../../data_connect/erpSecondMergeHeaderDataConnect';
+import { erpDownloadExcelHeaderDataConnect } from '../../../../data_connect/erpDownloadExcelHeaderDataConnect';
 import EditFieldComponent from './edit-field/EditField.component';
 import HeaderListComponent from './header-list/HeaderList.component';
 import MainLayout from './layout/MainLayout';
@@ -14,7 +14,7 @@ const ErpManagementExcelForm = (props) => {
     const [selectedHeader, dispatchSelectedHeader] = useReducer(selectedHeaderReducer, initialSelectedHeader);
 
     const __reqSearchHeaderList = async () => {
-        await erpSecondMergeHeaderDataConnect().searchList()
+        await erpDownloadExcelHeaderDataConnect().searchList()
             .then(res => {
                 if (res.status === 200 && res.data.message === 'success') {
                     dispatchHeaderList({
@@ -30,7 +30,7 @@ const ErpManagementExcelForm = (props) => {
     };
 
     const __reqCreateOne = async (body) => {
-        await erpSecondMergeHeaderDataConnect().createOne(body)
+        await erpDownloadExcelHeaderDataConnect().createOne(body)
             .catch(err => {
                 let res = err.response;
                 if (res?.status === 500) {
@@ -43,7 +43,7 @@ const ErpManagementExcelForm = (props) => {
     }
 
     const __reqDeleteOne = async (headerId) => {
-        await erpSecondMergeHeaderDataConnect().deleteOne(headerId)
+        await erpDownloadExcelHeaderDataConnect().deleteOne(headerId)
             .catch(err => {
                 let res = err.response;
                 if (res?.status === 500) {
@@ -56,7 +56,7 @@ const ErpManagementExcelForm = (props) => {
     }
 
     const __reqUpdateOne = async (body) => {
-        await erpSecondMergeHeaderDataConnect().updateOne(body)
+        await erpDownloadExcelHeaderDataConnect().updateOne(body)
             .then(res => {
                 if (res.status === 200 && res.data.message === 'success') {
                     alert('양식이 성공적으로 저장되었습니다.');

@@ -1,7 +1,14 @@
 import { useEffect, useReducer, useState } from "react";
+import { staticDefaultHeaderDetails } from "../../../../../static-data/staticData";
 import CombineOperators from "./CombineOperators.view";
+import DownloadButtonFieldView from "./DownloadButtonField.view";
+import { Container } from "./ExcelDownloadModal.styled";
+import ExcelHeaderDisplayView from "./ExcelHeaderDisplay.view";
+import ExcelHeaderSelectorView from "./ExcelHeaderSelector.view";
 import PreviewTableView from "./PreviewTable.view";
 import TitleView from "./Title.view";
+
+const defaultHeaderDetails = staticDefaultHeaderDetails;
 
 // collections를 가지고 downloadOrderItem 폼으로 변환, collection = [...orderItem]
 const getDownloadOrderItem = (collections) => {
@@ -17,6 +24,7 @@ const getDownloadOrderItem = (collections) => {
 const ExcelDownloadModalComponent = (props) => {
     const [downloadOrderItemList, dispatchDownloadOrderItemList] = useReducer(downloadOrderItemListReducer, initialDownloadOrderItemList);
     const [checkedItemList, dispatchCheckedItemList] = useReducer(checkedItemListReducer, initialCheckedItemList);
+    const [selectedExcelHeader, dispatchSelectedExcelHeader] = useReducer(selectedExcelHeaderReducer, initialSelectedExcelHeader);
 
     useEffect(() => {
         if (!props.checkedOrderItemListState || props.checkedOrderItemListState?.length <= 0) {
@@ -162,26 +170,68 @@ const ExcelDownloadModalComponent = (props) => {
         return checkedItemList.some(r => r.id === item.id);
     }
 
+    const onActionSelectExcelFormHeader = (e) => {
+        let id = e.target.value;
+        let header = props.excelFormHeaderList.filter(r => r.id === id)[0];
+
+        if (!id) {
+            dispatchSelectedExcelHeader({
+                type: 'CLEAR'
+            })
+        }
+        dispatchSelectedExcelHeader({
+            type: 'SET_DATA',
+            payload: header
+        })
+    }
+
+    const onActionDownloadExcel = () => {
+        console.log(downloadOrderItemList);
+        console.log(selectedExcelHeader);
+        props._onSubmit_downloadOrderItemsExcel(selectedExcelHeader, downloadOrderItemList)
+    }
+
     return (
         <>
-            <TitleView
-                title={'엑셀 다운로드'}
-            ></TitleView>
-            <CombineOperators
-                _onAction_combineDownloadOrderItemList={_onAction_combineDownloadOrderItemList}
-                _onAction_insulateDownloadOrderItemList={_onAction_insulateDownloadOrderItemList}
-                _onAction_insulateDownloadOrderItemListSelectOnly={_onAction_insulateDownloadOrderItemListSelectOnly}
-            ></CombineOperators>
-            {(downloadOrderItemList && props.headerState) &&
-                <PreviewTableView
-                    headerState={props.headerState}
-                    downloadOrderItemList={downloadOrderItemList}
-                    checkedItemList={checkedItemList}
-                    isCheckedItem={isCheckedItem}
+            <Container>
+                <TitleView
+                    title={'엑셀 다운로드'}
+                ></TitleView>
+                <CombineOperators
+                    _onAction_combineDownloadOrderItemList={_onAction_combineDownloadOrderItemList}
+                    _onAction_insulateDownloadOrderItemList={_onAction_insulateDownloadOrderItemList}
+                    _onAction_insulateDownloadOrderItemListSelectOnly={_onAction_insulateDownloadOrderItemListSelectOnly}
+                ></CombineOperators>
+                {(downloadOrderItemList && props.headerState) &&
+                    <PreviewTableView
+                        headerState={props.headerState}
+                        downloadOrderItemList={downloadOrderItemList}
+                        checkedItemList={checkedItemList}
+                        isCheckedItem={isCheckedItem}
 
-                    _onAction_checkItem={_onAction_checkItem}
-                ></PreviewTableView>
-            }
+                        _onAction_checkItem={_onAction_checkItem}
+                    ></PreviewTableView>
+                }
+                {props.excelFormHeaderList &&
+                    <ExcelHeaderSelectorView
+                        excelFormHeaderList={props.excelFormHeaderList}
+                        selectedExcelHeader={selectedExcelHeader}
+
+                        onActionSelectExcelFormHeader={onActionSelectExcelFormHeader}
+                    ></ExcelHeaderSelectorView>
+                }
+                {selectedExcelHeader &&
+                    <>
+                        <ExcelHeaderDisplayView
+                            defaultHeaderDetails={defaultHeaderDetails}
+                            selectedExcelHeader={selectedExcelHeader}
+                        ></ExcelHeaderDisplayView>
+                        <DownloadButtonFieldView
+                            onActionDownloadExcel={onActionDownloadExcel}
+                        ></DownloadButtonFieldView>
+                    </>
+                }
+            </Container>
         </>
     );
 }
@@ -189,6 +239,7 @@ export default ExcelDownloadModalComponent;
 
 const initialDownloadOrderItemList = null;
 const initialCheckedItemList = [];
+const initialSelectedExcelHeader = null;
 
 const downloadOrderItemListReducer = (state, action) => {
     switch (action.type) {
@@ -205,5 +256,15 @@ const checkedItemListReducer = (state, action) => {
         case 'CLEAR':
             return [];
         default: return [];
+    }
+}
+
+const selectedExcelHeaderReducer = (state, action) => {
+    switch (action.type) {
+        case 'SET_DATA':
+            return action.payload;
+        case 'CLEAR':
+            return initialSelectedExcelHeader;
+        default: return initialSelectedExcelHeader;
     }
 }
