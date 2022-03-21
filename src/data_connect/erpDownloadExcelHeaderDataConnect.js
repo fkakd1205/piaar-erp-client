@@ -26,6 +26,7 @@ const erpDownloadExcelHeaderDataConnect = () => {
         },
         actionDownloadForDownloadOrderItems: async function (id, downloadOrderItemsBody) {
             return await axios.post(`${API_SERVER_ADDRESS}/api/v1/erp-download-excel-headers/${id}/download-order-items/action-download`, downloadOrderItemsBody, {
+                responseType: 'blob',
                 withCredentials: true
             })
         }

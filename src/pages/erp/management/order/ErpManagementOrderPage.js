@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import ErpManagementNavbar from '../../../../component/erp/management/navbar/ErpManagementNavbar';
-import MainComponent from '../../../../component/erp/management/order/MainComponent';
+import OrderComponent from '../../../../component/erp/management/order';
 import NavbarMain from '../../../../component/navbar/NavbarMain';
 const Container = styled.div`
 
@@ -12,7 +12,7 @@ const ErpManagementOrderPage = (props) => {
             <Container>
                 <NavbarMain></NavbarMain>
                 <ErpManagementNavbar></ErpManagementNavbar>
-                <MainComponent></MainComponent>
+                <OrderComponent></OrderComponent>
             </Container>
         </>
     );

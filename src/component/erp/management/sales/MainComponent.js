@@ -177,17 +177,17 @@ const MainComponent = (props) => {
     const __reqActionDownloadForDownloadOrderItems = async (id, downloadOrderItemsBody) => {
         await erpDownloadExcelHeaderDataConnect().actionDownloadForDownloadOrderItems(id, downloadOrderItemsBody)
             .then(res => {
-                if (res.status === 200 && res.data.message === 'success') {
-                    const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
-                    const link = document.createElement('a');
-                    link.href = url;
+                // if (res.status === 200 && res.data.message === 'success') {
+                const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
+                const link = document.createElement('a');
+                link.href = url;
 
-                    let date = dateToYYYYMMDDhhmmssFile(new Date());
+                let date = dateToYYYYMMDDhhmmssFile(new Date());
 
-                    link.setAttribute('download', date + '_판매데이터_엑셀.xlsx');
-                    document.body.appendChild(link);
-                    link.click();
-                }
+                link.setAttribute('download', date + '_판매데이터_엑셀.xlsx');
+                document.body.appendChild(link);
+                link.click();
+                // }
             })
             .catch(err => {
                 let res = err.response;

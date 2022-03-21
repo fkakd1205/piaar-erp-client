@@ -1,35 +1,40 @@
-import { useCallback, useEffect, useReducer, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useReducer, useState } from 'react';
 import qs from 'query-string';
+import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
+import CommonModalComponent from '../../../module/modal/CommonModalComponent';
+import ViewHeaderSettingModalComponent from './view-header-setting-modal/ViewHeaderSettingModal.component';
+import HeaderComponent from './header/Header.component';
 import { erpOrderHeaderDataConnect } from '../../../../data_connect/erpOrderHeaderDataConnect';
+import SearchOperatorComponent from './search-operator/SearchOperator.component';
+import { getEndDate, getStartDate } from '../../../../utils/dateFormatUtils';
 import { erpOrderItemDataConnect } from '../../../../data_connect/erpOrderItemDataConnect';
-import ItemTableComponent from './ItemTableComponent';
-import SearchOperatorComponent from './SearchOperatorComponent';
-import TopOperatorComponent from './TopOperatorComponent';
-import { dateToYYYYMMDDhhmmss, getEndDate, getStartDate } from '../../../../utils/dateFormatUtils';
 import { productOptionDataConnect } from '../../../../data_connect/productOptionDataConnect';
-import CheckedItemTableComponent from './CheckedItemTableComponent';
-import axios from 'axios';
+import OrderItemTableComponent from './order-item-table/OrderItemTable.component';
+import CheckedOrderItemTableComponent from './checked-order-item-table/CheckedOrderItemTable.component';
+import CheckedOperatorComponent from './checked-operator/CheckedOperator.component';
 
 const Container = styled.div`
-    margin-bottom: 150px;
+    margin-bottom: 100px;
 `;
 
-const MainComponent = (props) => {
+// TODO : 페이지 구조 개선 해야됨. 현재 header, view-header-setting-modal 완성했고, search-operator 아직 완성 못함. 
+const OrderComponent = (props) => {
     const location = useLocation();
     const query = qs.parse(location.search);
 
-    const [headerState, dispatchHeaderState] = useReducer(headerStateReducer, initialHeaderState);
-    const [productOptionListState, dispatchProductOptionListState] = useReducer(productOptionListStateReducer, initialProductOptionListState);
-    const [orderItemListState, dispatchOrderItemListState] = useReducer(orderItemListStateReducer, initialOrderItemListState);
-    const [checkedOrderItemListState, dispatchCheckedOrderItemListState] = useReducer(checkedOrderItemListStateReducer, initialCheckedOrderItemListState);
+    const [viewHeader, dispatchViewHeader] = useReducer(viewHeaderReducer, initialViewHeader);
+    const [productOptionList, dispatchProductOptionList] = useReducer(productOptionListReducer, initialProductOptionList);
+    const [orderItemList, dispatchOrderItemList] = useReducer(orderItemListReducer, initialOrderItemList);
+    const [checkedOrderItemList, dispatchCheckedOrderItemList] = useReducer(checkedOrderItemListReducer, initialCheckedOrderItemList);
+
+    const [headerSettingModalOpen, setHeaderSettingModalOpen] = useState(false);
 
     const __reqSearchOrderHeaderOne = async () => {
         await erpOrderHeaderDataConnect().searchOne()
             .then(res => {
                 if (res.status === 200 && res.data.message === 'success') {
-                    dispatchHeaderState({
+                    dispatchViewHeader({
                         type: 'INIT_DATA',
                         payload: res.data.data
                     })
@@ -70,7 +75,7 @@ const MainComponent = (props) => {
         await productOptionDataConnect().searchList()
             .then(res => {
                 if (res.status === 200 && res.data.message === 'success') {
-                    dispatchProductOptionListState({
+                    dispatchProductOptionList({
                         type: 'INIT_DATA',
                         payload: res.data.data
                     })
@@ -85,21 +90,23 @@ const MainComponent = (props) => {
         let startDate = query.startDate ? getStartDate(query.startDate) : null;
         let endDate = query.endDate ? getEndDate(query.endDate) : null;
         let searchColumnName = query.searchColumnName || null;
-        let searchValue = query.searchValue || null;
+        let searchQuery = query.searchQuery || null;
+        let periodType = query.periodType || null;
 
         let params = {
             salesYn: 'n',
             releaseYn: 'n',
             startDate: startDate,
             endDate: endDate,
+            periodType: periodType,
             searchColumnName: searchColumnName,
-            searchValue: searchValue
+            searchValue: searchQuery
         }
 
         await erpOrderItemDataConnect().searchList(params)
             .then(res => {
                 if (res.status === 200 && res.data.message === 'success') {
-                    dispatchOrderItemListState({
+                    dispatchOrderItemList({
                         type: 'INIT_DATA',
                         payload: res.data.data
                     })
@@ -159,47 +166,56 @@ const MainComponent = (props) => {
         __reqSearchOrderItemList();
     }, [location]);
 
-    const _onChange_checkAllCheckedOrderListState = useCallback(() => {
-        if (orderItemListState.length === checkedOrderItemListState.length) {
-            dispatchCheckedOrderItemListState({
+
+    const _onAction_openHeaderSettingModal = () => {
+        setHeaderSettingModalOpen(true);
+    }
+
+    const _onAction_closeHeaderSettingModal = () => {
+        setHeaderSettingModalOpen(false);
+    }
+
+    const _onAction_checkOrderItem = (e, orderItem) => {
+        e.stopPropagation();
+        let data = [...checkedOrderItemList];
+        let selectedId = orderItem.id;
+
+        if (checkedOrderItemList.some(r => r.id === selectedId)) {
+            data = data.filter(r => r.id !== selectedId);
+        } else {
+            data.push(orderItem);
+        }
+
+        dispatchCheckedOrderItemList({
+            type: 'SET_DATA',
+            payload: data
+        })
+    }
+
+    const _onAction_checkOrderItemAll = () => {
+        if (orderItemList.length === checkedOrderItemList.length) {
+            dispatchCheckedOrderItemList({
                 type: 'CLEAR'
             })
         } else {
-            let data = [...orderItemListState];
-            dispatchCheckedOrderItemListState({
+            let data = [...orderItemList];
+            dispatchCheckedOrderItemList({
                 type: 'SET_DATA',
                 payload: data
             })
         }
-    }, [checkedOrderItemListState, orderItemListState])
+    }
 
-    const _onChange_checkOneCheckedOrderListState = useCallback((e, selectedData) => {
-        e.stopPropagation();
-        let data = [...checkedOrderItemListState];
-        let selectedId = selectedData.id;
-
-        if (checkedOrderItemListState.some(r => r.id === selectedId)) {
-            data = data.filter(r => r.id !== selectedId);
-        } else {
-            data.push(selectedData);
-        }
-
-        dispatchCheckedOrderItemListState({
-            type: 'SET_DATA',
-            payload: data
-        })
-    }, [checkedOrderItemListState])
-
-    const _onCheckedOrderItemListClear = () => {
-        dispatchCheckedOrderItemListState({
+    const _onAction_releaseCheckedOrderItemListAll = () => {
+        dispatchCheckedOrderItemList({
             type: 'CLEAR'
         })
     }
 
     // 헤더 설정 서밋
-    const _onSubmit_modifiedHeader = async (headerDetails) => {
+    const _onSubmit_saveAndModifyViewHeader = async (headerDetails) => {
         let params = null;
-        if (!headerState) {
+        if (!viewHeader) {
             params = {
                 headerDetail: {
                     details: headerDetails
@@ -208,7 +224,7 @@ const MainComponent = (props) => {
             await __reqCreateOrderHeaderOne(params);
         } else {
             params = {
-                ...headerState,
+                ...viewHeader,
                 headerDetail: {
                     details: headerDetails
                 }
@@ -216,73 +232,93 @@ const MainComponent = (props) => {
             await __reqUpdateOrderHeaderOne(params);
         }
 
+        _onAction_closeHeaderSettingModal();
         await __reqSearchOrderHeaderOne();
     }
 
     // 판매 전환 서밋
     const _onSubmit_changeSalesYnForOrderItemList = async (body) => {
         await __reqChangeSalesYnForOrderItemList(body);
-        _onCheckedOrderItemListClear();
+        dispatchCheckedOrderItemList({
+            type: 'CLEAR'
+        })
         await __reqSearchOrderItemList();
     }
 
     // 데이터 삭제 서밋
     const _onSubmit_deleteOrderItemList = async function (params) {
         await __reqDeleteOrderItemList(params);
-        _onCheckedOrderItemListClear();
+        dispatchCheckedOrderItemList({
+            type: 'CLEAR'
+        })
         await __reqSearchOrderItemList();
     }
 
     // 옵션 코드 변경
-    const _onSubmit_changeOptionCodeForOrderItemListInBatch = async function (data) {
-        await __reqChangeOptionCodeForOrderItemListInBatch(data);
-        _onCheckedOrderItemListClear();
+    const _onSubmit_changeOptionCodeForOrderItemListInBatch = async function (body) {
+        await __reqChangeOptionCodeForOrderItemListInBatch(body);
+        dispatchCheckedOrderItemList({
+            type: 'CLEAR'
+        })
         await __reqSearchOrderItemList();
     }
-
     return (
         <>
             <Container>
-                <TopOperatorComponent
-                    headerState={headerState}
-
-                    _onSubmit_modifiedHeader={_onSubmit_modifiedHeader}
-                ></TopOperatorComponent>
+                <HeaderComponent
+                    _onAction_openHeaderSettingModal={_onAction_openHeaderSettingModal}
+                ></HeaderComponent>
                 <SearchOperatorComponent
-                    headerState={headerState}
+                    viewHeader={viewHeader}
                 ></SearchOperatorComponent>
-                <ItemTableComponent
-                    headerState={headerState}
-                    productOptionListState={productOptionListState}
-                    orderItemListState={orderItemListState}
-                    checkedOrderItemListState={checkedOrderItemListState}
+                <OrderItemTableComponent
+                    viewHeader={viewHeader}
+                    orderItemList={orderItemList}
+                    checkedOrderItemList={checkedOrderItemList}
 
-                    _onChange_checkAllCheckedOrderListState={_onChange_checkAllCheckedOrderListState}
-                    _onChange_checkOneCheckedOrderListState={_onChange_checkOneCheckedOrderListState}
-                ></ItemTableComponent>
-                <CheckedItemTableComponent
-                    headerState={headerState}
-                    productOptionListState={productOptionListState}
-                    checkedOrderItemListState={checkedOrderItemListState}
+                    _onAction_checkOrderItem={_onAction_checkOrderItem}
+                    _onAction_checkOrderItemAll={_onAction_checkOrderItemAll}
+                ></OrderItemTableComponent>
+                <CheckedOperatorComponent
+                    checkedOrderItemList={checkedOrderItemList}
+                    productOptionList={productOptionList}
 
-                    _onCheckedOrderItemListClear={_onCheckedOrderItemListClear}
+                    _onAction_releaseCheckedOrderItemListAll={_onAction_releaseCheckedOrderItemListAll}
                     _onSubmit_changeSalesYnForOrderItemList={_onSubmit_changeSalesYnForOrderItemList}
                     _onSubmit_deleteOrderItemList={_onSubmit_deleteOrderItemList}
                     _onSubmit_changeOptionCodeForOrderItemListInBatch={_onSubmit_changeOptionCodeForOrderItemListInBatch}
-                ></CheckedItemTableComponent>
+                ></CheckedOperatorComponent>
+                <CheckedOrderItemTableComponent
+                    viewHeader={viewHeader}
+                    checkedOrderItemList={checkedOrderItemList}
+                ></CheckedOrderItemTableComponent>
             </Container>
+
+            {/* Modal */}
+            <CommonModalComponent
+                open={headerSettingModalOpen}
+                maxWidth={'lg'}
+
+                onClose={_onAction_closeHeaderSettingModal}
+            >
+                <ViewHeaderSettingModalComponent
+                    viewHeader={viewHeader}
+
+                    _onSubmit_saveAndModifyViewHeader={_onSubmit_saveAndModifyViewHeader}
+                ></ViewHeaderSettingModalComponent>
+            </CommonModalComponent>
         </>
     );
 }
 
-export default MainComponent;
+export default OrderComponent;
 
-const initialHeaderState = null;
-const initialProductOptionListState = null;
-const initialOrderItemListState = null;
-const initialCheckedOrderItemListState = [];
+const initialViewHeader = null;
+const initialProductOptionList = null;
+const initialOrderItemList = null;
+const initialCheckedOrderItemList = [];
 
-const headerStateReducer = (state, action) => {
+const viewHeaderReducer = (state, action) => {
     switch (action.type) {
         case 'INIT_DATA':
             return action.payload;
@@ -290,7 +326,7 @@ const headerStateReducer = (state, action) => {
     }
 }
 
-const productOptionListStateReducer = (state, action) => {
+const productOptionListReducer = (state, action) => {
     switch (action.type) {
         case 'INIT_DATA':
             return action.payload;
@@ -298,7 +334,7 @@ const productOptionListStateReducer = (state, action) => {
     }
 }
 
-const orderItemListStateReducer = (state, action) => {
+const orderItemListReducer = (state, action) => {
     switch (action.type) {
         case 'INIT_DATA':
             return action.payload;
@@ -306,7 +342,7 @@ const orderItemListStateReducer = (state, action) => {
     }
 }
 
-const checkedOrderItemListStateReducer = (state, action) => {
+const checkedOrderItemListReducer = (state, action) => {
     switch (action.type) {
         case 'SET_DATA':
             return action.payload;
