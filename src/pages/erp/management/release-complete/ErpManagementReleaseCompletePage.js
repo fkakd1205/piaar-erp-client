@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import ErpManagementNavbar from '../../../../component/erp/management/navbar/ErpManagementNavbar';
-import SalesComponent from '../../../../component/erp/management/sales';
+import ReleaseCompleteComponent from '../../../../component/erp/management/release-complete';
 import NavbarMain from '../../../../component/navbar/NavbarMain';
 const Container = styled.div`
 
@@ -12,7 +12,7 @@ const ErpManagementReleaseCompletePage = (props) => {
             <Container>
                 <NavbarMain></NavbarMain>
                 <ErpManagementNavbar></ErpManagementNavbar>
-                <SalesComponent></SalesComponent>
+                <ReleaseCompleteComponent></ReleaseCompleteComponent>
             </Container>
         </>
     );
