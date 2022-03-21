@@ -13,7 +13,7 @@ const ExcelHeaderSelectorView = (props) => {
                         onChange={props.onActionSelectExcelFormHeader}
                     >
                         <option value=''>선택</option>
-                        {props.excelFormHeaderList?.map(excelFormHeader => {
+                        {props.downloadExcelList?.map(excelFormHeader => {
                             return (
                                 <option
                                     key={excelFormHeader.id}

@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 const Container = styled.div`
-
+    margin-bottom: 100px;
 `;
 
 const TableFieldWrapper = styled.div`
@@ -15,7 +15,7 @@ const TableFieldWrapper = styled.div`
     .table-box{
         height: 80vh;
         overflow: auto;
-        border: 1px solid #309FFF40;
+        border: 1px solid #e0e0e0;
 
         @media only screen and (max-width:768px){
             font-size: 10px;
@@ -33,31 +33,33 @@ const TableFieldWrapper = styled.div`
     table thead tr th{
         vertical-align: middle !important;
         text-align: center;
-        background: #309FFF;
-        color: white;
+        background:#fff;
+        color: #000;
         padding: 10px;
         font-size: 14px;
+        font-weight: 700;
+        border-bottom: 1px solid #e0e0e0;
     }
 
     table tbody tr{
         &:hover{
-            background: #309FFF40;
+            background: #0000000a;
         }
     }
 
     table tbody tr td{
         padding: 7px 5px;
         vertical-align: middle !important;
-        border-bottom: 1px solid #309FFF20;
+        border-bottom: 1px solid #e0e0e0;
         text-align: center;
         font-size: 12px;
-        color: #444;
+        color: #000;
         font-weight: 500;
         line-height: 1.5;
         word-break: keep-all;
 
         &:hover{
-            background: #309FFF80;
+            background: #2C73D260;
             color: white;
             font-weight: 600;
         }
@@ -79,7 +81,7 @@ const TableFieldWrapper = styled.div`
         border-radius: 10px;
     }
     .table-box::-webkit-scrollbar-thumb{
-        background-color: #309FFF;
+        background:#00000010;
         border-radius: 10px;
     }
 `;

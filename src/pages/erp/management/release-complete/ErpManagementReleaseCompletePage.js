@@ -6,7 +6,7 @@ const Container = styled.div`
 
 `;
 
-const ErpManagementSalesPage = (props) => {
+const ErpManagementReleaseCompletePage = (props) => {
     return (
         <>
             <Container>
@@ -17,4 +17,4 @@ const ErpManagementSalesPage = (props) => {
         </>
     );
 }
-export default ErpManagementSalesPage;
+export default ErpManagementReleaseCompletePage;

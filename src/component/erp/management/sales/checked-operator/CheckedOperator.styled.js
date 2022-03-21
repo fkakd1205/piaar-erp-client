@@ -39,7 +39,7 @@ const TitleWrapper = styled.div`
 
         background: #fff;
         border: 1px solid #a1a1a1;
-        border-radius: 3px;
+        border-radius: 2px;
 
         font-size: 12px;
         font-weight: 700;
@@ -50,7 +50,6 @@ const TitleWrapper = styled.div`
         transition: all .1s;
 
         &:hover{
-            /* transform: scale(1.03); */
             background: #e1e1e160;
         }
     }
@@ -139,7 +138,7 @@ const ButtonWrapper = styled.div`
 
         background: #ff3060;
         border: 1px solid #ff3060;
-        border-radius: 2px;
+        border-radius: 50%;
 
         font-size: 16px;
         font-weight: 600;
@@ -150,11 +149,11 @@ const ButtonWrapper = styled.div`
         transition: all .1s;
 
         &:hover{
-            transform: scale(1.02);
+            transform: scale(1.03);
         }
 
         @media all and (max-width:992px){
-            width: 130px;
+            width: 30px;
             height: 30px;
         }
     }

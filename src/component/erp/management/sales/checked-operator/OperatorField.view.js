@@ -12,7 +12,29 @@ export default function OperatorFieldView(props) {
                             className='button-el'
                             onClick={props.onActionOpenSalesConfirmModal}
                         >
-                            판매 전환
+                            출고 전환
+                            <Ripple color={'#e0e0e0'} duration={1000}></Ripple>
+                        </button>
+                    </div>
+                    <div className='button-box'>
+                        <button
+                            type='button'
+                            className='button-el'
+                            onClick={props.onActionOpenSalesConfirmModal}
+                        >
+                            판매 전환 취소
+                            <Ripple color={'#e0e0e0'} duration={1000}></Ripple>
+                        </button>
+                    </div>
+                </ButtonWrapper>
+                <ButtonWrapper>
+                    <div className='button-box'>
+                        <button
+                            type='button'
+                            className='button-el'
+                            onClick={props.onActionOpenOptionCodeModal}
+                        >
+                            옵션 코드 변경
                             <Ripple color={'#e0e0e0'} duration={1000}></Ripple>
                         </button>
                     </div>
@@ -22,7 +44,7 @@ export default function OperatorFieldView(props) {
                             className='button-el'
                             onClick={props.onActionOpenOptionCodeModal}
                         >
-                            옵션 코드 수정
+                            출고 옵션 코드 변경
                             <Ripple color={'#e0e0e0'} duration={1000}></Ripple>
                         </button>
                     </div>
@@ -31,10 +53,10 @@ export default function OperatorFieldView(props) {
                     <div className='button-box'>
                         <button
                             type='button'
-                            className='circle-button-el'
-                            onClick={props.onActionOpenDeleteConfirmModal}
+                            className='button-el'
+                            onClick={props.onActionOpenDownloadExcelModal}
                         >
-                            <img className='circle-button-icon-el' src='/assets/icon/delete_icon.png' alt='delete button'></img>
+                            엑셀 다운로드
                             <Ripple color={'#e0e0e0'} duration={1000}></Ripple>
                         </button>
                     </div>

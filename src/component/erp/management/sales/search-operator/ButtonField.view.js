@@ -19,7 +19,6 @@ export default function ButtonFieldView(props) {
                     <button
                         type='submit'
                         className='button-el'
-                        // onClick={props.onActionRouteToSearch}
                     >
                         조회
                         <Ripple color={'#e0e0e0'} duration={1000}></Ripple>

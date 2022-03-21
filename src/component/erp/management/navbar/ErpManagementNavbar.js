@@ -90,11 +90,7 @@ const thisRouters = [
         pathname: '/erp/management/sales'
     },
     {
-        name: '출고 준비 상태 관리',
-        pathname: '/erp/management/release-ready'
-    },
-    {
-        name: '출고 완료 상태 관리',
+        name: '출고 상태 관리',
         pathname: '/erp/management/release-complete'
     },
     {

@@ -27,12 +27,12 @@ const ExcelDownloadModalComponent = (props) => {
     const [selectedExcelHeader, dispatchSelectedExcelHeader] = useReducer(selectedExcelHeaderReducer, initialSelectedExcelHeader);
 
     useEffect(() => {
-        if (!props.checkedOrderItemListState || props.checkedOrderItemListState?.length <= 0) {
+        if (!props.checkedOrderItemList || props.checkedOrderItemList?.length <= 0) {
             return;
         }
 
         // downloadOrderItem 폼으로 List 변환
-        let dataList = props.checkedOrderItemListState.map(r => {
+        let dataList = props.checkedOrderItemList.map(r => {
             let collections = [r];
             return getDownloadOrderItem(collections);
         })
@@ -46,7 +46,7 @@ const ExcelDownloadModalComponent = (props) => {
 
         _onSet_downloadOrderItemList(dataList);
 
-    }, [props.checkedOrderItemListState]);
+    }, [props.checkedOrderItemList]);
 
     const _onSet_downloadOrderItemList = (data) => {
         dispatchDownloadOrderItemList({
@@ -172,7 +172,7 @@ const ExcelDownloadModalComponent = (props) => {
 
     const onActionSelectExcelFormHeader = (e) => {
         let id = e.target.value;
-        let header = props.excelFormHeaderList.filter(r => r.id === id)[0];
+        let header = props.downloadExcelList.filter(r => r.id === id)[0];
 
         if (!id) {
             dispatchSelectedExcelHeader({
@@ -186,9 +186,7 @@ const ExcelDownloadModalComponent = (props) => {
     }
 
     const onActionDownloadExcel = () => {
-        console.log(downloadOrderItemList);
-        console.log(selectedExcelHeader);
-        props._onSubmit_downloadOrderItemsExcel(selectedExcelHeader, downloadOrderItemList)
+        props.onActionDownloadExcel(selectedExcelHeader, downloadOrderItemList)
     }
 
     return (
@@ -202,9 +200,9 @@ const ExcelDownloadModalComponent = (props) => {
                     _onAction_insulateDownloadOrderItemList={_onAction_insulateDownloadOrderItemList}
                     _onAction_insulateDownloadOrderItemListSelectOnly={_onAction_insulateDownloadOrderItemListSelectOnly}
                 ></CombineOperators>
-                {(downloadOrderItemList && props.headerState) &&
+                {(downloadOrderItemList && props.viewHeader) &&
                     <PreviewTableView
-                        headerState={props.headerState}
+                        viewHeader={props.viewHeader}
                         downloadOrderItemList={downloadOrderItemList}
                         checkedItemList={checkedItemList}
                         isCheckedItem={isCheckedItem}
@@ -212,9 +210,9 @@ const ExcelDownloadModalComponent = (props) => {
                         _onAction_checkItem={_onAction_checkItem}
                     ></PreviewTableView>
                 }
-                {props.excelFormHeaderList &&
+                {props.downloadExcelList &&
                     <ExcelHeaderSelectorView
-                        excelFormHeaderList={props.excelFormHeaderList}
+                        downloadExcelList={props.downloadExcelList}
                         selectedExcelHeader={selectedExcelHeader}
 
                         onActionSelectExcelFormHeader={onActionSelectExcelFormHeader}

@@ -9,7 +9,8 @@ const Wrapper = styled.div`
 `;
 
 const ControlButtonFieldWrapper = styled.div`
-    width: 100%;
+    margin-top: 20px;
+    padding: 0 30px;
     height: auto;
 
     display: flex;
@@ -17,32 +18,39 @@ const ControlButtonFieldWrapper = styled.div`
     
     color: white;
 
+    @media only screen and (max-width:992px){
+        padding: 0 10px;
+    }
+
     .button-box{
-        padding: 10px 30px;    
+
+        padding-right: 10px;
         
         @media only screen and (max-width:992px){
-            padding: 10px 10px;
-            width: 100%;
+            /* padding: 10px 10px; */
+            /* width: 100%; */
         }
     }
 
     .button-el{
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 600;
-        width: 240px;
+        width: 180px;
         padding: 10px;
-        color: white;
+        color: #000;
         vertical-align: middle;
-        background-color: #2C73D2;
-        border-radius: 20px;
-        border: none;
+        background: white;
+        border-radius: 2px;
+        border: 1px solid #e0e0e0;
         transition: opacity 0.1s linear;
 
         &:hover{
             cursor: pointer;
+            background: #2C73D2;
+            border: 1px solid #2C73D2;
+            color: #fff;
             transition: 0.2s;
-            transform: scale(1.05);
-            background: #7DC2FF;
+            transform: scale(1.03);
         }
 
         &:active{
@@ -51,16 +59,7 @@ const ControlButtonFieldWrapper = styled.div`
         }
 
         @media only screen and (max-width:992px){
-            width: 100%;
-        }
-
-        @media only screen and (max-width:768px){
-            font-size: 14px;
-            width: 100%;
-        }
-
-        @media only screen and (max-width:576px){
-            width: 100%;
+            width: 130px;
             font-size: 12px;
         }
     }

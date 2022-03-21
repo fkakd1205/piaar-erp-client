@@ -18,7 +18,6 @@ const Container = styled.div`
     margin-bottom: 100px;
 `;
 
-// TODO : 페이지 구조 개선 해야됨. 현재 header, view-header-setting-modal 완성했고, search-operator 아직 완성 못함. 
 const OrderComponent = (props) => {
     const location = useLocation();
     const query = qs.parse(location.search);

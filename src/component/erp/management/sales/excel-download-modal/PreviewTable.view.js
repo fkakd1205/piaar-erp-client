@@ -3,12 +3,12 @@ import styled from 'styled-components';
 import { dateToYYYYMMDDhhmmss } from '../../../../../utils/dateFormatUtils';
 import { Container, PreviewTableWrapper, TableBox, TableWrapper } from './ExcelDownloadModal.styled';
 
-const Colgroup = ({ headerState }) => {
+const Colgroup = ({ viewHeader }) => {
     return (
         <colgroup>
             <col width={'50px'}></col>
             <col width={'50px'}></col>
-            {headerState.headerDetail.details.map((r, index) => {
+            {viewHeader.headerDetail.details.map((r, index) => {
                 return (
                     <col key={index} width={'200px'}></col>
                 );
@@ -18,13 +18,13 @@ const Colgroup = ({ headerState }) => {
     );
 }
 
-const TableHead = ({ headerState }) => {
+const TableHead = ({ viewHeader }) => {
     return (
         <thead>
             <tr>
                 <th className="fiexed-header" scope="col">#</th>
                 <th className="fiexed-header" scope="col">선택</th>
-                {headerState.headerDetail.details.map((r, index) => {
+                {viewHeader.headerDetail.details.map((r, index) => {
                     return (
                         <th key={index} className="fiexed-header" scope="col">{r.customCellName}</th>
                     )
@@ -34,7 +34,7 @@ const TableHead = ({ headerState }) => {
     );
 }
 
-const TableBody = ({ headerState, downloadOrderItemList, isCheckedItem, _onAction_checkItem }) => {
+const TableBody = ({ viewHeader, downloadOrderItemList, isCheckedItem, _onAction_checkItem }) => {
     return (
         <tbody>
             {downloadOrderItemList.map((r1, r1Index) => {
@@ -64,7 +64,7 @@ const TableBody = ({ headerState, downloadOrderItemList, isCheckedItem, _onActio
                                             onChange={() => _onAction_checkItem(r2)}
                                         ></input>
                                     </td>
-                                    {headerState?.headerDetail.details.map(r3 => {
+                                    {viewHeader?.headerDetail.details.map(r3 => {
                                         let matchedColumnName = r3.matchedColumnName;
                                         if (matchedColumnName === 'createdAt') {
                                             return (
@@ -90,13 +90,13 @@ const PreviewTableView = (props) => {
             <TableBox>
                 <table cellSpacing="0">
                     <Colgroup
-                        headerState={props.headerState}
+                        viewHeader={props.viewHeader}
                     ></Colgroup>
                     <TableHead
-                        headerState={props.headerState}
+                        viewHeader={props.viewHeader}
                     ></TableHead>
                     <TableBody
-                        headerState={props.headerState}
+                        viewHeader={props.viewHeader}
                         downloadOrderItemList={props.downloadOrderItemList}
                         isCheckedItem={props.isCheckedItem}
 
