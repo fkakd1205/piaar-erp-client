@@ -1,13 +1,17 @@
 import { useReducer, useState } from "react";
 import { erpOrderItemDataConnect } from "../../../../data_connect/erpOrderItemDataConnect";
-import BackdropLoadingComponent from "../../../module/loading/BackdropLoadingComponent";
+import { useBackdropHook, BackdropHookComponent } from "../../../../hooks/backdrop/useBackdropHook";
 import OperatorComponent from "./operator/Operator.component";
 import PreviewTableComponent from "./preview-table/PreviewTable.component";
 
 const ErpOrderUploadComponent = (props) => {
-    const [excelDataList, dispatchExcelDataList] = useReducer(excelDataListReducer, initialExcelDataList);
+    const {
+        open: backdropOpen,
+        onActionOpen: onActionOpenBackdrop,
+        onActionClose: onActionCloseBackdrop
+    } = useBackdropHook();
 
-    const [backdropLoadingOpen, setBackdropLoadingOpen] = useState(false);
+    const [excelDataList, dispatchExcelDataList] = useReducer(excelDataListReducer, initialExcelDataList);
 
     const __reqUploadExcelFile = async (formData) => {
         await erpOrderItemDataConnect().uploadExcelFile(formData)
@@ -53,23 +57,15 @@ const ErpOrderUploadComponent = (props) => {
     }
 
     const _onSubmit_uploadExcelFile = async (formData) => {
-        _onAction_openBackdropLoading();
+        onActionOpenBackdrop();
         await __reqUploadExcelFile(formData);
-        _onAction_closeBackdropLoading();
+        onActionCloseBackdrop();
     }
 
     const _onSubmit_createOrderItems = async () => {
-        _onAction_openBackdropLoading();
+        onActionOpenBackdrop();
         await __reqCreateOrderItems(excelDataList);
-        _onAction_closeBackdropLoading();
-    }
-
-    const _onAction_openBackdropLoading = () => {
-        setBackdropLoadingOpen(true);
-    }
-
-    const _onAction_closeBackdropLoading = () => {
-        setBackdropLoadingOpen(false);
+        onActionCloseBackdrop();
     }
 
     return (
@@ -81,13 +77,11 @@ const ErpOrderUploadComponent = (props) => {
             <PreviewTableComponent
                 excelDataList={excelDataList}
             ></PreviewTableComponent>
-            
-            {/* Backdrop Loading */}
-            <BackdropLoadingComponent
-                open={backdropLoadingOpen}
 
-                onClose={() => { ; }}
-            ></BackdropLoadingComponent>
+            {/* Backdrop Loading */}
+            <BackdropHookComponent
+                open={backdropOpen}
+            />
         </>
     );
 }

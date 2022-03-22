@@ -8,7 +8,7 @@ import ConfirmModalComponent from "../../../../module/modal/ConfirmModalComponen
 import ViewDetailSelectModal from "./ViewDetailSelectModal.view";
 import DeleteButtonFieldView from "./DeleteButtonField.view";
 import UpdateButtonFieldView from './UpdateButtonField.view';
-import { staticDefaultHeaderDetails } from "../../../../../static-data/staticData";
+import { getDefaultHeaderDetails } from "../../../../../static-data/staticData";
 
 function Layout({ children }) {
     return (
@@ -28,7 +28,7 @@ function DownArrow() {
     );
 }
 
-const defaultHeaderDetails = staticDefaultHeaderDetails;
+const defaultHeaderDetails = getDefaultHeaderDetails();
 
 export default function EditFieldComponent(props) {
     const [updateHeader, dispatchUpdateHeader] = useReducer(updateHeaderReducer, initialUpdateHeader);

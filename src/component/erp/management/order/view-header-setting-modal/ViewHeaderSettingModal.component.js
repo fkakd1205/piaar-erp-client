@@ -4,11 +4,11 @@ import InfoTextFieldView from "./InfoTextField.view";
 import TableOperatorFieldView from "./TableOperatorField.view";
 import DefaultTableFieldView from './DefaultTableField.view'
 import { Container } from "./ViewHeaderSettingModal.styled";
-import { staticDefaultHeaderDetails } from "../../../../../static-data/staticData";
+import { getDefaultHeaderDetails } from "../../../../../static-data/staticData";
 import { useEffect, useReducer } from "react";
 import CreateTableFieldView from "./CreateTableField.view";
 
-const defaultHeaderDetails = staticDefaultHeaderDetails;
+const defaultHeaderDetails = getDefaultHeaderDetails();
 
 const ViewHeaderSettingModalComponent = (props) => {
     const [createHeaderDetails, dispatchCreateHeaderDetails] = useReducer(createHeaderDetailsReducer, initialCreateHeaderDetails);

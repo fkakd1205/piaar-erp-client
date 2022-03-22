@@ -13,6 +13,7 @@ import { productOptionDataConnect } from '../../../../data_connect/productOption
 import OrderItemTableComponent from './order-item-table/OrderItemTable.component';
 import CheckedOrderItemTableComponent from './checked-order-item-table/CheckedOrderItemTable.component';
 import CheckedOperatorComponent from './checked-operator/CheckedOperator.component';
+import { useBackdropHook, BackdropHookComponent } from '../../../../hooks/backdrop/useBackdropHook';
 
 const Container = styled.div`
     margin-bottom: 100px;
@@ -21,6 +22,12 @@ const Container = styled.div`
 const OrderComponent = (props) => {
     const location = useLocation();
     const query = qs.parse(location.search);
+
+    const {
+        open: backdropOpen,
+        onActionOpen: onActionOpenBackdrop,
+        onActionClose: onActionCloseBackdrop
+    } = useBackdropHook();
 
     const [viewHeader, dispatchViewHeader] = useReducer(viewHeaderReducer, initialViewHeader);
     const [productOptionList, dispatchProductOptionList] = useReducer(productOptionListReducer, initialProductOptionList);
@@ -213,6 +220,7 @@ const OrderComponent = (props) => {
 
     // 헤더 설정 서밋
     const _onSubmit_saveAndModifyViewHeader = async (headerDetails) => {
+        onActionOpenBackdrop()
         let params = null;
         if (!viewHeader) {
             params = {
@@ -233,33 +241,40 @@ const OrderComponent = (props) => {
 
         _onAction_closeHeaderSettingModal();
         await __reqSearchOrderHeaderOne();
+        onActionCloseBackdrop()
     }
 
     // 판매 전환 서밋
     const _onSubmit_changeSalesYnForOrderItemList = async (body) => {
+        onActionOpenBackdrop()
         await __reqChangeSalesYnForOrderItemList(body);
         dispatchCheckedOrderItemList({
             type: 'CLEAR'
         })
         await __reqSearchOrderItemList();
+        onActionCloseBackdrop()
     }
 
     // 데이터 삭제 서밋
     const _onSubmit_deleteOrderItemList = async function (params) {
+        onActionOpenBackdrop()
         await __reqDeleteOrderItemList(params);
         dispatchCheckedOrderItemList({
             type: 'CLEAR'
         })
         await __reqSearchOrderItemList();
+        onActionCloseBackdrop()
     }
 
     // 옵션 코드 변경
     const _onSubmit_changeOptionCodeForOrderItemListInBatch = async function (body) {
+        onActionOpenBackdrop()
         await __reqChangeOptionCodeForOrderItemListInBatch(body);
         dispatchCheckedOrderItemList({
             type: 'CLEAR'
         })
         await __reqSearchOrderItemList();
+        onActionCloseBackdrop()
     }
     return (
         <>
@@ -306,6 +321,11 @@ const OrderComponent = (props) => {
                     _onSubmit_saveAndModifyViewHeader={_onSubmit_saveAndModifyViewHeader}
                 ></ViewHeaderSettingModalComponent>
             </CommonModalComponent>
+
+            {/* Backdrop */}
+            <BackdropHookComponent
+                open={backdropOpen}
+            />
         </>
     );
 }

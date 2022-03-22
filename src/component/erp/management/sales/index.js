@@ -14,6 +14,7 @@ import OrderItemTableComponent from './order-item-table/OrderItemTable.component
 import CheckedOrderItemTableComponent from './checked-order-item-table/CheckedOrderItemTable.component';
 import CheckedOperatorComponent from './checked-operator/CheckedOperator.component';
 import { erpDownloadExcelHeaderDataConnect } from '../../../../data_connect/erpDownloadExcelHeaderDataConnect';
+import { BackdropHookComponent, useBackdropHook } from '../../../../hooks/backdrop/useBackdropHook';
 
 const Container = styled.div`
     margin-bottom: 100px;
@@ -22,6 +23,12 @@ const Container = styled.div`
 const SalesComponent = (props) => {
     const location = useLocation();
     const query = qs.parse(location.search);
+
+    const {
+        open: backdropOpen,
+        onActionOpen: onActionOpenBackdrop,
+        onActionClose: onActionCloseBackdrop
+    } = useBackdropHook();
 
     const [viewHeader, dispatchViewHeader] = useReducer(viewHeaderReducer, initialViewHeader);
     const [productOptionList, dispatchProductOptionList] = useReducer(productOptionListReducer, initialProductOptionList);
@@ -158,6 +165,19 @@ const SalesComponent = (props) => {
             });
     }
 
+    const __reqChangeReleaseOptionCodeForOrderItemListInBatch = async function (body) {
+        await erpOrderItemDataConnect().changeReleaseOptionCodeForListInBatch(body)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            });
+    }
+
     const __reqSearchDownloadExcelHeaders = async () => {
         await erpDownloadExcelHeaderDataConnect().searchList()
             .then(res => {
@@ -177,18 +197,31 @@ const SalesComponent = (props) => {
     const __reqActionDownloadForDownloadOrderItems = async (id, downloadOrderItemsBody) => {
         await erpDownloadExcelHeaderDataConnect().actionDownloadForDownloadOrderItems(id, downloadOrderItemsBody)
             .then(res => {
-                // if (res.status === 200 && res.data.message === 'success') {
-                const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
-                const link = document.createElement('a');
-                link.href = url;
+                if (res.status === 200) {
+                    const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
+                    const link = document.createElement('a');
+                    link.href = url;
 
-                let date = dateToYYYYMMDDhhmmssFile(new Date());
+                    let date = dateToYYYYMMDDhhmmssFile(new Date());
 
-                link.setAttribute('download', date + '_판매데이터_엑셀.xlsx');
-                document.body.appendChild(link);
-                link.click();
-                // }
+                    link.setAttribute('download', date + '_판매데이터_엑셀.xlsx');
+                    document.body.appendChild(link);
+                    link.click();
+                }
             })
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            })
+    }
+
+    const __reqChangeReleaseYnForOrderItemList = async (body) => {
+        await erpOrderItemDataConnect().changeReleaseYnForList(body)
             .catch(err => {
                 let res = err.response;
                 if (res?.status === 500) {
@@ -257,6 +290,7 @@ const SalesComponent = (props) => {
 
     // 헤더 설정 서밋
     const _onSubmit_saveAndModifyViewHeader = async (headerDetails) => {
+        onActionOpenBackdrop();
         let params = null;
         if (!viewHeader) {
             params = {
@@ -277,39 +311,71 @@ const SalesComponent = (props) => {
 
         _onAction_closeHeaderSettingModal();
         await __reqSearchOrderHeaderOne();
+        onActionCloseBackdrop();
     }
 
     // 판매 전환 서밋
     const _onSubmit_changeSalesYnForOrderItemList = async (body) => {
+        onActionOpenBackdrop();
         await __reqChangeSalesYnForOrderItemList(body);
         dispatchCheckedOrderItemList({
             type: 'CLEAR'
         })
         await __reqSearchOrderItemList();
+        onActionCloseBackdrop();
     }
 
     // 데이터 삭제 서밋
     const _onSubmit_deleteOrderItemList = async function (params) {
+        onActionOpenBackdrop();
         await __reqDeleteOrderItemList(params);
         dispatchCheckedOrderItemList({
             type: 'CLEAR'
         })
         await __reqSearchOrderItemList();
+        onActionCloseBackdrop();
     }
 
     // 옵션 코드 변경
     const _onSubmit_changeOptionCodeForOrderItemListInBatch = async function (body) {
+        onActionOpenBackdrop();
         await __reqChangeOptionCodeForOrderItemListInBatch(body);
         dispatchCheckedOrderItemList({
             type: 'CLEAR'
         })
         await __reqSearchOrderItemList();
+        onActionCloseBackdrop();
+    }
+
+    // 출고 옵션 코드 변경
+    const _onSubmit_changeReleaseOptionCodeForOrderItemListInBatch = async function (body) {
+        onActionOpenBackdrop();
+        await __reqChangeReleaseOptionCodeForOrderItemListInBatch(body);
+        dispatchCheckedOrderItemList({
+            type: 'CLEAR'
+        })
+        await __reqSearchOrderItemList();
+        onActionCloseBackdrop();
     }
 
     // 엑셀 다운로드
     const _onSubmit_downloadOrderItemsExcel = async (downloadExcelHeader, downloadOrderItemList) => {
+        onActionOpenBackdrop();
         await __reqActionDownloadForDownloadOrderItems(downloadExcelHeader.id, downloadOrderItemList);
+        onActionCloseBackdrop();
     }
+
+    // 출고 전환
+    const _onSubmit_changeReleaseYnForOrderItemList = async (body) => {
+        onActionOpenBackdrop();
+        await __reqChangeReleaseYnForOrderItemList(body);
+        dispatchCheckedOrderItemList({
+            type: 'CLEAR'
+        })
+        await __reqSearchOrderItemList();
+        onActionCloseBackdrop();
+    }
+
     return (
         <>
             <Container>
@@ -337,7 +403,9 @@ const SalesComponent = (props) => {
                     _onSubmit_changeSalesYnForOrderItemList={_onSubmit_changeSalesYnForOrderItemList}
                     _onSubmit_deleteOrderItemList={_onSubmit_deleteOrderItemList}
                     _onSubmit_changeOptionCodeForOrderItemListInBatch={_onSubmit_changeOptionCodeForOrderItemListInBatch}
+                    _onSubmit_changeReleaseOptionCodeForOrderItemListInBatch={_onSubmit_changeReleaseOptionCodeForOrderItemListInBatch}
                     _onSubmit_downloadOrderItemsExcel={_onSubmit_downloadOrderItemsExcel}
+                    _onSubmit_changeReleaseYnForOrderItemList={_onSubmit_changeReleaseYnForOrderItemList}
                 ></CheckedOperatorComponent>
                 <CheckedOrderItemTableComponent
                     viewHeader={viewHeader}
@@ -358,6 +426,11 @@ const SalesComponent = (props) => {
                     _onSubmit_saveAndModifyViewHeader={_onSubmit_saveAndModifyViewHeader}
                 ></ViewHeaderSettingModalComponent>
             </CommonModalComponent>
+
+            {/* Backdrop */}
+            <BackdropHookComponent
+                open={backdropOpen}
+            ></BackdropHookComponent>
         </>
     );
 }

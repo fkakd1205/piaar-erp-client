@@ -200,6 +200,19 @@ const ReleaseCompleteComponent = (props) => {
             })
     }
 
+    const __reqChangeReleaseYnForOrderItemList = async (body) => {
+        await erpOrderItemDataConnect().changeReleaseYnForList(body)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            })
+    }
+
     useEffect(() => {
         __reqSearchOrderHeaderOne();
         __reqSearchProductOptionList();
@@ -310,6 +323,15 @@ const ReleaseCompleteComponent = (props) => {
     const _onSubmit_downloadOrderItemsExcel = async (downloadExcelHeader, downloadOrderItemList) => {
         await __reqActionDownloadForDownloadOrderItems(downloadExcelHeader.id, downloadOrderItemList);
     }
+
+    // 출고 취소
+    const _onSubmit_changeReleaseYnForOrderItemList = async (body) => {
+        await __reqChangeReleaseYnForOrderItemList(body);
+        dispatchCheckedOrderItemList({
+            type: 'CLEAR'
+        })
+        await __reqSearchOrderItemList();
+    }
     return (
         <>
             <Container>
@@ -338,6 +360,7 @@ const ReleaseCompleteComponent = (props) => {
                     _onSubmit_deleteOrderItemList={_onSubmit_deleteOrderItemList}
                     _onSubmit_changeOptionCodeForOrderItemListInBatch={_onSubmit_changeOptionCodeForOrderItemListInBatch}
                     _onSubmit_downloadOrderItemsExcel={_onSubmit_downloadOrderItemsExcel}
+                    _onSubmit_changeReleaseYnForOrderItemList={_onSubmit_changeReleaseYnForOrderItemList}
                 ></CheckedOperatorComponent>
                 <CheckedOrderItemTableComponent
                     viewHeader={viewHeader}

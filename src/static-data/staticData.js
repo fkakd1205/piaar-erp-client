@@ -1,6 +1,5 @@
 const staticDefaultHeaderDetails = [
     {
-        "cellNumber": 0,
         "originCellName": "피아르 고유번호",
         "customCellName": "피아르 고유번호",
         "matchedColumnName": "uniqueCode",
@@ -14,7 +13,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 1,
         "originCellName": "주문번호1",
         "customCellName": "주문번호1",
         "matchedColumnName": "orderNumber1",
@@ -28,7 +26,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 2,
         "originCellName": "주문번호2",
         "customCellName": "주문번호2",
         "matchedColumnName": "orderNumber2",
@@ -42,7 +39,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 3,
         "originCellName": "주문번호3",
         "customCellName": "주문번호3",
         "matchedColumnName": "orderNumber3",
@@ -56,7 +52,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 4,
         "originCellName": "상품명",
         "customCellName": "상품명",
         "matchedColumnName": "prodName",
@@ -70,7 +65,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 5,
         "originCellName": "옵션명",
         "customCellName": "옵션명",
         "matchedColumnName": "optionName",
@@ -84,7 +78,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 6,
         "originCellName": "수량",
         "customCellName": "수량",
         "matchedColumnName": "unit",
@@ -98,7 +91,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 7,
         "originCellName": "수취인명",
         "customCellName": "수취인명",
         "matchedColumnName": "receiver",
@@ -112,7 +104,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 8,
         "originCellName": "전화번호1",
         "customCellName": "전화번호1",
         "matchedColumnName": "receiverContact1",
@@ -126,7 +117,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 9,
         "originCellName": "전화번호2",
         "customCellName": "전화번호2",
         "matchedColumnName": "receiverContact2",
@@ -140,7 +130,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 10,
         "originCellName": "주소",
         "customCellName": "주소",
         "matchedColumnName": "destination",
@@ -154,7 +143,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 11,
         "originCellName": "우편번호",
         "customCellName": "우편번호",
         "matchedColumnName": "zipCode",
@@ -168,7 +156,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 12,
         "originCellName": "배송방식",
         "customCellName": "배송방식",
         "matchedColumnName": "transportType",
@@ -182,7 +169,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 13,
         "originCellName": "배송메세지",
         "customCellName": "배송메세지",
         "matchedColumnName": "deliveryMessage",
@@ -196,7 +182,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 14,
         "originCellName": "상품고유번호1",
         "customCellName": "상품고유번호1",
         "matchedColumnName": "prodUniqueNumber1",
@@ -210,7 +195,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 15,
         "originCellName": "상품고유번호2",
         "customCellName": "상품고유번호2",
         "matchedColumnName": "prodUniqueNumber2",
@@ -224,7 +208,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 16,
         "originCellName": "옵션고유번호1",
         "customCellName": "옵션고유번호1",
         "matchedColumnName": "optionUniqueNumber1",
@@ -238,7 +221,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 17,
         "originCellName": "옵션고유번호2",
         "customCellName": "옵션고유번호2",
         "matchedColumnName": "optionUniqueNumber2",
@@ -252,7 +234,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 18,
         "originCellName": "피아르 상품코드",
         "customCellName": "피아르 상품코드",
         "matchedColumnName": "prodCode",
@@ -266,7 +247,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 19,
         "originCellName": "피아르 옵션코드",
         "customCellName": "피아르 옵션코드",
         "matchedColumnName": "optionCode",
@@ -280,7 +260,19 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 20,
+        "originCellName": "출고 옵션코드",
+        "customCellName": "출고 옵션코드",
+        "matchedColumnName": "releaseOptionCode",
+        "fixedValue": '',
+        "mergeYn": "n",
+        "splitter": '-',
+        "viewDetails": [
+            {
+                "matchedColumnName": "releaseOptionCode"
+            }
+        ]
+    },
+    {
         "originCellName": "관리메모1",
         "customCellName": "관리메모1",
         "matchedColumnName": "managementMemo1",
@@ -294,7 +286,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 21,
         "originCellName": "관리메모2",
         "customCellName": "관리메모2",
         "matchedColumnName": "managementMemo2",
@@ -308,7 +299,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 22,
         "originCellName": "관리메모3",
         "customCellName": "관리메모3",
         "matchedColumnName": "managementMemo3",
@@ -322,7 +312,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 23,
         "originCellName": "관리메모4",
         "customCellName": "관리메모4",
         "matchedColumnName": "managementMemo4",
@@ -336,7 +325,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 24,
         "originCellName": "관리메모5",
         "customCellName": "관리메모5",
         "matchedColumnName": "managementMemo5",
@@ -350,7 +338,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 25,
         "originCellName": "관리메모6",
         "customCellName": "관리메모6",
         "matchedColumnName": "managementMemo6",
@@ -364,7 +351,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 26,
         "originCellName": "관리메모7",
         "customCellName": "관리메모7",
         "matchedColumnName": "managementMemo7",
@@ -378,7 +364,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 27,
         "originCellName": "관리메모8",
         "customCellName": "관리메모8",
         "matchedColumnName": "managementMemo8",
@@ -392,7 +377,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 28,
         "originCellName": "관리메모9",
         "customCellName": "관리메모9",
         "matchedColumnName": "managementMemo9",
@@ -406,7 +390,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 29,
         "originCellName": "관리메모10",
         "customCellName": "관리메모10",
         "matchedColumnName": "managementMemo10",
@@ -420,7 +403,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 30,
         "originCellName": "관리메모11",
         "customCellName": "관리메모11",
         "matchedColumnName": "managementMemo11",
@@ -434,7 +416,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 31,
         "originCellName": "관리메모12",
         "customCellName": "관리메모12",
         "matchedColumnName": "managementMemo12",
@@ -448,7 +429,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 32,
         "originCellName": "관리메모13",
         "customCellName": "관리메모13",
         "matchedColumnName": "managementMemo13",
@@ -462,7 +442,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 33,
         "originCellName": "관리메모14",
         "customCellName": "관리메모14",
         "matchedColumnName": "managementMemo14",
@@ -476,7 +455,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 34,
         "originCellName": "관리메모15",
         "customCellName": "관리메모15",
         "matchedColumnName": "managementMemo15",
@@ -490,7 +468,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 35,
         "originCellName": "관리메모16",
         "customCellName": "관리메모16",
         "matchedColumnName": "managementMemo16",
@@ -504,7 +481,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 36,
         "originCellName": "관리메모17",
         "customCellName": "관리메모17",
         "matchedColumnName": "managementMemo17",
@@ -518,7 +494,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 37,
         "originCellName": "관리메모18",
         "customCellName": "관리메모18",
         "matchedColumnName": "managementMemo18",
@@ -532,7 +507,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 38,
         "originCellName": "관리메모19",
         "customCellName": "관리메모19",
         "matchedColumnName": "managementMemo19",
@@ -546,7 +520,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 39,
         "originCellName": "관리메모20",
         "customCellName": "관리메모20",
         "matchedColumnName": "managementMemo20",
@@ -560,7 +533,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 40,
         "originCellName": "*카테고리명",
         "customCellName": "*카테고리명",
         "matchedColumnName": "categoryName",
@@ -574,7 +546,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 41,
         "originCellName": "*상품명",
         "customCellName": "*상품명",
         "matchedColumnName": "prodDefaultName",
@@ -588,7 +559,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 42,
         "originCellName": "*상품관리명",
         "customCellName": "*상품관리명",
         "matchedColumnName": "prodManagementName",
@@ -602,7 +572,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 43,
         "originCellName": "*옵션명",
         "customCellName": "*옵션명",
         "matchedColumnName": "optionDefaultName",
@@ -616,7 +585,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 44,
         "originCellName": "*옵션관리명",
         "customCellName": "*옵션관리명",
         "matchedColumnName": "optionManagementName",
@@ -630,7 +598,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 45,
         "originCellName": "*재고수량",
         "customCellName": "*재고수량",
         "matchedColumnName": "optionStockUnit",
@@ -644,7 +611,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 46,
         "originCellName": "*주문등록일",
         "customCellName": "*주문등록일",
         "matchedColumnName": "createdAt",
@@ -658,7 +624,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 47,
         "originCellName": "판매등록일",
         "customCellName": "판매등록일",
         "matchedColumnName": "salesAt",
@@ -672,7 +637,6 @@ const staticDefaultHeaderDetails = [
         ]
     },
     {
-        "cellNumber": 48,
         "originCellName": "운송코드",
         "customCellName": "운송코드",
         "matchedColumnName": "freightCode",
@@ -687,6 +651,18 @@ const staticDefaultHeaderDetails = [
     },
 ];
 
+function getDefaultHeaderDetails() {
+    let result = staticDefaultHeaderDetails.map((r, index) => {
+        return {
+            ...r,
+            cellNumber: index
+        }
+    })
+
+    return result;
+}
+
 export {
-    staticDefaultHeaderDetails
+    staticDefaultHeaderDetails,
+    getDefaultHeaderDetails
 }

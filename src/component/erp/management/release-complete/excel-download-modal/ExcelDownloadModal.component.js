@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useState } from "react";
-import { staticDefaultHeaderDetails } from "../../../../../static-data/staticData";
+import { getDefaultHeaderDetails } from "../../../../../static-data/staticData";
 import CombineOperators from "./CombineOperators.view";
 import DownloadButtonFieldView from "./DownloadButtonField.view";
 import { Container } from "./ExcelDownloadModal.styled";
@@ -8,7 +8,7 @@ import ExcelHeaderSelectorView from "./ExcelHeaderSelector.view";
 import PreviewTableView from "./PreviewTable.view";
 import TitleView from "./Title.view";
 
-const defaultHeaderDetails = staticDefaultHeaderDetails;
+const defaultHeaderDetails = getDefaultHeaderDetails();
 
 // collections를 가지고 downloadOrderItem 폼으로 변환, collection = [...orderItem]
 const getDownloadOrderItem = (collections) => {

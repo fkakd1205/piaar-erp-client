@@ -4,11 +4,11 @@ import qs from 'query-string';
 import { useEffect, useReducer } from "react";
 import DateSelectorFieldView from './DateSelectorField.view';
 import DetailSearchFieldView from "./DetailSearchField.view";
-import { staticDefaultHeaderDetails } from "../../../../../static-data/staticData";
+import { getDefaultHeaderDetails } from "../../../../../static-data/staticData";
 import ButtonFieldView from "./ButtonField.view";
 import { dateToYYYYMMDD } from "../../../../../utils/dateFormatUtils";
 
-const defaultHeaderDetails = staticDefaultHeaderDetails;
+const defaultHeaderDetails = getDefaultHeaderDetails();
 
 const SearchOperatorComponent = (props) => {
     const location = useLocation();

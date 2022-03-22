@@ -6,14 +6,21 @@ const Container = styled.div`
 
 `;
 
-const BackdropLoadingComponent = (props) => {
+/**
+ * 
+ * @param {Object} props
+ * @param {boolean} props.open
+ * @param {function} props.onClose
+ * @returns 
+ */
+const BackdropLoadingComponent = ({ open, onClose }) => {
     return (
         <>
             <Container>
                 <Backdrop
-                    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                    open={props.open}
-                    onClick={() => props.onClose()}
+                    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 9999 }}
+                    open={open}
+                    onClick={typeof (onClose) === 'function' ? () => onClose() : () => { ; }}
                 >
                     <CircularProgress color="inherit" />
                 </Backdrop>

@@ -12,6 +12,7 @@ const CheckedOperatorComponent = (props) => {
     const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] = useState(false);
     const [optionCodeModalOpen, setOptionCodeModalOpen] = useState(false);
     const [downloadExcelModalOpen, setDownloadExcelModalOpen] = useState(false);
+    const [releaseConfirmModalOpen, setReleaseConfirmModalOpen] = useState(false);
 
     const onActionReleaseCheckedOrderItemListAll = () => {
         props._onAction_releaseCheckedOrderItemListAll();
@@ -101,6 +102,31 @@ const CheckedOperatorComponent = (props) => {
         props._onSubmit_downloadOrderItemsExcel(selectedExcelHeader, downloadOrderItemList);
     }
 
+    const onActionOpenReleaseConfirmModal = () => {
+        if (props.checkedOrderItemList?.length <= 0) {
+            alert('데이터를 먼저 선택해 주세요.');
+            return;
+        }
+
+        setReleaseConfirmModalOpen(true);
+    }
+
+    const onActionCloseReleaseConfirmModal = () => {
+        setReleaseConfirmModalOpen(false);
+    }
+
+    const onActionConfirmRelease = () => {
+        let data = props.checkedOrderItemList.map(r => {
+            return {
+                ...r,
+                releaseYn: 'n',
+                releaseAt: null
+            }
+        })
+        props._onSubmit_changeReleaseYnForOrderItemList(data);
+        onActionCloseReleaseConfirmModal();
+    }
+
     return (
         <>
             <Container>
@@ -125,6 +151,7 @@ const CheckedOperatorComponent = (props) => {
                     onActionOpenDeleteConfirmModal={onActionOpenDeleteConfirmModal}
                     onActionOpenOptionCodeModal={onActionOpenOptionCodeModal}
                     onActionOpenDownloadExcelModal={onActionOpenDownloadExcelModal}
+                    onActionOpenReleaseConfirmModal={onActionOpenReleaseConfirmModal}
                 ></OperatorFieldView>
             </Container>
 
@@ -144,6 +171,14 @@ const CheckedOperatorComponent = (props) => {
 
                 onConfirm={onActionConfirmDelete}
                 onClose={onActionCloseDeleteConfirmModal}
+            ></ConfirmModalComponent>
+            <ConfirmModalComponent
+                open={releaseConfirmModalOpen}
+                title={'출고 취소 확인 메세지'}
+                message={`[ ${props.checkedOrderItemList?.length || 0} ] 건의 데이터를 출고 취소 하시겠습니까?`}
+
+                onConfirm={onActionConfirmRelease}
+                onClose={onActionCloseReleaseConfirmModal}
             ></ConfirmModalComponent>
             <CommonModalComponent
                 open={optionCodeModalOpen}
