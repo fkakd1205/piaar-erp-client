@@ -31,7 +31,7 @@ const OrderComponent = (props) => {
 
     const [viewHeader, dispatchViewHeader] = useReducer(viewHeaderReducer, initialViewHeader);
     const [productOptionList, dispatchProductOptionList] = useReducer(productOptionListReducer, initialProductOptionList);
-    const [orderItemList, dispatchOrderItemList] = useReducer(orderItemListReducer, initialOrderItemList);
+    const [orderItemPage, dispatchOrderItemPage] = useReducer(orderItemPageReducer, initialOrderItemPage);
     const [checkedOrderItemList, dispatchCheckedOrderItemList] = useReducer(checkedOrderItemListReducer, initialCheckedOrderItemList);
 
     const [headerSettingModalOpen, setHeaderSettingModalOpen] = useState(false);
@@ -112,7 +112,7 @@ const OrderComponent = (props) => {
         await erpOrderItemDataConnect().searchList(params)
             .then(res => {
                 if (res.status === 200 && res.data.message === 'success') {
-                    dispatchOrderItemList({
+                    dispatchOrderItemPage({
                         type: 'INIT_DATA',
                         payload: res.data.data
                     })
@@ -199,12 +199,12 @@ const OrderComponent = (props) => {
     }
 
     const _onAction_checkOrderItemAll = () => {
-        if (orderItemList.length === checkedOrderItemList.length) {
+        if (orderItemPage.length === checkedOrderItemList.length) {
             dispatchCheckedOrderItemList({
                 type: 'CLEAR'
             })
         } else {
-            let data = [...orderItemList];
+            let data = [...orderItemPage];
             dispatchCheckedOrderItemList({
                 type: 'SET_DATA',
                 payload: data
@@ -287,7 +287,7 @@ const OrderComponent = (props) => {
                 ></SearchOperatorComponent>
                 <OrderItemTableComponent
                     viewHeader={viewHeader}
-                    orderItemList={orderItemList}
+                    orderItemList={orderItemPage?.content}
                     checkedOrderItemList={checkedOrderItemList}
 
                     _onAction_checkOrderItem={_onAction_checkOrderItem}
@@ -334,7 +334,7 @@ export default OrderComponent;
 
 const initialViewHeader = null;
 const initialProductOptionList = null;
-const initialOrderItemList = null;
+const initialOrderItemPage = null;
 const initialCheckedOrderItemList = [];
 
 const viewHeaderReducer = (state, action) => {
@@ -353,7 +353,7 @@ const productOptionListReducer = (state, action) => {
     }
 }
 
-const orderItemListReducer = (state, action) => {
+const orderItemPageReducer = (state, action) => {
     switch (action.type) {
         case 'INIT_DATA':
             return action.payload;

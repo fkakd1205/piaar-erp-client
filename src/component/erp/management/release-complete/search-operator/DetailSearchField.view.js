@@ -13,7 +13,7 @@ export default function DetailSearchFieldView(props) {
                 >
                     <option value=''>전체</option>
                     {props.viewHeader?.headerDetail?.details?.map(r => {
-                        let bool = props.defaultHeaderDetails.map(r2 => r2.matchedColumnName).includes(r.matchedColumnName);
+                        let bool = props.defaultHeaderDetails.map(r2 => r2.allowedSearch ? r2.matchedColumnName : null).includes(r.matchedColumnName);
                         if (bool) {
                             return (
                                 <option key={r.matchedColumnName} value={r.matchedColumnName}>{r.customCellName}({r.originCellName})</option>

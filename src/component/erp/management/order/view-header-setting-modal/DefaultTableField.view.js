@@ -6,7 +6,7 @@ function Colgroup({ defaultHeaderDetails }) {
         <colgroup>
             {defaultHeaderDetails.map((r, index) => {
                 return (
-                    <col key={index} width={'120px'}></col>
+                    <col key={index} width={'140px'}></col>
                 );
             })}
 
