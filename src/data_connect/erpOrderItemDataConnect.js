@@ -36,12 +36,9 @@ const erpOrderItemDataConnect = () => {
             })
         },
         changeReleaseOptionCodeForListInBatch: async function (body) {
-            return await axios.patch(`${API_SERVER_ADDRESS}/api/v1/erp-order-items/batch/option-code/release`, body, {
+            return await axios.patch(`${API_SERVER_ADDRESS}/api/v1/erp-order-items/batch/release-option-code`, body, {
                 withCredentials: true
             })
-            // return await axios.patch(`${API_SERVER_ADDRESS}/api/v1/erp-order-items/batch/release-option-code`, body, {
-            //     withCredentials: true
-            // })
         },
         deleteList: async function (params) {
             return await axios.post(`${API_SERVER_ADDRESS}/api/v1/erp-order-items/batch-delete`, params, {
