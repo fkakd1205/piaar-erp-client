@@ -145,7 +145,7 @@ const SearchOperatorComponent = (props) => {
             query.searchColumnName = searchColumnName;
         } else {
             delete query.searchColumnName;
-            delete query.searchValue;
+            delete query.searchQuery;
         }
 
         if (searchColumnName && searchQuery) {

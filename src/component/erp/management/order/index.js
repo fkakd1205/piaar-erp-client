@@ -106,7 +106,7 @@ const OrderComponent = (props) => {
             endDate: endDate,
             periodType: periodType,
             searchColumnName: searchColumnName,
-            searchValue: searchQuery
+            searchQuery: searchQuery
         }
 
         await erpOrderItemDataConnect().searchList(params)
