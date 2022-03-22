@@ -121,7 +121,7 @@ const TableBox = styled.div`
         cursor: pointer;
     }
 
-    & .fiexed-header {
+    & .fixed-header {
         position: sticky;
         top: 0;
         z-index:10;
@@ -247,7 +247,7 @@ const ExcelHeaderDisplayWrapper = styled.div`
         cursor: pointer;
     }
 
-    .table-box .fiexed-header {
+    .table-box .fixed-header {
         position: sticky;
         top: 0;
         z-index:10;

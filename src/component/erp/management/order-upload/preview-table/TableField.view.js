@@ -17,7 +17,7 @@ export default function TableFieldView(props) {
                         <tr>
                             {props.erpOrderUploadDefaultHeader.map((data, index) => {
                                 return (
-                                    <th key={index} className="fiexed-header" scope="col">{data}</th>
+                                    <th key={index} className="fixed-header" scope="col">{data}</th>
                                 )
                             })}
                         </tr>

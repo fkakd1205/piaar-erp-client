@@ -103,7 +103,6 @@ const SalesComponent = (props) => {
 
         let params = {
             salesYn: 'y',
-            releaseYn: 'n',
             startDate: startDate,
             endDate: endDate,
             periodType: periodType,

@@ -79,7 +79,7 @@ const DefaultHeaderTableBox = styled.div`
         color: #444;
     }
 
-    & .fiexed-header {
+    & .fixed-header {
         position: sticky;
         top: 0;
         z-index:10;
@@ -170,7 +170,7 @@ const UpdateHeaderTableBox = styled.div`
         flex-wrap: wrap;
     }
 
-    & .fiexed-header {
+    & .fixed-header {
         position: sticky;
         top: 0;
         z-index:10;

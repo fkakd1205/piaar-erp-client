@@ -2,6 +2,16 @@ import { dateToYYYYMMDDhhmmss } from '../../../../../utils/dateFormatUtils';
 import InfiniteScrollObserver from '../../../../module/observer/InfiniteScrollObserver';
 import { TableFieldWrapper } from './OrderItemTable.styled';
 
+function CollectIcon() {
+    return (
+        <img
+            src='/assets/icon/correct_icon.png'
+            style={{ width: '15px', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }}
+            alt=""
+            loading='lazy'
+        ></img>
+    );
+}
 export default function TableFieldView(props) {
     return (
         <TableFieldWrapper>
@@ -10,7 +20,8 @@ export default function TableFieldView(props) {
             >
                 <table cellSpacing="0">
                     <colgroup>
-                        <col width={'50px'}></col>
+                        <col width={'40px'}></col>
+                        <col width={'40px'}></col>
                         {props.viewHeader?.headerDetail.details?.map((r, index) => {
                             return (
                                 <col key={index} width={'200px'}></col>
@@ -21,7 +32,13 @@ export default function TableFieldView(props) {
                     <thead>
                         <tr>
                             <th
-                                className="fiexed-header"
+                                className="fixed-header fixed-col"
+                                style={{zIndex:'12'}}
+                            >
+                                <div>출고됨</div>
+                            </th>
+                            <th
+                                className="fixed-header"
                                 onClick={() => props.onActionCheckOrderItemAll()}
                                 style={{ cursor: 'pointer' }}
                             >
@@ -34,7 +51,7 @@ export default function TableFieldView(props) {
                             </th>
                             {props.viewHeader?.headerDetail.details?.map((r, index) => {
                                 return (
-                                    <th key={index} className="fiexed-header" scope="col">{r.customCellName}</th>
+                                    <th key={index} className="fixed-header" scope="col">{r.customCellName}</th>
                                 )
                             })}
                         </tr>
@@ -51,6 +68,11 @@ export default function TableFieldView(props) {
                                             className={`${checked && 'tr-active'}`}
                                             onClick={(e) => props.onActionCheckOrderItem(e, r1)}
                                         >
+                                            <td className='fixed-col'>
+                                                {r1.releaseYn === 'y' &&
+                                                    <CollectIcon />
+                                                }
+                                            </td>
                                             <td style={{ cursor: 'pointer' }}>
                                                 <input type='checkbox' checked={checked} onChange={(e) => props.onActionCheckOrderItem(e, r1)}></input>
                                             </td>

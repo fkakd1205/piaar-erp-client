@@ -177,7 +177,7 @@ const DefaultTableFieldWrapper = styled.div`
         color: #444;
     }
 
-    .table-box .fiexed-header {
+    .table-box .fixed-header {
         position: sticky;
         top: 0;
         z-index:10;
@@ -257,7 +257,7 @@ const CreateTableFieldWrapper = styled.div`
         }
     }
 
-    & .fiexed-header {
+    & .fixed-header {
         position: sticky;
         top: 0;
         z-index:10;

@@ -22,11 +22,11 @@ const TableHead = ({ viewHeader }) => {
     return (
         <thead>
             <tr>
-                <th className="fiexed-header" scope="col">#</th>
-                <th className="fiexed-header" scope="col">선택</th>
+                <th className="fixed-header" scope="col">#</th>
+                <th className="fixed-header" scope="col">선택</th>
                 {viewHeader.headerDetail.details.map((r, index) => {
                     return (
-                        <th key={index} className="fiexed-header" scope="col">{r.customCellName}</th>
+                        <th key={index} className="fixed-header" scope="col">{r.customCellName}</th>
                     )
                 })}
             </tr>

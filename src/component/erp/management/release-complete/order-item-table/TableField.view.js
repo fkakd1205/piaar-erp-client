@@ -21,7 +21,7 @@ export default function TableFieldView(props) {
                     <thead>
                         <tr>
                             <th
-                                className="fiexed-header"
+                                className="fixed-header"
                                 onClick={() => props.onActionCheckOrderItemAll()}
                                 style={{ cursor: 'pointer' }}
                             >
@@ -34,7 +34,7 @@ export default function TableFieldView(props) {
                             </th>
                             {props.viewHeader?.headerDetail.details?.map((r, index) => {
                                 return (
-                                    <th key={index} className="fiexed-header" scope="col">{r.customCellName}</th>
+                                    <th key={index} className="fixed-header" scope="col">{r.customCellName}</th>
                                 )
                             })}
                         </tr>

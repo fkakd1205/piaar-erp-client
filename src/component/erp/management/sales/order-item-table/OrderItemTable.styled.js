@@ -37,7 +37,7 @@ const TableFieldWrapper = styled.div`
         border-bottom: 1px solid #c0c0c0;
         color: #000;
         font-weight: 700;
-        padding: 10px;
+        padding: 10px 3px;
         font-size: 12px;
     }
 
@@ -52,8 +52,10 @@ const TableFieldWrapper = styled.div`
     }
 
     table tbody tr td{
+        position:relative;
         padding: 7px 5px;
         vertical-align: middle !important;
+        background: white;
         border-bottom: 1px solid #e0e0e0;
         text-align: center;
         font-size: 11px;
@@ -73,10 +75,17 @@ const TableFieldWrapper = styled.div`
         cursor: pointer;
     }
 
-    .table-box .fiexed-header {
+    .table-box .fixed-header {
         position: sticky;
         top: 0;
         z-index:10;
+    }
+
+    .table-box .fixed-col {
+        position: sticky;
+        left: 0;
+        z-index:11;
+        border-right: 1px solid #e0e0e060;
     }
 
     .table-box::-webkit-scrollbar{

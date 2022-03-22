@@ -12,7 +12,7 @@ export default function OperatorFieldView(props) {
                             className='button-el'
                             onClick={props.onActionOpenReleaseConfirmModal}
                         >
-                            출고 전환
+                            출고
                             <Ripple color={'#e0e0e0'} duration={1000}></Ripple>
                         </button>
                     </div>

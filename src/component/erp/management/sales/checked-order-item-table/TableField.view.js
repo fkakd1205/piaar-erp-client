@@ -21,7 +21,7 @@ export default function TableFieldView(props) {
                         <tr>
                             {props.viewHeader?.headerDetail.details?.map((r, index) => {
                                 return (
-                                    <th key={index} className="fiexed-header" scope="col">{r.customCellName}</th>
+                                    <th key={index} className="fixed-header" scope="col">{r.customCellName}</th>
                                 )
                             })}
                         </tr>
