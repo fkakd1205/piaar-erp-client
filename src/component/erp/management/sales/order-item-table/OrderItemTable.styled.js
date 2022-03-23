@@ -5,7 +5,7 @@ const Container = styled.div`
 `;
 
 const TableFieldWrapper = styled.div`
-    margin-top: 10px;
+    /* margin-top: 10px; */
     padding: 0 30px;
 
     @media all and (max-width: 992px){
@@ -55,7 +55,6 @@ const TableFieldWrapper = styled.div`
         position:relative;
         padding: 7px 5px;
         vertical-align: middle !important;
-        background: white;
         border-bottom: 1px solid #e0e0e0;
         text-align: center;
         font-size: 11px;
@@ -80,9 +79,10 @@ const TableFieldWrapper = styled.div`
         top: 0;
         z-index:10;
     }
-
+    
     .table-box .fixed-col {
         position: sticky;
+        background: white;
         left: 0;
         z-index:11;
         border-right: 1px solid #e0e0e060;
@@ -103,7 +103,46 @@ const TableFieldWrapper = styled.div`
     }
 `;
 
+const SelectorButtonFieldWrapper = styled.div`
+    margin-top: 20px;
+    padding: 0 30px;
+
+    @media all and (max-width: 992px){
+        padding: 0 10px;
+    }
+
+    .flex-box{
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        border-collapse: collapse;
+
+        .button-el:nth-of-type(2){
+            margin-left: -1px;
+        }
+    }
+
+    .button-el{
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
+        border-bottom: none;
+        background: white;
+        width: 100px;
+        height: 30px;
+        font-weight: 700;
+        font-size: 12px;
+        color:#000;
+
+        cursor: pointer;
+
+        &:hover{
+            background: #e0e0e040;
+        }
+    }
+`;
 export {
     Container,
-    TableFieldWrapper
+    TableFieldWrapper,
+    SelectorButtonFieldWrapper
 }

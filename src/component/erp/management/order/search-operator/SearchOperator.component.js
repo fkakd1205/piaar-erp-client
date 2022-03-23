@@ -123,6 +123,8 @@ const SearchOperatorComponent = (props) => {
             query.searchQuery = searchQuery;
         }
 
+        delete query.page;
+
         navigate(qs.stringifyUrl({
             url: location.pathname,
             query: { ...query }

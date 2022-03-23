@@ -14,10 +14,15 @@ import OrderItemTableComponent from './order-item-table/OrderItemTable.component
 import CheckedOrderItemTableComponent from './checked-order-item-table/CheckedOrderItemTable.component';
 import CheckedOperatorComponent from './checked-operator/CheckedOperator.component';
 import { useBackdropHook, BackdropHookComponent } from '../../../../hooks/backdrop/useBackdropHook';
+import PagenationComponent from '../../../module/pagenation/PagenationComponent';
+import { staticOrderItemDetaultPageSizeElements } from '../../../../static-data/staticData';
+import OrderItemTablePagenationComponent from './order-item-table-pagenation/OrderItemTablePagenation.component';
 
 const Container = styled.div`
     margin-bottom: 100px;
 `;
+
+const PAGE_SIZE_ELEMENTS = staticOrderItemDetaultPageSizeElements;
 
 const OrderComponent = (props) => {
     const location = useLocation();
@@ -98,6 +103,8 @@ const OrderComponent = (props) => {
         let searchColumnName = query.searchColumnName || null;
         let searchQuery = query.searchQuery || null;
         let periodType = query.periodType || null;
+        let page = query.page || null;
+        let size = query.size || null;
 
         let params = {
             salesYn: 'n',
@@ -106,7 +113,9 @@ const OrderComponent = (props) => {
             endDate: endDate,
             periodType: periodType,
             searchColumnName: searchColumnName,
-            searchQuery: searchQuery
+            searchQuery: searchQuery,
+            page: page,
+            size: size
         }
 
         await erpOrderItemDataConnect().searchList(params)
@@ -169,7 +178,12 @@ const OrderComponent = (props) => {
     }, []);
 
     useEffect(() => {
-        __reqSearchOrderItemList();
+        async function fetchInit() {
+            onActionOpenBackdrop();
+            await __reqSearchOrderItemList();
+            onActionCloseBackdrop();
+        }
+        fetchInit();
     }, [location]);
 
 
@@ -199,17 +213,37 @@ const OrderComponent = (props) => {
     }
 
     const _onAction_checkOrderItemAll = () => {
-        if (orderItemPage.length === checkedOrderItemList.length) {
-            dispatchCheckedOrderItemList({
-                type: 'CLEAR'
-            })
-        } else {
-            let data = [...orderItemPage];
-            dispatchCheckedOrderItemList({
-                type: 'SET_DATA',
-                payload: data
-            })
-        }
+        let newData = [];
+        let idSet = new Set(checkedOrderItemList.map(r => r.id));
+
+        orderItemPage.content.forEach(r => {
+            if (idSet.has(r.id)) {
+                return;
+            } else {
+                newData.push(r);
+            }
+        });
+
+        dispatchCheckedOrderItemList({
+            type: 'SET_DATA',
+            payload: [
+                ...checkedOrderItemList,
+                ...newData
+            ]
+        });
+    }
+
+    const _onAction_releaseOrderItemAll = () => {
+        let idSet = new Set(orderItemPage.content.map(r => r.id));
+
+        let newData = checkedOrderItemList.filter(r => {
+            return !idSet.has(r.id);
+        })
+
+        dispatchCheckedOrderItemList({
+            type: 'SET_DATA',
+            payload: newData
+        })
     }
 
     const _onAction_releaseCheckedOrderItemListAll = () => {
@@ -292,7 +326,11 @@ const OrderComponent = (props) => {
 
                     _onAction_checkOrderItem={_onAction_checkOrderItem}
                     _onAction_checkOrderItemAll={_onAction_checkOrderItemAll}
+                    _onAction_releaseOrderItemAll={_onAction_releaseOrderItemAll}
                 ></OrderItemTableComponent>
+                <OrderItemTablePagenationComponent
+                    orderItemPage={orderItemPage}
+                ></OrderItemTablePagenationComponent>
                 <CheckedOperatorComponent
                     checkedOrderItemList={checkedOrderItemList}
                     productOptionList={productOptionList}

@@ -1,20 +1,26 @@
-import { useCallback, useEffect, useReducer } from "react";
+import { useCallback, useEffect, useReducer, useRef } from "react";
 import { Container } from "./OrderItemTable.styled";
+import SelectorButtonFieldView from "./SelectorButtonField.view";
 import TableFieldView from "./TableField.view";
 
 const OrderItemTableComponent = (props) => {
     const [viewSize, dispatchViewSize] = useReducer(viewSizeReducer, initialViewSize);
+    const tableScrollRef = useRef();
 
     useEffect(() => {
         if (!props.orderItemList || props.orderItemList?.length <= 0) {
             return;
         }
 
+        if (tableScrollRef && tableScrollRef.current) {
+            tableScrollRef.current.scrollTop = 0;
+        }
+
         dispatchViewSize({
             type: 'SET_DATA',
             payload: 50
         })
-    }, [props.orderItemList])
+    }, [props.orderItemList]);
 
     const isCheckedAll = useCallback(() => {
         if (!props.orderItemList || props.orderItemList?.length <= 0) {
@@ -38,6 +44,10 @@ const OrderItemTableComponent = (props) => {
         props._onAction_checkOrderItemAll();
     }
 
+    const onActionReleaseOrderItemAll = () => {
+        props._onAction_releaseOrderItemAll();
+    }
+
     const onActionfetchMoreOrderItems = async () => {
         let newSize = viewSize + 20;
         dispatchViewSize({
@@ -50,17 +60,25 @@ const OrderItemTableComponent = (props) => {
         <>
             <Container>
                 {(props.viewHeader && props.orderItemList) &&
-                    <TableFieldView
-                        viewHeader={props.viewHeader}
-                        orderItemList={props.orderItemList}
-                        viewSize={viewSize}
-                        isCheckedOne={isCheckedOne}
-                        isCheckedAll={isCheckedAll}
+                    <>
+                        <SelectorButtonFieldView
+                            onActionCheckOrderItemAll={onActionCheckOrderItemAll}
+                            onActionReleaseOrderItemAll={onActionReleaseOrderItemAll}
+                        ></SelectorButtonFieldView>
+                        <TableFieldView
+                            tableScrollRef={tableScrollRef}
 
-                        onActionCheckOrderItem={onActionCheckOrderItem}
-                        onActionCheckOrderItemAll={onActionCheckOrderItemAll}
-                        onActionfetchMoreOrderItems={onActionfetchMoreOrderItems}
-                    ></TableFieldView>
+                            viewHeader={props.viewHeader}
+                            orderItemList={props.orderItemList}
+                            viewSize={viewSize}
+                            isCheckedOne={isCheckedOne}
+                            isCheckedAll={isCheckedAll}
+
+                            onActionCheckOrderItem={onActionCheckOrderItem}
+                            onActionCheckOrderItemAll={onActionCheckOrderItemAll}
+                            onActionfetchMoreOrderItems={onActionfetchMoreOrderItems}
+                        ></TableFieldView>
+                    </>
                 }
                 {!props.viewHeader &&
                     <div style={{ textAlign: 'center', padding: '100px 0', fontWeight: '600' }}>뷰 헤더를 먼저 설정해 주세요.</div>

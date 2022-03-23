@@ -17,6 +17,7 @@ export default function TableFieldView(props) {
         <TableFieldWrapper>
             <div
                 className='table-box'
+                ref={props.tableScrollRef}
             >
                 <table cellSpacing="0">
                     <colgroup>
@@ -33,21 +34,14 @@ export default function TableFieldView(props) {
                         <tr>
                             <th
                                 className="fixed-header fixed-col"
-                                style={{zIndex:'12'}}
+                                style={{ zIndex: '12' }}
                             >
                                 <div>출고됨</div>
                             </th>
                             <th
                                 className="fixed-header"
-                                onClick={() => props.onActionCheckOrderItemAll()}
-                                style={{ cursor: 'pointer' }}
                             >
-                                <input
-                                    type='checkbox'
-                                    checked={props.isCheckedAll()}
-
-                                    onChange={() => props.onActionCheckOrderItemAll()}
-                                ></input>
+                                선택
                             </th>
                             {props.viewHeader?.headerDetail.details?.map((r, index) => {
                                 return (
@@ -68,23 +62,31 @@ export default function TableFieldView(props) {
                                             className={`${checked && 'tr-active'}`}
                                             onClick={(e) => props.onActionCheckOrderItem(e, r1)}
                                         >
-                                            <td className='fixed-col'>
+                                            <td
+                                                className={`fixed-col`}
+                                            >
                                                 {r1.releaseYn === 'y' &&
                                                     <CollectIcon />
                                                 }
                                             </td>
-                                            <td style={{ cursor: 'pointer' }}>
+                                            <td
+                                                style={{ cursor: 'pointer' }}
+                                            >
                                                 <input type='checkbox' checked={checked} onChange={(e) => props.onActionCheckOrderItem(e, r1)}></input>
                                             </td>
                                             {props.viewHeader?.headerDetail.details?.map(r2 => {
                                                 let matchedColumnName = r2.matchedColumnName;
                                                 if (matchedColumnName === 'createdAt') {
                                                     return (
-                                                        <td key={r2.cellNumber}>{dateToYYYYMMDDhhmmss(r1[matchedColumnName] || new Date())}</td>
+                                                        <td
+                                                            key={r2.cellNumber}
+                                                        >{dateToYYYYMMDDhhmmss(r1[matchedColumnName] || new Date())}</td>
                                                     )
                                                 }
                                                 return (
-                                                    <td key={r2.cellNumber}>{r1[matchedColumnName]}</td>
+                                                    <td
+                                                        key={r2.cellNumber}
+                                                    >{r1[matchedColumnName]}</td>
                                                 )
                                             })}
                                         </tr>

@@ -151,6 +151,8 @@ const SearchOperatorComponent = (props) => {
         if (searchColumnName && searchQuery) {
             query.searchQuery = searchQuery;
         }
+        
+        delete query.page;
 
         navigate(qs.stringifyUrl({
             url: location.pathname,

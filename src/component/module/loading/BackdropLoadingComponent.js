@@ -18,7 +18,11 @@ const BackdropLoadingComponent = ({ open, onClose }) => {
         <>
             <Container>
                 <Backdrop
-                    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 9999 }}
+                    sx={{
+                        color: '#000',
+                        zIndex: (theme) => theme.zIndex.drawer + 9999
+                    }}
+                    style={{background:'#ffffff30'}}
                     open={open}
                     onClick={typeof (onClose) === 'function' ? () => onClose() : () => { ; }}
                 >

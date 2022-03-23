@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { dateToYYYYMMDDhhmmss } from '../../../../../utils/dateFormatUtils';
 import InfiniteScrollObserver from '../../../../module/observer/InfiniteScrollObserver';
 import { TableFieldWrapper } from './OrderItemTable.styled';
@@ -7,6 +8,7 @@ export default function TableFieldView(props) {
         <TableFieldWrapper>
             <div
                 className='table-box'
+                ref={props.tableScrollRef}
             >
                 <table cellSpacing="0">
                     <colgroup>
@@ -22,15 +24,8 @@ export default function TableFieldView(props) {
                         <tr>
                             <th
                                 className="fixed-header"
-                                onClick={() => props.onActionCheckOrderItemAll()}
-                                style={{ cursor: 'pointer' }}
                             >
-                                <input
-                                    type='checkbox'
-                                    checked={props.isCheckedAll()}
-
-                                    onChange={() => props.onActionCheckOrderItemAll()}
-                                ></input>
+                                선택
                             </th>
                             {props.viewHeader?.headerDetail.details?.map((r, index) => {
                                 return (

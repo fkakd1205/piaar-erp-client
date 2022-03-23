@@ -715,6 +715,8 @@ const staticDefaultHeaderDetails = [
     }
 ];
 
+const staticOrderItemDetaultPageSizeElements = [200, 500, 1000];
+
 function getDefaultHeaderDetails() {
     let result = staticDefaultHeaderDetails.map((r, index) => {
         return {
@@ -728,5 +730,6 @@ function getDefaultHeaderDetails() {
 
 export {
     staticDefaultHeaderDetails,
+    staticOrderItemDetaultPageSizeElements,
     getDefaultHeaderDetails
 }

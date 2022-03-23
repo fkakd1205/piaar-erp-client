@@ -15,6 +15,7 @@ import CheckedOrderItemTableComponent from './checked-order-item-table/CheckedOr
 import CheckedOperatorComponent from './checked-operator/CheckedOperator.component';
 import { erpDownloadExcelHeaderDataConnect } from '../../../../data_connect/erpDownloadExcelHeaderDataConnect';
 import { BackdropHookComponent, useBackdropHook } from '../../../../hooks/backdrop/useBackdropHook';
+import OrderItemTablePagenationComponent from './order-item-table-pagenation/OrderItemTablePagenation.component';
 
 const Container = styled.div`
     margin-bottom: 100px;
@@ -32,7 +33,7 @@ const SalesComponent = (props) => {
 
     const [viewHeader, dispatchViewHeader] = useReducer(viewHeaderReducer, initialViewHeader);
     const [productOptionList, dispatchProductOptionList] = useReducer(productOptionListReducer, initialProductOptionList);
-    const [orderItemList, dispatchOrderItemList] = useReducer(orderItemListReducer, initialOrderItemList);
+    const [orderItemPage, dispatchOrderItemPage] = useReducer(orderItemPageReducer, initialOrderItemPage);
     const [checkedOrderItemList, dispatchCheckedOrderItemList] = useReducer(checkedOrderItemListReducer, initialCheckedOrderItemList);
     const [downloadExcelList, dispatchDownloadExcelList] = useReducer(downloadExcelListReducer, initialDownloadExcelList);
 
@@ -100,6 +101,8 @@ const SalesComponent = (props) => {
         let searchColumnName = query.searchColumnName || null;
         let searchQuery = query.searchQuery || null;
         let periodType = query.periodType || null;
+        let page = query.page || null;
+        let size = query.size || null;
 
         let params = {
             salesYn: 'y',
@@ -107,13 +110,15 @@ const SalesComponent = (props) => {
             endDate: endDate,
             periodType: periodType,
             searchColumnName: searchColumnName,
-            searchQuery: searchQuery
+            searchQuery: searchQuery,
+            page: page,
+            size: size
         }
 
         await erpOrderItemDataConnect().searchList(params)
             .then(res => {
                 if (res.status === 200 && res.data.message === 'success') {
-                    dispatchOrderItemList({
+                    dispatchOrderItemPage({
                         type: 'INIT_DATA',
                         payload: res.data.data
                     })
@@ -239,7 +244,12 @@ const SalesComponent = (props) => {
     }, []);
 
     useEffect(() => {
-        __reqSearchOrderItemList();
+        async function fetchInit() {
+            onActionOpenBackdrop();
+            await __reqSearchOrderItemList();
+            onActionCloseBackdrop();
+        }
+        fetchInit();
     }, [location]);
 
     const _onAction_openHeaderSettingModal = () => {
@@ -268,17 +278,37 @@ const SalesComponent = (props) => {
     }
 
     const _onAction_checkOrderItemAll = () => {
-        if (orderItemList.length === checkedOrderItemList.length) {
-            dispatchCheckedOrderItemList({
-                type: 'CLEAR'
-            })
-        } else {
-            let data = [...orderItemList];
-            dispatchCheckedOrderItemList({
-                type: 'SET_DATA',
-                payload: data
-            })
-        }
+        let newData = [];
+        let idSet = new Set(checkedOrderItemList.map(r => r.id));
+
+        orderItemPage.content.forEach(r => {
+            if (idSet.has(r.id)) {
+                return;
+            } else {
+                newData.push(r);
+            }
+        });
+
+        dispatchCheckedOrderItemList({
+            type: 'SET_DATA',
+            payload: [
+                ...checkedOrderItemList,
+                ...newData
+            ]
+        });
+    }
+
+    const _onAction_releaseOrderItemAll = () => {
+        let idSet = new Set(orderItemPage.content.map(r => r.id));
+
+        let newData = checkedOrderItemList.filter(r => {
+            return !idSet.has(r.id);
+        })
+
+        dispatchCheckedOrderItemList({
+            type: 'SET_DATA',
+            payload: newData
+        })
     }
 
     const _onAction_releaseCheckedOrderItemListAll = () => {
@@ -386,12 +416,16 @@ const SalesComponent = (props) => {
                 ></SearchOperatorComponent>
                 <OrderItemTableComponent
                     viewHeader={viewHeader}
-                    orderItemList={orderItemList}
+                    orderItemList={orderItemPage?.content}
                     checkedOrderItemList={checkedOrderItemList}
 
                     _onAction_checkOrderItem={_onAction_checkOrderItem}
                     _onAction_checkOrderItemAll={_onAction_checkOrderItemAll}
+                    _onAction_releaseOrderItemAll={_onAction_releaseOrderItemAll}
                 ></OrderItemTableComponent>
+                <OrderItemTablePagenationComponent
+                    orderItemPage={orderItemPage}
+                ></OrderItemTablePagenationComponent>
                 <CheckedOperatorComponent
                     viewHeader={viewHeader}
                     checkedOrderItemList={checkedOrderItemList}
@@ -438,7 +472,7 @@ export default SalesComponent;
 
 const initialViewHeader = null;
 const initialProductOptionList = null;
-const initialOrderItemList = null;
+const initialOrderItemPage = null;
 const initialCheckedOrderItemList = [];
 const initialDownloadExcelList = null;
 
@@ -458,7 +492,7 @@ const productOptionListReducer = (state, action) => {
     }
 }
 
-const orderItemListReducer = (state, action) => {
+const orderItemPageReducer = (state, action) => {
     switch (action.type) {
         case 'INIT_DATA':
             return action.payload;

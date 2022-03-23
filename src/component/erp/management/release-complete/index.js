@@ -14,19 +14,26 @@ import OrderItemTableComponent from './order-item-table/OrderItemTable.component
 import CheckedOrderItemTableComponent from './checked-order-item-table/CheckedOrderItemTable.component';
 import CheckedOperatorComponent from './checked-operator/CheckedOperator.component';
 import { erpDownloadExcelHeaderDataConnect } from '../../../../data_connect/erpDownloadExcelHeaderDataConnect';
+import OrderItemTablePagenationComponent from './order-item-table-pagenation/OrderItemTablePagenation.component';
+import { useBackdropHook, BackdropHookComponent } from '../../../../hooks/backdrop/useBackdropHook';
 
 const Container = styled.div`
     margin-bottom: 100px;
 `;
 
-// TODO : 모든 부분 완성해야됨.
 const ReleaseCompleteComponent = (props) => {
     const location = useLocation();
     const query = qs.parse(location.search);
 
+    const {
+        open: backdropOpen,
+        onActionOpen: onActionOpenBackdrop,
+        onActionClose: onActionCloseBackdrop
+    } = useBackdropHook();
+
     const [viewHeader, dispatchViewHeader] = useReducer(viewHeaderReducer, initialViewHeader);
     const [productOptionList, dispatchProductOptionList] = useReducer(productOptionListReducer, initialProductOptionList);
-    const [orderItemList, dispatchOrderItemList] = useReducer(orderItemListReducer, initialOrderItemList);
+    const [orderItemPage, dispatchOrderItemPage] = useReducer(orderItemPageReducer, initialOrderItemPage);
     const [checkedOrderItemList, dispatchCheckedOrderItemList] = useReducer(checkedOrderItemListReducer, initialCheckedOrderItemList);
     const [downloadExcelList, dispatchDownloadExcelList] = useReducer(downloadExcelListReducer, initialDownloadExcelList);
 
@@ -94,6 +101,9 @@ const ReleaseCompleteComponent = (props) => {
         let searchColumnName = query.searchColumnName || null;
         let searchQuery = query.searchQuery || null;
         let periodType = query.periodType || null;
+        let page = query.page || null;
+        let size = query.size || null;
+
 
         let params = {
             releaseYn: 'y',
@@ -101,13 +111,15 @@ const ReleaseCompleteComponent = (props) => {
             endDate: endDate,
             periodType: periodType,
             searchColumnName: searchColumnName,
-            searchQuery: searchQuery
+            searchQuery: searchQuery,
+            page: page,
+            size: size
         }
 
         await erpOrderItemDataConnect().searchList(params)
             .then(res => {
                 if (res.status === 200 && res.data.message === 'success') {
-                    dispatchOrderItemList({
+                    dispatchOrderItemPage({
                         type: 'INIT_DATA',
                         payload: res.data.data
                     })
@@ -220,7 +232,12 @@ const ReleaseCompleteComponent = (props) => {
     }, []);
 
     useEffect(() => {
-        __reqSearchOrderItemList();
+        async function fetchInit() {
+            onActionOpenBackdrop();
+            await __reqSearchOrderItemList();
+            onActionCloseBackdrop();
+        }
+        fetchInit();
     }, [location]);
 
     const _onAction_openHeaderSettingModal = () => {
@@ -249,17 +266,37 @@ const ReleaseCompleteComponent = (props) => {
     }
 
     const _onAction_checkOrderItemAll = () => {
-        if (orderItemList.length === checkedOrderItemList.length) {
-            dispatchCheckedOrderItemList({
-                type: 'CLEAR'
-            })
-        } else {
-            let data = [...orderItemList];
-            dispatchCheckedOrderItemList({
-                type: 'SET_DATA',
-                payload: data
-            })
-        }
+        let newData = [];
+        let idSet = new Set(checkedOrderItemList.map(r => r.id));
+
+        orderItemPage.content.forEach(r => {
+            if (idSet.has(r.id)) {
+                return;
+            } else {
+                newData.push(r);
+            }
+        });
+
+        dispatchCheckedOrderItemList({
+            type: 'SET_DATA',
+            payload: [
+                ...checkedOrderItemList,
+                ...newData
+            ]
+        });
+    }
+
+    const _onAction_releaseOrderItemAll = () => {
+        let idSet = new Set(orderItemPage.content.map(r => r.id));
+
+        let newData = checkedOrderItemList.filter(r => {
+            return !idSet.has(r.id);
+        })
+
+        dispatchCheckedOrderItemList({
+            type: 'SET_DATA',
+            payload: newData
+        })
     }
 
     const _onAction_releaseCheckedOrderItemListAll = () => {
@@ -270,6 +307,7 @@ const ReleaseCompleteComponent = (props) => {
 
     // 헤더 설정 서밋
     const _onSubmit_saveAndModifyViewHeader = async (headerDetails) => {
+        onActionOpenBackdrop();
         let params = null;
         if (!viewHeader) {
             params = {
@@ -290,47 +328,58 @@ const ReleaseCompleteComponent = (props) => {
 
         _onAction_closeHeaderSettingModal();
         await __reqSearchOrderHeaderOne();
+        onActionCloseBackdrop();
     }
 
     // 판매 전환 서밋
     const _onSubmit_changeSalesYnForOrderItemList = async (body) => {
+        onActionOpenBackdrop();
         await __reqChangeSalesYnForOrderItemList(body);
         dispatchCheckedOrderItemList({
             type: 'CLEAR'
         })
         await __reqSearchOrderItemList();
+        onActionCloseBackdrop();
     }
 
     // 데이터 삭제 서밋
     const _onSubmit_deleteOrderItemList = async function (params) {
+        onActionOpenBackdrop();
         await __reqDeleteOrderItemList(params);
         dispatchCheckedOrderItemList({
             type: 'CLEAR'
         })
         await __reqSearchOrderItemList();
+        onActionCloseBackdrop();
     }
 
     // 옵션 코드 변경
     const _onSubmit_changeOptionCodeForOrderItemListInBatch = async function (body) {
+        onActionOpenBackdrop();
         await __reqChangeOptionCodeForOrderItemListInBatch(body);
         dispatchCheckedOrderItemList({
             type: 'CLEAR'
         })
         await __reqSearchOrderItemList();
+        onActionCloseBackdrop();
     }
 
     // 엑셀 다운로드
     const _onSubmit_downloadOrderItemsExcel = async (downloadExcelHeader, downloadOrderItemList) => {
+        onActionOpenBackdrop();
         await __reqActionDownloadForDownloadOrderItems(downloadExcelHeader.id, downloadOrderItemList);
+        onActionCloseBackdrop();
     }
 
     // 출고 취소
     const _onSubmit_changeReleaseYnForOrderItemList = async (body) => {
+        onActionOpenBackdrop();
         await __reqChangeReleaseYnForOrderItemList(body);
         dispatchCheckedOrderItemList({
             type: 'CLEAR'
         })
         await __reqSearchOrderItemList();
+        onActionCloseBackdrop();
     }
     return (
         <>
@@ -343,12 +392,16 @@ const ReleaseCompleteComponent = (props) => {
                 ></SearchOperatorComponent>
                 <OrderItemTableComponent
                     viewHeader={viewHeader}
-                    orderItemList={orderItemList}
+                    orderItemList={orderItemPage?.content}
                     checkedOrderItemList={checkedOrderItemList}
 
                     _onAction_checkOrderItem={_onAction_checkOrderItem}
                     _onAction_checkOrderItemAll={_onAction_checkOrderItemAll}
+                    _onAction_releaseOrderItemAll={_onAction_releaseOrderItemAll}
                 ></OrderItemTableComponent>
+                <OrderItemTablePagenationComponent
+                    orderItemPage={orderItemPage}
+                ></OrderItemTablePagenationComponent>
                 <CheckedOperatorComponent
                     viewHeader={viewHeader}
                     checkedOrderItemList={checkedOrderItemList}
@@ -381,6 +434,11 @@ const ReleaseCompleteComponent = (props) => {
                     _onSubmit_saveAndModifyViewHeader={_onSubmit_saveAndModifyViewHeader}
                 ></ViewHeaderSettingModalComponent>
             </CommonModalComponent>
+
+            {/* Backdrop */}
+            <BackdropHookComponent
+                open={backdropOpen}
+            />
         </>
     );
 }
@@ -389,7 +447,7 @@ export default ReleaseCompleteComponent;
 
 const initialViewHeader = null;
 const initialProductOptionList = null;
-const initialOrderItemList = null;
+const initialOrderItemPage = null;
 const initialCheckedOrderItemList = [];
 const initialDownloadExcelList = null;
 
@@ -409,7 +467,7 @@ const productOptionListReducer = (state, action) => {
     }
 }
 
-const orderItemListReducer = (state, action) => {
+const orderItemPageReducer = (state, action) => {
     switch (action.type) {
         case 'INIT_DATA':
             return action.payload;
