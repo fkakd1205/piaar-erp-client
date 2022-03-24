@@ -1,4 +1,5 @@
 import { dateToYYYYMMDDhhmmss } from '../../../../../utils/dateFormatUtils';
+import SortButton from '../../../../module/button/SortButton';
 import InfiniteScrollObserver from '../../../../module/observer/InfiniteScrollObserver';
 import { TableFieldWrapper } from './OrderItemTable.styled';
 
@@ -29,7 +30,18 @@ export default function TableFieldView(props) {
                             </th>
                             {props.viewHeader?.headerDetail.details?.map((r, index) => {
                                 return (
-                                    <th key={index} className="fixed-header" scope="col">{r.customCellName}</th>
+                                    <th key={index} className="fixed-header" scope="col">
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <div>
+                                                {r.customCellName}
+                                            </div>
+                                            <SortButton
+                                                buttonSize={25}
+                                                iconSize={16}
+                                                markPoint={r.matchedColumnName}
+                                            ></SortButton>
+                                        </div>
+                                    </th>
                                 )
                             })}
                         </tr>

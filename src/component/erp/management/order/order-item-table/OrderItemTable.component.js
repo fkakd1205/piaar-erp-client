@@ -1,10 +1,13 @@
-import { useCallback, useEffect, useReducer, useRef } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { Container } from "./OrderItemTable.styled";
 import SelectorButtonFieldView from "./SelectorButtonField.view";
 import TableFieldView from "./TableField.view";
+import { useLocation, useNavigate } from 'react-router-dom';
+import qs from 'query-string';
 
 const OrderItemTableComponent = (props) => {
     const [viewSize, dispatchViewSize] = useReducer(viewSizeReducer, initialViewSize);
+    const [isPageLoading, setIsPageLoading] = useState(true);
     const tableScrollRef = useRef();
 
     useEffect(() => {
@@ -55,6 +58,7 @@ const OrderItemTableComponent = (props) => {
             payload: newSize
         })
     }
+
 
     return (
         <>

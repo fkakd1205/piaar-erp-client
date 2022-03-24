@@ -14,15 +14,15 @@ import OrderItemTableComponent from './order-item-table/OrderItemTable.component
 import CheckedOrderItemTableComponent from './checked-order-item-table/CheckedOrderItemTable.component';
 import CheckedOperatorComponent from './checked-operator/CheckedOperator.component';
 import { useBackdropHook, BackdropHookComponent } from '../../../../hooks/backdrop/useBackdropHook';
-import PagenationComponent from '../../../module/pagenation/PagenationComponent';
-import { staticOrderItemDetaultPageSizeElements } from '../../../../static-data/staticData';
+import { getDefaultHeaderFields } from '../../../../static-data/staticData';
 import OrderItemTablePagenationComponent from './order-item-table-pagenation/OrderItemTablePagenation.component';
+import { sortFormatUtils } from '../../../../utils/sortFormatUtils';
 
 const Container = styled.div`
     margin-bottom: 100px;
 `;
 
-const PAGE_SIZE_ELEMENTS = staticOrderItemDetaultPageSizeElements;
+const DEFAULT_HEADER_FIELDS = getDefaultHeaderFields();
 
 const OrderComponent = (props) => {
     const location = useLocation();
@@ -105,6 +105,9 @@ const OrderComponent = (props) => {
         let periodType = query.periodType || null;
         let page = query.page || null;
         let size = query.size || null;
+        let sortBy = query.sortBy || null;
+        let sortDirection = query.sortDirection || null;
+        let sort = sortFormatUtils().getSortWithSortElements(DEFAULT_HEADER_FIELDS, sortBy, sortDirection);
 
         let params = {
             salesYn: 'n',
@@ -115,7 +118,8 @@ const OrderComponent = (props) => {
             searchColumnName: searchColumnName,
             searchQuery: searchQuery,
             page: page,
-            size: size
+            size: size,
+            sort: sort
         }
 
         await erpOrderItemDataConnect().searchList(params)

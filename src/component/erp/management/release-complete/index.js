@@ -16,10 +16,14 @@ import CheckedOperatorComponent from './checked-operator/CheckedOperator.compone
 import { erpDownloadExcelHeaderDataConnect } from '../../../../data_connect/erpDownloadExcelHeaderDataConnect';
 import OrderItemTablePagenationComponent from './order-item-table-pagenation/OrderItemTablePagenation.component';
 import { useBackdropHook, BackdropHookComponent } from '../../../../hooks/backdrop/useBackdropHook';
+import { getDefaultHeaderFields } from '../../../../static-data/staticData';
+import { sortFormatUtils } from '../../../../utils/sortFormatUtils';
 
 const Container = styled.div`
     margin-bottom: 100px;
 `;
+
+const DEFAULT_HEADER_FIELDS = getDefaultHeaderFields();
 
 const ReleaseCompleteComponent = (props) => {
     const location = useLocation();
@@ -103,6 +107,9 @@ const ReleaseCompleteComponent = (props) => {
         let periodType = query.periodType || null;
         let page = query.page || null;
         let size = query.size || null;
+        let sortBy = query.sortBy || null;
+        let sortDirection = query.sortDirection || null;
+        let sort = sortFormatUtils().getSortWithSortElements(DEFAULT_HEADER_FIELDS, sortBy, sortDirection);
 
 
         let params = {
@@ -113,7 +120,8 @@ const ReleaseCompleteComponent = (props) => {
             searchColumnName: searchColumnName,
             searchQuery: searchQuery,
             page: page,
-            size: size
+            size: size,
+            sort: sort
         }
 
         await erpOrderItemDataConnect().searchList(params)

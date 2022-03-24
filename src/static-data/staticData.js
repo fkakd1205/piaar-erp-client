@@ -728,8 +728,17 @@ function getDefaultHeaderDetails() {
     return result;
 }
 
+function getDefaultHeaderFields() {
+    let result = staticDefaultHeaderDetails.map(r => {
+        return r.matchedColumnName;
+    })
+
+    return result;
+}
+
 export {
     staticDefaultHeaderDetails,
     staticOrderItemDetaultPageSizeElements,
-    getDefaultHeaderDetails
+    getDefaultHeaderDetails,
+    getDefaultHeaderFields
 }
