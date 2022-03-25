@@ -29,6 +29,12 @@ const erpDownloadExcelHeaderDataConnect = () => {
                 responseType: 'blob',
                 withCredentials: true
             })
+        },
+        actionDownloadForUploadExcelSampleForm: async function () {
+            return await axios.post(`${API_SERVER_ADDRESS}/api/v1/erp-download-excel-headers/upload-excel-sample/action-download`, {}, {
+                responseType: 'blob',
+                withCredentials: true
+            })
         }
     }
 }

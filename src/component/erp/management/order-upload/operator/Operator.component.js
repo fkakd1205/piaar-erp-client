@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import ControlButtonFieldView from "./ControlButtonField.view";
-import { Container, Wrapper } from "./Operator.styled";
+import { Container, TipFieldWrapper, Wrapper } from "./Operator.styled";
 
 function Layout({ children }) {
     return (
@@ -9,6 +9,31 @@ function Layout({ children }) {
                 {children}
             </Wrapper>
         </Container>
+    );
+}
+
+function Tip() {
+    return (
+        <TipFieldWrapper>
+            <div className='text-box'>
+                TIP1 : [피아르 고유번호] 는 자동 생성되는 항목이니 비워두시기 바랍니다.
+            </div>
+            <div className='text-box'>
+                TIP2 : [상품명], [옵션정보], [수량], [수취인명], [전화번호1], [주소] 은 필수 항목 입니다.
+            </div>
+            <div className='text-box'>
+                TIP3 : 데이터 중복 업로드를 방지하시려면 [판매채널 주문번호1] 을 반드시 기입해 주세요.
+            </div>
+            <div className='text-box'>
+                TIP4 : 피아르 상품 정보들과 자동으로 매칭되기를 원하시면 [피아르 옵션코드] 를 기입해 주세요.
+            </div>
+            <div className='text-box'>
+                TIP5 : 판매액 및 순수익에 대한 보다 정확한 통계를 위해서는 [판매금액], [배송비] 를 기입해 주세요.
+            </div>
+            <div className='text-box'>
+                TIP6 : 판매 채널별 통계자료를 얻기 위해서는 [판매채널] 을 기입해 주세요.
+            </div>
+        </TipFieldWrapper>
     );
 }
 
@@ -43,6 +68,10 @@ const OperatorComponent = (props) => {
         props._onSubmit_createOrderItems()
     }
 
+    const onActionDownloadSampleForm = () => {
+        props._onSubmit_downloadUploadExcelSample();
+    }
+
     return (
         <>
             <Layout>
@@ -57,7 +86,9 @@ const OperatorComponent = (props) => {
                 <ControlButtonFieldView
                     onActionOpenFileUploader={onActionOpenFileUploader}
                     onActionSaveExcelData={onActionSaveExcelData}
+                    onActionDownloadSampleForm={onActionDownloadSampleForm}
                 ></ControlButtonFieldView>
+                <Tip></Tip>
             </Layout>
         </>
     );

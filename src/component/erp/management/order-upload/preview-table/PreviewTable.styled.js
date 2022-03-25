@@ -36,7 +36,7 @@ const TableFieldWrapper = styled.div`
         background:#fff;
         color: #000;
         padding: 10px;
-        font-size: 14px;
+        font-size: 12px;
         font-weight: 700;
         border-bottom: 1px solid #e0e0e0;
     }
@@ -52,7 +52,7 @@ const TableFieldWrapper = styled.div`
         vertical-align: middle !important;
         border-bottom: 1px solid #e0e0e0;
         text-align: center;
-        font-size: 12px;
+        font-size: 11px;
         color: #000;
         font-weight: 500;
         line-height: 1.5;

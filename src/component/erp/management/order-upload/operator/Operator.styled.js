@@ -10,21 +10,22 @@ const Wrapper = styled.div`
 
 const ControlButtonFieldWrapper = styled.div`
     margin-top: 20px;
-    padding: 0 30px;
+    padding: 0 25px;
     height: auto;
-
-    display: flex;
-    flex-wrap: wrap;
-    
     color: white;
 
+    .flex-box{
+        display: flex;
+        flex-wrap: wrap;
+    }
+
     @media only screen and (max-width:992px){
-        padding: 0 10px;
+        padding: 0 5px;
     }
 
     .button-box{
 
-        padding-right: 10px;
+        padding: 5px;
         
         @media only screen and (max-width:992px){
             /* padding: 10px 10px; */
@@ -40,7 +41,7 @@ const ControlButtonFieldWrapper = styled.div`
         color: #000;
         vertical-align: middle;
         background: white;
-        border-radius: 2px;
+        /* border-radius: 2px; */
         border: 1px solid #e0e0e0;
         transition: opacity 0.1s linear;
 
@@ -113,9 +114,30 @@ const ControlButtonBox = styled.div`
     }
 `;
 
+const TipFieldWrapper = styled.div`
+    padding:0 30px;
+    margin-top: 10px;
+
+    @media all and (max-width: 992px){
+        padding:0 10px;
+    }
+    .text-box{
+        margin-top: 3px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #2c73d2;
+        word-break: keep-all;
+
+        @media all and (max-width: 992px){
+            font-size: 11px;
+        }
+    }
+`;
+
 export {
     Container,
     Wrapper,
     ControlButtonBox,
-    ControlButtonFieldWrapper
+    ControlButtonFieldWrapper,
+    TipFieldWrapper
 }

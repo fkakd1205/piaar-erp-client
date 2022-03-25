@@ -5,7 +5,7 @@ function Colgroup({ defaultHeaderList }) {
         <colgroup>
             {defaultHeaderList.map((r, index) => {
                 return (
-                    <col key={index} width={'120px'}></col>
+                    <col key={index} width={'140px'}></col>
                 );
             })}
 
