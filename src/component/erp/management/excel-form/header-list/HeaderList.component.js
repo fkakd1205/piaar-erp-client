@@ -1,15 +1,15 @@
 import { useReducer, useState } from "react";
 import CommonModalComponent from "../../../../module/modal/CommonModalComponent";
-import AddButtonFieldView from "./AddButtonField.view";
 import AddModalView from "./AddModal.view";
-import { Container } from "./HeaderList.styled";
+import HeaderFieldView from "./HeaderField.view";
+import { Container, Wrapper, TitleFieldWrapper } from "./HeaderList.styled";
 import ItemListView from './ItemList.view';
 
-function Layout({ children }) {
+function Title({ element }) {
     return (
-        <Container>
-            {children}
-        </Container>
+        <TitleFieldWrapper>
+            {element}
+        </TitleFieldWrapper>
     );
 }
 
@@ -45,7 +45,7 @@ export default function HeaderListComponent(props) {
             alert('양식의 이름을 지정해 주세요.')
             return;
         }
-        
+
         setDisabledBtn(true);
         props._onSubmit_create(createHeader);
         onActionAddModalClose();
@@ -66,17 +66,19 @@ export default function HeaderListComponent(props) {
 
     return (
         <>
-            <Layout>
-                <ItemListView
-                    headerList={props.headerList}
-                    isSelected={isSelected}
+            <Container>
+                <Wrapper>
+                    <HeaderFieldView
+                        onActionAddModalOpen={onActionAddModalOpen}
+                    ></HeaderFieldView>
+                    <ItemListView
+                        headerList={props.headerList}
+                        isSelected={isSelected}
 
-                    onActionHeaderSelect={onActionHeaderSelect}
-                ></ItemListView>
-                <AddButtonFieldView
-                    onActionAddModalOpen={onActionAddModalOpen}
-                ></AddButtonFieldView>
-            </Layout>
+                        onActionHeaderSelect={onActionHeaderSelect}
+                    ></ItemListView>
+                </Wrapper>
+            </Container>
 
             {/* Modal */}
             <CommonModalComponent

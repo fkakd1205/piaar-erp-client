@@ -6,6 +6,7 @@ export default function TableFieldView(props) {
             <div className='table-box'>
                 <table cellSpacing="0">
                     <colgroup>
+                        <col width={'50px'}></col>
                         {props.erpOrderUploadDefaultHeader.map((r, index) => {
                             return (
                                 <col key={index} width={'300px'}></col>
@@ -15,6 +16,12 @@ export default function TableFieldView(props) {
                     </colgroup>
                     <thead>
                         <tr>
+                            <th
+                                className="fixed-header fixed-col"
+                                style={{ zIndex: '12' }}
+                            >
+                                삭제
+                            </th>
                             {props.erpOrderUploadDefaultHeader.map((data, index) => {
                                 return (
                                     <th key={index} className="fixed-header" scope="col">{data.originCellName}</th>
@@ -26,10 +33,22 @@ export default function TableFieldView(props) {
                         {props.excelDataList?.map((rowData, rowIndex) => {
                             return (
                                 <tr key={rowIndex}>
+                                    <td
+                                        className="fixed-col"
+                                    >
+                                        <button
+                                            type='button'
+                                            className='delete-button-el'
+                                            onClick={(e)=>props.onActionDeleteDataOne(e, rowIndex)}
+                                        >
+                                            <img
+                                                className='delete-button-icon'
+                                                src='/assets/icon/delete_icon.png'
+                                                alt=""
+                                            ></img>
+                                        </button>
+                                    </td>
                                     <td>{rowData.uniqueCode}</td>
-                                    <td>{rowData.orderNumber1}</td>
-                                    <td>{rowData.orderNumber2}</td>
-                                    <td>{rowData.orderNumber3}</td>
                                     <td>{rowData.prodName}</td>
                                     <td>{rowData.optionName}</td>
                                     <td>{rowData.unit}</td>
@@ -37,15 +56,22 @@ export default function TableFieldView(props) {
                                     <td>{rowData.receiverContact1}</td>
                                     <td>{rowData.receiverContact2}</td>
                                     <td>{rowData.destination}</td>
+                                    <td>{rowData.salesChannel}</td>
+                                    <td>{rowData.orderNumber1}</td>
+                                    <td>{rowData.orderNumber2}</td>
+                                    <td>{rowData.channelProdCode}</td>
+                                    <td>{rowData.channelOptionCode}</td>
                                     <td>{rowData.zipCode}</td>
+                                    <td>{rowData.courier}</td>
                                     <td>{rowData.transportType}</td>
                                     <td>{rowData.deliveryMessage}</td>
-                                    <td>{rowData.prodUniqueNumber1}</td>
-                                    <td>{rowData.prodUniqueNumber2}</td>
-                                    <td>{rowData.optionUniqueNumber1}</td>
-                                    <td>{rowData.optionUniqueNumber2}</td>
+                                    <td>{rowData.waybillNumber}</td>
+                                    <td>{rowData.price}</td>
+                                    <td>{rowData.deliveryCharge}</td>
+                                    <td>{rowData.barcode}</td>
                                     <td>{rowData.prodCode}</td>
                                     <td>{rowData.optionCode}</td>
+                                    <td>{rowData.releaseOptionCode}</td>
                                     <td>{rowData.managementMemo1}</td>
                                     <td>{rowData.managementMemo2}</td>
                                     <td>{rowData.managementMemo3}</td>
@@ -56,16 +82,6 @@ export default function TableFieldView(props) {
                                     <td>{rowData.managementMemo8}</td>
                                     <td>{rowData.managementMemo9}</td>
                                     <td>{rowData.managementMemo10}</td>
-                                    <td>{rowData.managementMemo11}</td>
-                                    <td>{rowData.managementMemo12}</td>
-                                    <td>{rowData.managementMemo13}</td>
-                                    <td>{rowData.managementMemo14}</td>
-                                    <td>{rowData.managementMemo15}</td>
-                                    <td>{rowData.managementMemo16}</td>
-                                    <td>{rowData.managementMemo17}</td>
-                                    <td>{rowData.managementMemo18}</td>
-                                    <td>{rowData.managementMemo19}</td>
-                                    <td>{rowData.managementMemo20}</td>
                                 </tr>
                             )
                         })}

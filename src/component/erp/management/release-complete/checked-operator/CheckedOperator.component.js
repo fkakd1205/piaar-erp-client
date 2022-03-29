@@ -4,6 +4,8 @@ import CommonModalComponent from "../../../../module/modal/CommonModalComponent"
 import ConfirmModalComponent from "../../../../module/modal/ConfirmModalComponent";
 import ExcelDownloadModalComponent from "../excel-download-modal/ExcelDownloadModal.component";
 import OptionCodeModalComponent from "../option-code-modal/OptionCodeModal.component";
+import ReleaseOptionCodeModalComponent from "../release-option-code-modal/ReleaseOptionCodeModal.component";
+import WaybillModalComponent from "../waybill-modal/WaybillModal.component";
 import { Container, TitleWrapper } from "./CheckedOperator.styled";
 import OperatorFieldView from "./OperatorField.view";
 
@@ -13,6 +15,8 @@ const CheckedOperatorComponent = (props) => {
     const [optionCodeModalOpen, setOptionCodeModalOpen] = useState(false);
     const [downloadExcelModalOpen, setDownloadExcelModalOpen] = useState(false);
     const [releaseConfirmModalOpen, setReleaseConfirmModalOpen] = useState(false);
+    const [releaseOptionCodeModalOpen, setReleaseOptionCodeModalOpen] = useState(false);
+    const [waybillModalOpen, setWaybillModalOpen] = useState(false);
 
     const onActionReleaseCheckedOrderItemListAll = () => {
         props._onAction_releaseCheckedOrderItemListAll();
@@ -127,6 +131,55 @@ const CheckedOperatorComponent = (props) => {
         onActionCloseReleaseConfirmModal();
     }
 
+    const onActionOpenReleaseOptionCodeModal = () => {
+        if (props.checkedOrderItemList?.length <= 0) {
+            alert('데이터를 먼저 선택해 주세요.');
+            return;
+        }
+        setReleaseOptionCodeModalOpen(true);
+    }
+
+    const onActionCloseReleaseOptionCodeModal = () => {
+        setReleaseOptionCodeModalOpen(false);
+    }
+
+    const onActionChangeReleaseOptionCode = (optionCode) => {
+        let data = [...props.checkedOrderItemList];
+        data = data.map(r => {
+            return {
+                ...r,
+                releaseOptionCode: optionCode
+            }
+        })
+        props._onSubmit_changeReleaseOptionCodeForOrderItemListInBatch(data);
+        onActionCloseReleaseOptionCodeModal();
+    }
+
+    const onActionOpenWaybillModal = () => {
+        if (props.checkedOrderItemList?.length <= 0) {
+            alert('데이터를 먼저 선택해 주세요.');
+            return;
+        }
+        setWaybillModalOpen(true);
+    }
+
+    const onActionCloseWaybillModal = () => {
+        setWaybillModalOpen(false);
+    }
+
+    const onActionDownloadWaybillExcelSample = () => {
+        props._onAction_downloadWaybillExcelSample();
+    }
+
+    const onActionRegisterWaybill = (uploadFile) => {
+        var formData = new FormData();
+        formData.append('file', uploadFile);
+        formData.append('orderItems', new Blob([JSON.stringify(props.checkedOrderItemList)], { type: 'application/json' }))
+
+        props._onSubmit_changeWaybillForOrderItemList(formData);
+        onActionCloseWaybillModal();
+    }
+
     return (
         <>
             <Container>
@@ -152,6 +205,8 @@ const CheckedOperatorComponent = (props) => {
                     onActionOpenOptionCodeModal={onActionOpenOptionCodeModal}
                     onActionOpenDownloadExcelModal={onActionOpenDownloadExcelModal}
                     onActionOpenReleaseConfirmModal={onActionOpenReleaseConfirmModal}
+                    onActionOpenReleaseOptionCodeModal={onActionOpenReleaseOptionCodeModal}
+                    onActionOpenWaybillModal={onActionOpenWaybillModal}
                 ></OperatorFieldView>
             </Container>
 
@@ -192,6 +247,20 @@ const CheckedOperatorComponent = (props) => {
                     onConfirm={(optionCode) => onActionChangeOptionCode(optionCode)}
                 ></OptionCodeModalComponent>
             </CommonModalComponent>
+            {/* 출고 옵션 코드 모달 */}
+            <CommonModalComponent
+                open={releaseOptionCodeModalOpen}
+
+                onClose={onActionCloseReleaseOptionCodeModal}
+            >
+                <ReleaseOptionCodeModalComponent
+                    checkedOrderItemList={props.checkedOrderItemList}
+                    productOptionList={props.productOptionList}
+
+                    onConfirm={(optionCode) => onActionChangeReleaseOptionCode(optionCode)}
+                ></ReleaseOptionCodeModalComponent>
+            </CommonModalComponent>
+            {/* 엑셀 다운로드 모달 */}
             <CommonModalComponent
                 open={downloadExcelModalOpen}
                 maxWidth={'lg'}
@@ -205,6 +274,18 @@ const CheckedOperatorComponent = (props) => {
 
                     onActionDownloadExcel={onActionDownloadExcel}
                 ></ExcelDownloadModalComponent>
+            </CommonModalComponent>
+            {/* 운송장 등록 모달 */}
+            <CommonModalComponent
+                open={waybillModalOpen}
+
+                onClose={onActionCloseWaybillModal}
+            >
+                <WaybillModalComponent
+                    onActionDownloadWaybillExcelSample={onActionDownloadWaybillExcelSample}
+                    onActionCloseWaybillModal={onActionCloseWaybillModal}
+                    onActionRegisterWaybill={onActionRegisterWaybill}
+                ></WaybillModalComponent>
             </CommonModalComponent>
         </>
     );

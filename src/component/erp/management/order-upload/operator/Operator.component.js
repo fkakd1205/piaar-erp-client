@@ -1,4 +1,6 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import CommonModalComponent from "../../../../module/modal/CommonModalComponent";
+import SingleAddModalComponent from "../single-add-modal/SingleAddModal.component";
 import ControlButtonFieldView from "./ControlButtonField.view";
 import { Container, TipFieldWrapper, Wrapper } from "./Operator.styled";
 
@@ -40,6 +42,8 @@ function Tip() {
 const OperatorComponent = (props) => {
     const fileUploaderRef = useRef();
 
+    const [singleAddModalOpen, setSingleAddModalOpen] = useState(false);
+
     const onActionOpenFileUploader = () => {
         fileUploaderRef.current.click();
     }
@@ -72,6 +76,19 @@ const OperatorComponent = (props) => {
         props._onSubmit_downloadUploadExcelSample();
     }
 
+    const onActionOpenSingleAddModal = () => {
+        setSingleAddModalOpen(true);
+    }
+
+    const onActionCloseSingleAddModal = () => {
+        setSingleAddModalOpen(false);
+    }
+
+    const onActionAddSingleData = (data) => {
+        props._onSubmit_addSingleExcelData(data);
+        onActionCloseSingleAddModal();
+    }
+
     return (
         <>
             <Layout>
@@ -87,9 +104,21 @@ const OperatorComponent = (props) => {
                     onActionOpenFileUploader={onActionOpenFileUploader}
                     onActionSaveExcelData={onActionSaveExcelData}
                     onActionDownloadSampleForm={onActionDownloadSampleForm}
+                    onActionOpenSingleAddModal={onActionOpenSingleAddModal}
                 ></ControlButtonFieldView>
                 <Tip></Tip>
             </Layout>
+
+            {/* Modal */}
+            <CommonModalComponent
+                open={singleAddModalOpen}
+
+                onClose={onActionCloseSingleAddModal}
+            >
+                <SingleAddModalComponent
+                    onActionAddSingleData={onActionAddSingleData}
+                ></SingleAddModalComponent>
+            </CommonModalComponent>
         </>
     );
 }

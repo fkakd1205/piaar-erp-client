@@ -54,6 +54,11 @@ const erpOrderItemDataConnect = () => {
             return await axios.post(`${API_SERVER_ADDRESS}/api/v1/erp-order-items/erp-second-merge-headers/${secondMergeHeaderId}/action-merge`, body, {
                 withCredentials: true
             })
+        },
+        changeWaybillForList: async function (formData) {
+            return await axios.patch(`${API_SERVER_ADDRESS}/api/v1/erp-order-items/batch/waybill`, formData, {
+                withCredentials: true
+            })
         }
     }
 }

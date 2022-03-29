@@ -6,9 +6,9 @@ import UpdateHeaderTableView from "./UpdateHeaderTable.view";
 import CommonModalComponent from "../../../../module/modal/CommonModalComponent";
 import ConfirmModalComponent from "../../../../module/modal/ConfirmModalComponent";
 import ViewDetailSelectModal from "./ViewDetailSelectModal.view";
-import DeleteButtonFieldView from "./DeleteButtonField.view";
 import UpdateButtonFieldView from './UpdateButtonField.view';
 import { getDefaultHeaderDetails } from "../../../../../static-data/staticData";
+import HeaderFieldView from "./HeaderField.view";
 
 function Layout({ children }) {
     return (
@@ -282,9 +282,9 @@ export default function EditFieldComponent(props) {
         <>
             {updateHeader &&
                 <Layout>
-                    <DeleteButtonFieldView
+                    <HeaderFieldView
                         onActionDeleteHeaderConfirmModalOpen={onActionDeleteHeaderConfirmModalOpen}
-                    ></DeleteButtonFieldView>
+                    ></HeaderFieldView>
                     <TitleView
                         title={'기준 양식'}
                     ></TitleView>
@@ -298,18 +298,20 @@ export default function EditFieldComponent(props) {
                     <TitleView
                         title={'다운로드 엑셀 양식'}
                     ></TitleView>
-                    <UpdateHeaderTableView
-                        updateHeader={updateHeader}
-                        defaultHeaderList={defaultHeaderDetails}
+                    {updateHeader.headerDetail.details?.length > 0 &&
+                        <UpdateHeaderTableView
+                            updateHeader={updateHeader}
+                            defaultHeaderList={defaultHeaderDetails}
 
-                        onChangeOrderToLeft={_onChange_orderToLeft}
-                        onChangeOrderToRight={_onChange_orderToRight}
-                        onChangeHeaderDetailValue={_onChange_headerDetailValue}
-                        onOpenAddViewDetailModal={_onAction_openAddViewDetailModal}
-                        onCloseAddViewDetailModal={_onAction_closeAddViewDetailModal}
-                        onAddViewDetail={_onAction_addViewDetail}
-                        onDeleteViewDetail={_onAction_deleteViewDetail}
-                    ></UpdateHeaderTableView>
+                            onChangeOrderToLeft={_onChange_orderToLeft}
+                            onChangeOrderToRight={_onChange_orderToRight}
+                            onChangeHeaderDetailValue={_onChange_headerDetailValue}
+                            onOpenAddViewDetailModal={_onAction_openAddViewDetailModal}
+                            onCloseAddViewDetailModal={_onAction_closeAddViewDetailModal}
+                            onAddViewDetail={_onAction_addViewDetail}
+                            onDeleteViewDetail={_onAction_deleteViewDetail}
+                        ></UpdateHeaderTableView>
+                    }
                     <UpdateButtonFieldView
                         onActionUpdateHeader={onActionUpdateHeader}
                     ></UpdateButtonFieldView>

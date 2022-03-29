@@ -4,6 +4,7 @@ import { erpDownloadExcelHeaderDataConnect } from '../../../../data_connect/erpD
 import EditFieldComponent from './edit-field/EditField.component';
 import HeaderListComponent from './header-list/HeaderList.component';
 import MainLayout from './layout/MainLayout';
+import PageHeaderComponent from './page-header/PageHeader.component';
 
 const Container = styled.div`
 
@@ -105,6 +106,7 @@ const ErpManagementExcelForm = (props) => {
     return (
         <>
             <Container>
+                <PageHeaderComponent></PageHeaderComponent>
                 {headerList &&
                     <MainLayout>
                         <HeaderListComponent

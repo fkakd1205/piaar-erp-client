@@ -34,9 +34,9 @@ const ControlButtonFieldWrapper = styled.div`
     }
 
     .button-el{
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 600;
-        width: 180px;
+        width: 140px;
         padding: 10px;
         color: #000;
         vertical-align: middle;
@@ -60,8 +60,8 @@ const ControlButtonFieldWrapper = styled.div`
         }
 
         @media only screen and (max-width:992px){
-            width: 130px;
-            font-size: 12px;
+            width: 80px;
+            font-size: 10px;
         }
     }
 `;
@@ -123,13 +123,13 @@ const TipFieldWrapper = styled.div`
     }
     .text-box{
         margin-top: 3px;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 700;
         color: #2c73d2;
         word-break: keep-all;
 
         @media all and (max-width: 992px){
-            font-size: 11px;
+            font-size: 10px;
         }
     }
 `;

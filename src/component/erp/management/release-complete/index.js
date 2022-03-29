@@ -178,6 +178,19 @@ const ReleaseCompleteComponent = (props) => {
             });
     }
 
+    const __reqChangeReleaseOptionCodeForOrderItemListInBatch = async function (body) {
+        await erpOrderItemDataConnect().changeReleaseOptionCodeForListInBatch(body)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            });
+    }
+
     const __reqSearchDownloadExcelHeaders = async () => {
         await erpDownloadExcelHeaderDataConnect().searchList()
             .then(res => {
@@ -222,6 +235,52 @@ const ReleaseCompleteComponent = (props) => {
 
     const __reqChangeReleaseYnForOrderItemList = async (body) => {
         await erpOrderItemDataConnect().changeReleaseYnForList(body)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            })
+    }
+
+    const __reqDownloadForWaybillExcelSample = async () => {
+        await erpDownloadExcelHeaderDataConnect().actionDownloadForWaybillExcelSample()
+            .then(res => {
+                if (res.status === 200) {
+                    const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
+                    const link = document.createElement('a');
+                    link.href = url;
+
+                    let date = dateToYYYYMMDDhhmmssFile(new Date());
+
+                    link.setAttribute('download', '운송장 일괄 등록 양식.xlsx');
+                    document.body.appendChild(link);
+                    link.click();
+                }
+            })
+            .catch(err => {
+                let res = err.response;
+
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data?.memo);
+            })
+            ;
+    }
+
+    const __reqChangeWaybillForOrderItemsInBatch = async (formData) => {
+        await erpOrderItemDataConnect().changeWaybillForList(formData)
+            .then(res => {
+                if (res.status === 200 && res.data.message === 'success') {
+                    alert(res.data.memo);
+                }
+            })
             .catch(err => {
                 let res = err.response;
                 if (res?.status === 500) {
@@ -372,6 +431,17 @@ const ReleaseCompleteComponent = (props) => {
         onActionCloseBackdrop();
     }
 
+    // 출고 옵션 코드 변경
+    const _onSubmit_changeReleaseOptionCodeForOrderItemListInBatch = async function (body) {
+        onActionOpenBackdrop();
+        await __reqChangeReleaseOptionCodeForOrderItemListInBatch(body);
+        dispatchCheckedOrderItemList({
+            type: 'CLEAR'
+        })
+        await __reqSearchOrderItemList();
+        onActionCloseBackdrop();
+    }
+
     // 엑셀 다운로드
     const _onSubmit_downloadOrderItemsExcel = async (downloadExcelHeader, downloadOrderItemList) => {
         onActionOpenBackdrop();
@@ -383,6 +453,24 @@ const ReleaseCompleteComponent = (props) => {
     const _onSubmit_changeReleaseYnForOrderItemList = async (body) => {
         onActionOpenBackdrop();
         await __reqChangeReleaseYnForOrderItemList(body);
+        dispatchCheckedOrderItemList({
+            type: 'CLEAR'
+        })
+        await __reqSearchOrderItemList();
+        onActionCloseBackdrop();
+    }
+
+    // 운송장 일괄 등록 엑셀 다운
+    const _onAction_downloadWaybillExcelSample = async () => {
+        onActionOpenBackdrop();
+        await __reqDownloadForWaybillExcelSample();
+        onActionCloseBackdrop();
+    }
+
+    // 운송장 일괄 등록
+    const _onSubmit_changeWaybillForOrderItemList = async (formData) => {
+        onActionOpenBackdrop();
+        await __reqChangeWaybillForOrderItemsInBatch(formData);
         dispatchCheckedOrderItemList({
             type: 'CLEAR'
         })
@@ -420,8 +508,11 @@ const ReleaseCompleteComponent = (props) => {
                     _onSubmit_changeSalesYnForOrderItemList={_onSubmit_changeSalesYnForOrderItemList}
                     _onSubmit_deleteOrderItemList={_onSubmit_deleteOrderItemList}
                     _onSubmit_changeOptionCodeForOrderItemListInBatch={_onSubmit_changeOptionCodeForOrderItemListInBatch}
+                    _onSubmit_changeReleaseOptionCodeForOrderItemListInBatch={_onSubmit_changeReleaseOptionCodeForOrderItemListInBatch}
                     _onSubmit_downloadOrderItemsExcel={_onSubmit_downloadOrderItemsExcel}
                     _onSubmit_changeReleaseYnForOrderItemList={_onSubmit_changeReleaseYnForOrderItemList}
+                    _onAction_downloadWaybillExcelSample={_onAction_downloadWaybillExcelSample}
+                    _onSubmit_changeWaybillForOrderItemList={_onSubmit_changeWaybillForOrderItemList}
                 ></CheckedOperatorComponent>
                 <CheckedOrderItemTableComponent
                     viewHeader={viewHeader}

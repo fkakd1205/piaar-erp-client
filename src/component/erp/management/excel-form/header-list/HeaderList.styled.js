@@ -2,17 +2,92 @@ import styled from 'styled-components';
 
 const Container = styled.div`
     width: 30%;
+
+    @media all and (max-width: 992px){
+        width: 100%;
+    }
 `;
 
-const ItemListContainer = styled.div`
+const Wrapper = styled.div`
+    overflow: hidden;
+    border:1px solid #e1e1e1;
+    border-radius: 3px;
+`;
+
+const HeaderFieldWrapper = styled.div`
+    padding: 10px;
+    border-bottom:1px solid #e1e1e1;
+
+    .flex-box{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .title-el{
+        font-size:16px; 
+        font-weight:600;
+        border-radius: 3px;    
+    }
+
+    .add-button{
+        overflow: hidden;
+        position: relative;
+        width: 30px;
+        height: 30px;
+
+        background: #2C73D2;
+        border: 1px solid #2C73D2;
+        border-radius: 50%;
+
+        cursor: pointer;
+    }
+
+    .add-button-icon{
+        width: 23px;
+        height: 23px;
+
+        position: absolute;
+        top:50%;
+        left:50%;
+        transform: translate(-50%, -50%);
+    }
+`;
+
+const TitleFieldWrapper = styled.div`
+    font-size:16px; 
+    font-weight:600;
+    border-radius: 3px;
 `;
 
 const ItemListWrapper = styled.div`
     overflow: hidden;
-    margin-right: 10px;
 
-    border: 1px solid #e1e1e1;
-    border-radius: 3px;
+    .item-none-box{
+        padding: 40px 0;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .item-list-box{
+        overflow: auto;
+        max-height: 200px;
+
+        &::-webkit-scrollbar{
+            background: #e1e1e130;
+            height:3px;
+            width: 5px;
+        }
+
+        &::-webkit-scrollbar-track{
+            border-radius: 10px;
+        }
+        &::-webkit-scrollbar-thumb{
+            background-color: #00000020;
+            border-radius: 10px;
+        }
+    }
 
     .item {
         overflow: hidden;
@@ -36,14 +111,13 @@ const ItemListWrapper = styled.div`
 `;
 
 const AddButtonFieldWrapper = styled.div`
-    margin-top: 10px;
     text-align: center;
 
     .add-button{
         overflow: hidden;
         position: relative;
-        width: 40px;
-        height: 40px;
+        width: 30px;
+        height: 30px;
 
         background: #2C73D2;
         border: 1px solid #2C73D2;
@@ -53,8 +127,8 @@ const AddButtonFieldWrapper = styled.div`
     }
 
     .add-button-icon{
-        width: 26px;
-        height: 26px;
+        width: 23px;
+        height: 23px;
 
         position: absolute;
         top:50%;
@@ -119,8 +193,10 @@ const AddModalWrapper = styled.div`
 
 export {
     Container,
-    ItemListContainer,
+    Wrapper,
+    TitleFieldWrapper,
     ItemListWrapper,
     AddButtonFieldWrapper,
-    AddModalWrapper
+    AddModalWrapper,
+    HeaderFieldWrapper
 }

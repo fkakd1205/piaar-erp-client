@@ -1,10 +1,11 @@
 import Ripple from "../../../../module/button/Ripple";
-import { AddButtonFieldWrapper } from "./HeaderList.styled";
+import { HeaderFieldWrapper } from "./HeaderList.styled";
 
-const AddButtonFieldView = (props) => {
+export default function HeaderFieldView(props) {
     return (
-        <>
-            <AddButtonFieldWrapper>
+        <HeaderFieldWrapper>
+            <div className='flex-box'>
+                <div className='title-el'>엑셀 양식 생성 및 선택</div>
                 <button
                     type='button'
                     className='add-button'
@@ -19,8 +20,7 @@ const AddButtonFieldView = (props) => {
                         duration={1000}
                     ></Ripple>
                 </button>
-            </AddButtonFieldWrapper>
-        </>
+            </div>
+        </HeaderFieldWrapper>
     );
 }
-export default AddButtonFieldView;

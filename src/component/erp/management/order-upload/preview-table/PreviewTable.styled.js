@@ -71,6 +71,38 @@ const TableFieldWrapper = styled.div`
         z-index:10;
     }
 
+    .table-box .fixed-col {
+        position: sticky;
+        background: white;
+        left: 0;
+        z-index:11;
+        border-right: 1px solid #e0e0e060;
+    }
+
+    .table-box .delete-button-el{
+        position: relative;
+        overflow: hidden;
+        width:28px;
+        height: 28px;
+        background: #ff3060;
+        border: 1px solid #ff3060;
+        border-radius: 2px;
+
+        cursor: pointer;
+
+        &:hover{
+            transform: scale(1.02);
+        }
+    }
+
+    .table-box .delete-button-el .delete-button-icon{
+        width:80%;
+        position: absolute;
+        top:50%;
+        left:50%;
+        transform: translate(-50%, -50%);
+    }
+
     .table-box::-webkit-scrollbar{
         background: #e1e1e130;
         height:7px;

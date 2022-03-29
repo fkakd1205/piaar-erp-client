@@ -35,6 +35,12 @@ const erpDownloadExcelHeaderDataConnect = () => {
                 responseType: 'blob',
                 withCredentials: true
             })
+        },
+        actionDownloadForWaybillExcelSample: async function () {
+            return await axios.post(`${API_SERVER_ADDRESS}/api/v1/erp-download-excel-headers/waybill-excel-sample/action-download`, {}, {
+                responseType: 'blob',
+                withCredentials: true
+            })
         }
     }
 }

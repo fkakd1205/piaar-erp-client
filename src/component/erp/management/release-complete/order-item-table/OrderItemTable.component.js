@@ -1,7 +1,20 @@
 import { useCallback, useEffect, useReducer, useRef } from "react";
-import { Container } from "./OrderItemTable.styled";
+import { Container, TipFieldWrapper } from "./OrderItemTable.styled";
 import SelectorButtonFieldView from "./SelectorButtonField.view";
 import TableFieldView from "./TableField.view";
+
+function Tip() {
+    return (
+        <TipFieldWrapper>
+            <div>
+                <span className='highlight'>[출고 옵션코드]</span> 를 기준으로 매칭된 상품 데이터 정보를 불러옵니다.
+            </div>
+            <div>
+                <span className='highlight'>[출고 옵션코드]</span> 에 매칭된 상품의 재고가 반영됩니다.
+            </div>
+        </TipFieldWrapper>
+    );
+}
 
 const OrderItemTableComponent = (props) => {
     const [viewSize, dispatchViewSize] = useReducer(viewSizeReducer, initialViewSize);
@@ -53,6 +66,7 @@ const OrderItemTableComponent = (props) => {
             <Container>
                 {(props.viewHeader && props.orderItemList) &&
                     <>
+                        <Tip></Tip>
                         <SelectorButtonFieldView
                             onActionCheckOrderItemAll={onActionCheckOrderItemAll}
                             onActionReleaseOrderItemAll={onActionReleaseOrderItemAll}

@@ -13,6 +13,16 @@ function CollectIcon() {
         ></img>
     );
 }
+
+const HIGHLIGHT_FIELDS = [
+    'optionCode',
+    'categoryName',
+    'prodDefaultName',
+    'prodManagementName',
+    'optionDefaultName',
+    'optionManagementName',
+    'optionStockUnit'
+];
 export default function TableFieldView(props) {
     return (
         <TableFieldWrapper>
@@ -46,7 +56,11 @@ export default function TableFieldView(props) {
                             </th>
                             {props.viewHeader?.headerDetail.details?.map((r, index) => {
                                 return (
-                                    <th key={index} className="fixed-header" scope="col">
+                                    <th
+                                        key={index}
+                                        className="fixed-header"
+                                        scope="col"
+                                    >
                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                             <div>
                                                 {r.customCellName}
@@ -57,6 +71,9 @@ export default function TableFieldView(props) {
                                                 markPoint={r.matchedColumnName}
                                             ></SortButton>
                                         </div>
+                                        {HIGHLIGHT_FIELDS.includes(r.matchedColumnName) &&
+                                            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '10%', background: '#b9c2e1' }}></div>
+                                        }
                                     </th>
                                 )
                             })}

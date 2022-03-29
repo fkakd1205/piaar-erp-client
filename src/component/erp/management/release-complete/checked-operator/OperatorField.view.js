@@ -32,7 +32,7 @@ export default function OperatorFieldView(props) {
                         <button
                             type='button'
                             className='button-el'
-                            onClick={props.onActionOpenOptionCodeModal}
+                            onClick={props.onActionOpenReleaseOptionCodeModal}
                         >
                             출고 옵션 코드 변경
                             <Ripple color={'#e0e0e0'} duration={1000}></Ripple>
@@ -40,6 +40,16 @@ export default function OperatorFieldView(props) {
                     </div>
                 </ButtonWrapper>
                 <ButtonWrapper>
+                    <div className='button-box'>
+                        <button
+                            type='button'
+                            className='button-el'
+                            onClick={props.onActionOpenWaybillModal}
+                        >
+                            운송장 일괄 등록
+                            <Ripple color={'#e0e0e0'} duration={1000}></Ripple>
+                        </button>
+                    </div>
                     <div className='button-box'>
                         <button
                             type='button'

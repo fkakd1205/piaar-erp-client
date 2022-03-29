@@ -1,14 +1,67 @@
 import styled from "styled-components";
 
 const Container = styled.div`
-    width: 70%;
+    width: 50%;
+    flex:1;
+
+    @media all and (max-width: 992px){
+        width: 100%;
+        margin-top: 20px;
+    }
 `;
 
 const Wrapper = styled.div`
-    margin-left: 10px;
     padding-bottom: 10px;
     border: 1px solid #e1e1e1;
     border-radius: 3px;
+`;
+
+const HeaderFieldWrapper = styled.div`
+    padding: 10px;
+    border-bottom: 1px solid #e1e1e1;
+    
+    .flex-box{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .title-el{
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .button-box{
+
+    }
+
+    .button-el{
+        overflow: hidden;
+        position: relative;
+        width:40px;
+        height:40px;
+
+        background: #ff3060;
+        border: 1px solid #ff306000;
+        border-radius: 50%;
+
+        cursor: pointer;
+
+        transition: all .3s;
+        &:hover{
+            transform: scale(1.05);
+        }
+    }
+
+    .button-icon{
+        position: absolute;
+        top:50%;
+        left:50%;
+        transform: translate(-50%, -50%);
+        width: 26px;
+        height: 26px;
+
+    }
 `;
 
 const TitleWrapper = styled.div`
@@ -333,6 +386,7 @@ const UpdateButtonFieldWrapper = styled.div`
 export {
     Container,
     Wrapper,
+    HeaderFieldWrapper,
     TitleWrapper,
     DefaultHeaderTableWrapper,
     DefaultHeaderTableBox,

@@ -19,8 +19,18 @@ const ErpOrderUploadComponent = (props) => {
         await erpOrderItemDataConnect().uploadExcelFile(formData)
             .then(res => {
                 if (res.status === 200 && res.data.message === 'success') {
+                    if (excelDataList) {
+                        dispatchExcelDataList({
+                            type: 'SET_DATA',
+                            payload: [
+                                ...excelDataList,
+                                ...res.data.data
+                            ]
+                        });
+                        return;
+                    }
                     dispatchExcelDataList({
-                        type: 'INIT_DATA',
+                        type: 'SET_DATA',
                         payload: res.data.data
                     })
                 }
@@ -92,6 +102,9 @@ const ErpOrderUploadComponent = (props) => {
     }
 
     const _onSubmit_createOrderItems = async () => {
+        if(!excelDataList || excelDataList.length <= 0){
+            return;
+        }
         onActionOpenBackdrop();
         await __reqCreateOrderItems(excelDataList);
         onActionCloseBackdrop();
@@ -103,15 +116,46 @@ const ErpOrderUploadComponent = (props) => {
         onActionCloseBackdrop();
     }
 
+    const _onSubmit_addSingleExcelData = async (data) => {
+        if (excelDataList) {
+            dispatchExcelDataList({
+                type: 'SET_DATA',
+                payload: [
+                    ...excelDataList,
+                    data
+                ]
+            })
+        } else {
+            dispatchExcelDataList({
+                type: 'SET_DATA',
+                payload: [
+                    data
+                ]
+            })
+        }
+    }
+
+    const _onAction_deleteDataOne = async (index) => {
+        let data = excelDataList.filter((r, i) => i !== index);
+
+        dispatchExcelDataList({
+            type: 'SET_DATA',
+            payload: data
+        })
+    }
+
     return (
         <>
             <OperatorComponent
                 _onSubmit_uploadExcelFile={(formData) => _onSubmit_uploadExcelFile(formData)}
                 _onSubmit_createOrderItems={() => _onSubmit_createOrderItems()}
                 _onSubmit_downloadUploadExcelSample={_onSubmit_downloadUploadExcelSample}
+                _onSubmit_addSingleExcelData={_onSubmit_addSingleExcelData}
             ></OperatorComponent>
             <PreviewTableComponent
                 excelDataList={excelDataList}
+
+                _onAction_deleteDataOne={_onAction_deleteDataOne}
             ></PreviewTableComponent>
 
             {/* Backdrop Loading */}
@@ -128,7 +172,7 @@ const initialExcelDataList = null;
 
 const excelDataListReducer = (state, action) => {
     switch (action.type) {
-        case 'INIT_DATA':
+        case 'SET_DATA':
             return action.payload;
         case 'CLEAR':
             return null;
