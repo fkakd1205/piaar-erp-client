@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { loginDataConnect } from '../../data_connect/loginDataConnect';
 
 const Container = styled.div`
     height: 64px;
@@ -7,6 +8,13 @@ const Container = styled.div`
 `;
 
 const NavbarMain = (props) => {
+    const __reqLogin = async () => {
+        let params = {
+            username: '박세훈',
+            password: 'syna123.'
+        }
+        await loginDataConnect().login(params);
+    }
     return (
         <>
             <Container>
@@ -20,6 +28,7 @@ const NavbarMain = (props) => {
                 >
                     erp
                 </Link>
+                <button onClick={__reqLogin}>로그인하기</button>
             </Container>
         </>
     );

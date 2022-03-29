@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-function getRemainingDateCount(closingDate){
+function getRemainingDateCount(closingDate) {
     let currDate = new Date();
     let nextDate = new Date(closingDate);
 
@@ -43,6 +43,11 @@ function dateToYYYYMMDDhhmmss(idate) {
     return moment(date).format("YYYY-MM-DD HH:mm:ss");
 }
 
+function dateToYYMMDDhhmmss(idate) {
+    var date = new Date(idate);
+    return moment(date).format("YY/MM/DD HH:mm:ss");
+}
+
 function dateToYYYYMMDDhhmmssFile(idate) {
     var date = new Date(idate);
     return moment(date).format("YYYYMMDDHHmmss");
@@ -54,6 +59,7 @@ export {
     dateToYYMMDD,
     dateToYYYYMMDD,
     dateToYYYYMMDDhhmmss,
+    dateToYYMMDDhhmmss,
     dateToYYYYMMDDhhmmssFile,
     getRemainingDateCount
 }

@@ -2,7 +2,7 @@ import { List, ListItem, ListItemText } from '@mui/material';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
-import CommonModalComponent from '../../../template/modal/CommonModalComponent';
+import CommonModalComponent from '../../../module/modal/CommonModalComponent';
 
 const Container = styled.div`
     padding: 10px;
@@ -11,7 +11,8 @@ const Container = styled.div`
 
 const DesktopNavbarBox = styled.div`
     display:flex;
-    justify-content: end;
+    justify-content: flex-end;
+    -webkit-justify-content:flex-end;
     align-items: center;
     overflow: auto;
 
@@ -89,12 +90,12 @@ const thisRouters = [
         pathname: '/erp/management/sales'
     },
     {
-        name: '출고 준비 상태 관리',
-        pathname: '/erp/management/release-ready'
+        name: '출고 상태 관리',
+        pathname: '/erp/management/release-complete'
     },
     {
-        name: '출고 완료 상태 관리',
-        pathname: '/erp/management/release-complete'
+        name: '엑셀 폼 관리자',
+        pathname: '/erp/management/excel'
     }
 ]
 const ErpManagementNavbar = (props) => {

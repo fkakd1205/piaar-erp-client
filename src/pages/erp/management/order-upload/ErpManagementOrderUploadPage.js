@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import ErpManagementNavbar from '../../../../component/erp/management/navbar/ErpManagementNavbar';
-import MainComponent from '../../../../component/erp/management/order-upload/MainComponent';
+import ErpOrderUploadComponent from '../../../../component/erp/management/order-upload';
 import NavbarMain from '../../../../component/navbar/NavbarMain';
 const Container = styled.div`
 
@@ -12,7 +12,7 @@ const ErpManagementOrderUploadPage = (props) => {
             <Container>
                 <NavbarMain></NavbarMain>
                 <ErpManagementNavbar></ErpManagementNavbar>
-                <MainComponent></MainComponent>
+                <ErpOrderUploadComponent></ErpOrderUploadComponent>
             </Container>
         </>
     );
