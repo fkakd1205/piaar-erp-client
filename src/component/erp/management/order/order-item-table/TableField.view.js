@@ -31,15 +31,19 @@ export default function TableFieldView(props) {
                             {props.viewHeader?.headerDetail.details?.map((r, index) => {
                                 return (
                                     <th key={index} className="fixed-header" scope="col">
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <div
+                                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}
+                                        >
                                             <div>
                                                 {r.customCellName}
                                             </div>
-                                            <SortButton
-                                                buttonSize={25}
-                                                iconSize={16}
-                                                markPoint={r.matchedColumnName}
-                                            ></SortButton>
+                                            <div style={{ position: 'absolute', right: '0', top: '50%', transform: 'translate(0, -50%)' }}>
+                                                <SortButton
+                                                    buttonSize={25}
+                                                    iconSize={16}
+                                                    markPoint={r.matchedColumnName}
+                                                ></SortButton>
+                                            </div>
                                         </div>
                                     </th>
                                 )

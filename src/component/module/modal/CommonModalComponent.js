@@ -21,16 +21,25 @@ const CustomDialog = styled(Dialog)`
     }
 `;
 
-const CommonModalComponent = (props) => {
+/**
+ * 
+ * @param {Object} props
+ * @param {boolean} props.open
+ * @param {boolean} props.fullWidth
+ * @param {string} props.maxWidth
+ * @param {function} props.onClose
+ * @returns 
+ */
+const CommonModalComponent = ({ open, fullWidth, maxWidth, onClose, children }) => {
     return (
         <>
             <CustomDialog
-                open={props.open || false}
-                fullWidth={props.fullWidth || true}
-                maxWidth={props.maxWidth || 'xs'}
-                onClose={() => props.onClose() || {}}
+                open={open || false}
+                fullWidth={fullWidth || true}
+                maxWidth={maxWidth || 'xs'}
+                onClose={() => onClose() || {}}
             >
-                {props.children}
+                {children}
             </CustomDialog>
         </>
     );

@@ -4,7 +4,7 @@ const staticDefaultHeaderDetails2 = [
         "customCellName": "피아르 고유번호",
         "matchedColumnName": "uniqueCode",
         "allowedSearch": true,
-        "requiredFlag": false,
+        "requiredFlag": true,
         "variableType": 'string',
         "fixedValue": '',
         "mergeYn": "n",
