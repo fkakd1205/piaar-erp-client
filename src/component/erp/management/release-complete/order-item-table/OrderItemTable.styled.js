@@ -82,15 +82,16 @@ const TableFieldWrapper = styled.div`
         line-height: 1.5;
         word-break: keep-all;
 
+        @media all and (max-width: 992px){
+            font-size: 10px;
+        }
+        
         &:hover{
             background: #2C73D260;
             color: white;
             font-weight: 600;
         }
         
-        @media all and (max-width: 992px){
-            font-size: 10px;
-        }
     }
 
     .option-code-item{

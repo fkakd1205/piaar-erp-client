@@ -30,6 +30,22 @@ const TableFieldWrapper = styled.div`
         border: none;
     }
 
+    table .col-5-3 {
+        width:50px;
+
+        @media all and (max-width:992px){
+            width:30px;
+        }
+    }
+
+    table .col-15-13{
+        width:150px;
+
+        @media all and (max-width:992px){
+            width:130px;
+        }
+    }
+
     table thead tr th{
         vertical-align: middle !important;
         text-align: center;
@@ -39,6 +55,11 @@ const TableFieldWrapper = styled.div`
         font-weight: 700;
         padding: 10px 3px;
         font-size: 12px;
+
+        @media all and (max-width: 992px){
+            font-size: 10px;
+            padding: 10px 5px;
+        }
     }
 
     table tbody tr{
@@ -62,6 +83,10 @@ const TableFieldWrapper = styled.div`
         font-weight: 500;
         line-height: 1.5;
         word-break: keep-all;
+
+        @media all and (max-width: 992px){
+            font-size: 10px;
+        }
 
         &:hover{
             background: #2C73D260;
@@ -89,6 +114,15 @@ const TableFieldWrapper = styled.div`
         box-shadow: 6px 0 10px -7px #e0e0e0;
     }
 
+    .table-box .fixed-col-right {
+        position: sticky;
+        background: white;
+        right: 0;
+        z-index:10;
+        border-left: 1px solid #e0e0e060;
+        box-shadow: -6px 0 10px -7px #e0e0e0;
+    }
+    
     .table-box::-webkit-scrollbar{
         background: #e1e1e130;
         height:7px;
@@ -101,6 +135,45 @@ const TableFieldWrapper = styled.div`
     .table-box::-webkit-scrollbar-thumb{
         background-color: #00000010;
         border-radius: 10px;
+    }
+
+    .fix-button-el{
+        width: 25px;
+        height: 25px;
+        position: relative;
+
+        padding: 0; 
+
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 3px;
+
+        cursor: pointer;
+
+        &:hover{
+            background: #2C73D2;
+            border: 1px solid #2C73D2;
+
+            & .fix-button-icon{
+                opacity: 1;
+                filter: invert(100%);
+            }
+        }
+
+        @media all and (max-width: 992px){
+            width: 18px;
+            height: 18px;
+        }
+    }
+
+    .fix-button-icon{
+        width: 90%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+
+        transform: translate(-50%, -50%);
+        opacity: 0.6;
     }
 `;
 

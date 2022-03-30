@@ -295,7 +295,10 @@ const ReleaseCompleteComponent = (props) => {
     const __reqUpdateOrderItemOne = async (body) => {
         await erpOrderItemDataConnect().updateOne(body)
             .then(res => {
-                console.log(res);
+                if (res.status === 200 && res.data.message === 'success') {
+                    alert('수정되었습니다.');
+                    return;
+                }
             })
             .catch(err => {
                 let res = err.response;
