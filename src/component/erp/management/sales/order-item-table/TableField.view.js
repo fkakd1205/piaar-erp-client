@@ -32,14 +32,17 @@ export default function TableFieldView(props) {
             >
                 <table cellSpacing="0">
                     <colgroup>
-                        <col width={'40px'}></col>
-                        <col width={'40px'}></col>
+                        <col className='col-5-3'></col>
+                        <col className='col-5-3'></col>
                         {props.viewHeader?.headerDetail.details?.map((r, index) => {
                             return (
-                                <col key={index} width={'200px'}></col>
+                                <col
+                                    key={index}
+                                    className='col-15-13'
+                                ></col>
                             );
                         })}
-
+                        <col className='col-5-3'></col>
                     </colgroup>
                     <thead>
                         <tr>
@@ -62,7 +65,7 @@ export default function TableFieldView(props) {
                                         scope="col"
                                     >
                                         <div
-                                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position:'relative' }}
+                                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}
                                         >
                                             <div>
                                                 {r.customCellName}
@@ -81,6 +84,12 @@ export default function TableFieldView(props) {
                                     </th>
                                 )
                             })}
+                            <th
+                                className="fixed-header fixed-col-right"
+                                style={{ zIndex: 12 }}
+                            >
+                                수정
+                            </th>
                         </tr>
                     </thead>
 
@@ -124,6 +133,19 @@ export default function TableFieldView(props) {
                                                     </td>
                                                 )
                                             })}
+                                            <td className='fixed-col-right'>
+                                                <button
+                                                    type='button'
+                                                    className='fix-button-el'
+                                                    onClick={(e) => props.onActionOpenFixItemModal(e, r1)}
+                                                >
+                                                    <img
+                                                        src={'/assets/icon/edit_black_icon.png'}
+                                                        className='fix-button-icon'
+                                                        alt=""
+                                                    ></img>
+                                                </button>
+                                            </td>
                                         </tr>
                                     )
 

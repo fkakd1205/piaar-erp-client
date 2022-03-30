@@ -12,10 +12,9 @@ export default function TableFieldView(props) {
                     <colgroup>
                         {props.viewHeader?.headerDetail.details?.map((r, index) => {
                             return (
-                                <col key={index} width={'200px'}></col>
+                                <col key={index} className='col-15-13'></col>
                             );
                         })}
-
                     </colgroup>
                     <thead>
                         <tr>

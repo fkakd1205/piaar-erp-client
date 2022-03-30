@@ -134,8 +134,8 @@ const OrderItemTableComponent = (props) => {
         }
         props._onSubmit_updateErpOrderItemOne(fixTargetItem);
         onActionCloseFixItemModal();
-
     }
+    
     return (
         <>
             <Container>

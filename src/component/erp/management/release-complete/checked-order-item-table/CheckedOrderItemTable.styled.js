@@ -30,6 +30,14 @@ const TableFieldWrapper = styled.div`
         border: none;
     }
 
+    table .col-15-13{
+        width:150px;
+
+        @media all and (max-width:992px){
+            width:130px;
+        }
+    }
+    
     table thead tr th{
         vertical-align: middle !important;
         text-align: center;
