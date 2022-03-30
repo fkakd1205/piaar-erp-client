@@ -44,7 +44,7 @@ export default function TableFieldView(props) {
                     <thead>
                         <tr>
                             <th
-                                className="fixed-header fixed-col"
+                                className="fixed-header fixed-col-left"
                                 style={{ zIndex: '12' }}
                             >
                                 <div>출고됨</div>
@@ -61,15 +61,19 @@ export default function TableFieldView(props) {
                                         className="fixed-header"
                                         scope="col"
                                     >
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <div
+                                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position:'relative' }}
+                                        >
                                             <div>
                                                 {r.customCellName}
                                             </div>
-                                            <SortButton
-                                                buttonSize={25}
-                                                iconSize={16}
-                                                markPoint={r.matchedColumnName}
-                                            ></SortButton>
+                                            <div style={{ position: 'absolute', right: '0', top: '50%', transform: 'translate(0, -50%)' }}>
+                                                <SortButton
+                                                    buttonSize={25}
+                                                    iconSize={16}
+                                                    markPoint={r.matchedColumnName}
+                                                ></SortButton>
+                                            </div>
                                         </div>
                                         {HIGHLIGHT_FIELDS.includes(r.matchedColumnName) &&
                                             <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '10%', background: '#b9c2e1' }}></div>
@@ -92,7 +96,7 @@ export default function TableFieldView(props) {
                                             onClick={(e) => props.onActionCheckOrderItem(e, r1)}
                                         >
                                             <td
-                                                className={`fixed-col`}
+                                                className={`fixed-col-left`}
                                             >
                                                 {r1.releaseYn === 'y' &&
                                                     <CollectIcon />
@@ -115,7 +119,9 @@ export default function TableFieldView(props) {
                                                 return (
                                                     <td
                                                         key={r2.cellNumber}
-                                                    >{r1[matchedColumnName]}</td>
+                                                    >
+                                                        {r1[matchedColumnName]}
+                                                    </td>
                                                 )
                                             })}
                                         </tr>

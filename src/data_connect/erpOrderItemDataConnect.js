@@ -15,8 +15,19 @@ const erpOrderItemDataConnect = () => {
                 withCredentials: true
             })
         },
+        searchReleaseList: async function (params) {
+            return await axios.get(`${API_SERVER_ADDRESS}/api/v1/erp-order-items/search/release`, {
+                params: params,
+                withCredentials: true
+            })
+        },
         createList: async function (params) {
             return await axios.post(`${API_SERVER_ADDRESS}/api/v1/erp-order-items/batch`, params, {
+                withCredentials: true
+            })
+        },
+        updateOne: async function (body) {
+            return await axios.put(`${API_SERVER_ADDRESS}/api/v1/erp-order-items`, body, {
                 withCredentials: true
             })
         },

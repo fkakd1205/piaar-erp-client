@@ -22,13 +22,16 @@ export default function TableFieldView(props) {
             >
                 <table cellSpacing="0">
                     <colgroup>
-                        <col width={'50px'}></col>
+                        <col className='col-5-3'></col>
                         {props.viewHeader?.headerDetail.details?.map((r, index) => {
                             return (
-                                <col key={index} width={'200px'}></col>
+                                <col
+                                    key={index}
+                                    className='col-15-13'
+                                ></col>
                             );
                         })}
-
+                        <col className='col-5-3'></col>
                     </colgroup>
                     <thead>
                         <tr>
@@ -41,15 +44,19 @@ export default function TableFieldView(props) {
                             {props.viewHeader?.headerDetail.details?.map((r, index) => {
                                 return (
                                     <th key={index} className="fixed-header" scope="col">
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <div
+                                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}
+                                        >
                                             <div>
                                                 {r.customCellName}
                                             </div>
-                                            <SortButton
-                                                buttonSize={25}
-                                                iconSize={16}
-                                                markPoint={r.matchedColumnName}
-                                            ></SortButton>
+                                            <div style={{ position: 'absolute', right: '0', top: '50%', transform: 'translate(0, -50%)' }}>
+                                                <SortButton
+                                                    buttonSize={25}
+                                                    iconSize={16}
+                                                    markPoint={r.matchedColumnName}
+                                                ></SortButton>
+                                            </div>
                                         </div>
                                         {HIGHLIGHT_FIELDS.includes(r.matchedColumnName) &&
                                             <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '10%', background: '#e1d7b9' }}></div>
@@ -57,6 +64,12 @@ export default function TableFieldView(props) {
                                     </th>
                                 )
                             })}
+                            <th
+                                className="fixed-header fixed-col-right"
+                                style={{ zIndex: 12 }}
+                            >
+                                수정
+                            </th>
                         </tr>
                     </thead>
 
@@ -82,9 +95,24 @@ export default function TableFieldView(props) {
                                                     )
                                                 }
                                                 return (
-                                                    <td key={r2.cellNumber}>{r1[matchedColumnName]}</td>
+                                                    <td key={r2.cellNumber}>
+                                                        {r1[matchedColumnName]}
+                                                    </td>
                                                 )
                                             })}
+                                            <td className='fixed-col-right'>
+                                                <button
+                                                    type='button'
+                                                    className='fix-button-el'
+                                                    onClick={(e) => props.onActionOpenFixItemModal(e, r1)}
+                                                >
+                                                    <img
+                                                        src={'/assets/icon/edit_black_icon.png'}
+                                                        className='fix-button-icon'
+                                                        alt=""
+                                                    ></img>
+                                                </button>
+                                            </td>
                                         </tr>
                                     )
 

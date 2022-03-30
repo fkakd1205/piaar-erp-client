@@ -124,7 +124,7 @@ const ReleaseCompleteComponent = (props) => {
             sort: sort
         }
 
-        await erpOrderItemDataConnect().searchList(params)
+        await erpOrderItemDataConnect().searchReleaseList(params)
             .then(res => {
                 if (res.status === 200 && res.data.message === 'success') {
                     dispatchOrderItemPage({
@@ -289,6 +289,22 @@ const ReleaseCompleteComponent = (props) => {
                 }
 
                 alert(res?.data.memo);
+            })
+    }
+
+    const __reqUpdateOrderItemOne = async (body) => {
+        await erpOrderItemDataConnect().updateOne(body)
+            .then(res => {
+                console.log(res);
+            })
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data?.memo);
             })
     }
 
@@ -477,6 +493,18 @@ const ReleaseCompleteComponent = (props) => {
         await __reqSearchOrderItemList();
         onActionCloseBackdrop();
     }
+
+    // 단일 erpOrderItem 업데이트
+    const _onSubmit_updateErpOrderItemOne = async (body) => {
+        onActionOpenBackdrop();
+        await __reqUpdateOrderItemOne(body);
+        dispatchCheckedOrderItemList({
+            type: 'CLEAR'
+        })
+        await __reqSearchOrderItemList();
+        onActionCloseBackdrop();
+    }
+
     return (
         <>
             <Container>
@@ -494,6 +522,7 @@ const ReleaseCompleteComponent = (props) => {
                     _onAction_checkOrderItem={_onAction_checkOrderItem}
                     _onAction_checkOrderItemAll={_onAction_checkOrderItemAll}
                     _onAction_releaseOrderItemAll={_onAction_releaseOrderItemAll}
+                    _onSubmit_updateErpOrderItemOne={_onSubmit_updateErpOrderItemOne}
                 ></OrderItemTableComponent>
                 <OrderItemTablePagenationComponent
                     orderItemPage={orderItemPage}
