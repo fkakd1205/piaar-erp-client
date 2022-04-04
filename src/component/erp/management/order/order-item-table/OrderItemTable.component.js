@@ -4,11 +4,16 @@ import SelectorButtonFieldView from "./SelectorButtonField.view";
 import TableFieldView from "./TableField.view";
 import { useLocation, useNavigate } from 'react-router-dom';
 import qs from 'query-string';
+import CommonModalComponent from "../../../../module/modal/CommonModalComponent";
+import FixOrderItemModalComponent from "../fix-order-item-modal/FixOrderItemModal.component";
 
 const OrderItemTableComponent = (props) => {
-    const [viewSize, dispatchViewSize] = useReducer(viewSizeReducer, initialViewSize);
-    const [isPageLoading, setIsPageLoading] = useState(true);
     const tableScrollRef = useRef();
+
+    const [viewSize, dispatchViewSize] = useReducer(viewSizeReducer, initialViewSize);
+    const [fixTargetItem, dispatchFixTargetItem] = useReducer(fixTargetItemReducer, initialFixTargetItem);
+
+    const [fixItemModalOpen, setFixItemModalOpen] = useState(false);
 
     useEffect(() => {
         if (!props.orderItemList || props.orderItemList?.length <= 0) {
@@ -59,6 +64,75 @@ const OrderItemTableComponent = (props) => {
         })
     }
 
+    const onActionOpenFixItemModal = (e, orderItem) => {
+        e.stopPropagation();
+        dispatchFixTargetItem({
+            type: 'SET_DATA',
+            payload: orderItem
+        })
+        setFixItemModalOpen(true);
+    }
+
+    const onActionCloseFixItemModal = () => {
+        dispatchFixTargetItem({
+            type: 'CLEAR'
+        })
+        setFixItemModalOpen(false);
+    }
+
+    const onChangeFixTargetItem = (e) => {
+        let name = e.target.name;
+        let value = e.target.value;
+
+        dispatchFixTargetItem({
+            type: 'CHANGE_DATA',
+            payload: {
+                name: name,
+                value: value
+            }
+        })
+    }
+
+    const onActionConfirmUpdateFixOrderItem = (e) => {
+        e.preventDefault();
+        if (!fixTargetItem.uniqueCode) {
+            alert('[피아르 고유번호] 는 필수 입력 값 입니다.');
+            return;
+        }
+
+        if (!fixTargetItem.prodName) {
+            alert('[상품명] 은 필수 입력 값 입니다.');
+            return;
+        }
+
+        if (!fixTargetItem.optionName) {
+            alert('[옵션정보] 는 필수 입력 값 입니다.');
+            return;
+        }
+
+        if (!fixTargetItem.unit) {
+            alert('[수량] 은 필수 입력 값 입니다.');
+            return;
+        }
+
+        if (!fixTargetItem.receiver) {
+            alert('[수취인명] 은 필수 입력 값 입니다.');
+            return;
+        }
+
+        if (!fixTargetItem.receiverContact1) {
+            alert('[전화번호1] 은 필수 입력 값 입니다.');
+            return;
+        }
+
+        if (!fixTargetItem.destination) {
+            alert('[주소] 는 필수 입력 값 입니다.');
+            return;
+        }
+        props._onSubmit_updateErpOrderItemOne(fixTargetItem);
+        onActionCloseFixItemModal();
+    }
+
 
     return (
         <>
@@ -81,6 +155,7 @@ const OrderItemTableComponent = (props) => {
                             onActionCheckOrderItem={onActionCheckOrderItem}
                             onActionCheckOrderItemAll={onActionCheckOrderItemAll}
                             onActionfetchMoreOrderItems={onActionfetchMoreOrderItems}
+                            onActionOpenFixItemModal={onActionOpenFixItemModal}
                         ></TableFieldView>
                     </>
                 }
@@ -88,6 +163,23 @@ const OrderItemTableComponent = (props) => {
                     <div style={{ textAlign: 'center', padding: '100px 0', fontWeight: '600' }}>뷰 헤더를 먼저 설정해 주세요.</div>
                 }
             </Container>
+            {(fixItemModalOpen && fixTargetItem) &&
+                <CommonModalComponent
+                    open={fixItemModalOpen}
+                    fullWidth={true}
+                    maxWidth={'sm'}
+
+                    onClose={onActionCloseFixItemModal}
+                >
+                    <FixOrderItemModalComponent
+                        fixTargetItem={fixTargetItem}
+
+                        onChangeFixTargetItem={onChangeFixTargetItem}
+                        onActionCloseFixItemModal={onActionCloseFixItemModal}
+                        onActionConfirmUpdateFixOrderItem={onActionConfirmUpdateFixOrderItem}
+                    ></FixOrderItemModalComponent>
+                </CommonModalComponent>
+            }
         </>
     );
 }
@@ -95,11 +187,27 @@ const OrderItemTableComponent = (props) => {
 export default OrderItemTableComponent;
 
 const initialViewSize = 50;
+const initialFixTargetItem = null;
 
 const viewSizeReducer = (state, action) => {
     switch (action.type) {
         case 'SET_DATA':
             return action.payload;
         default: return 50;
+    }
+}
+
+const fixTargetItemReducer = (state, action) => {
+    switch (action.type) {
+        case 'SET_DATA':
+            return action.payload;
+        case 'CHANGE_DATA':
+            return {
+                ...state,
+                [action.payload.name]: action.payload.value
+            }
+        case 'CLEAR':
+            return initialFixTargetItem;
+        default: return initialFixTargetItem;
     }
 }

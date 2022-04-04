@@ -27,10 +27,9 @@ const erpOrderItemDataConnect = () => {
             })
         },
         updateOne: async function (body) {
-            console.log(body)
-            // return await axios.put(`${API_SERVER_ADDRESS}/api/v1/erp-order-items`, body, {
-            //     withCredentials: true
-            // })
+            return await axios.put(`${API_SERVER_ADDRESS}/api/v1/erp-order-items`, body, {
+                withCredentials: true
+            })
         },
         changeSalesYnForListInSales: async function (body) {
             return await axios.patch(`${API_SERVER_ADDRESS}/api/v1/erp-order-items/batch/sales-yn`, body, {

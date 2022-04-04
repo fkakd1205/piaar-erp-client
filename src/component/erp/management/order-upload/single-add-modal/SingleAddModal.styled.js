@@ -50,31 +50,36 @@ const PageHeaderFieldWrapper = styled.div`
 `;
 
 const PageContentFieldWrapper = styled.div`
-    padding: 0 10px;
     margin-top: 10px;
+    margin-bottom: 20px;
+    padding: 0 10px;
+
+    .input-box:nth-of-type(1){
+        margin-top: 0;
+    }
 
     .input-box{
         margin-top: 20px;
     }
 
     .input-box .input-label{
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 600;
     }
 
     .input-box .input-el{
-        width:100%;
-        height: 34px;
-
         box-sizing: border-box;
-        padding:0 5px;
-        margin-top: 5px;
+        width: 100%;
+        height: 40px;
 
-        border:1px solid #d0d0d0;
+        margin-top: 5px;
+        padding: 0 5px;
+
+        border: 1px solid #e0e0e0;
+        border-radius: 2px;
 
         &:focus{
             outline: none;
-            border:1px solid #2C73D2;
         }
     }
 `;

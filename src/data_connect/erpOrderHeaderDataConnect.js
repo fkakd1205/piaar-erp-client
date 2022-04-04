@@ -14,8 +14,18 @@ const erpOrderHeaderDataConnect = () => {
                 withCredentials: true
             })
         },
+        createOneSocket: async function (params) {
+            return await axios.post(`${API_SERVER_ADDRESS}/ws/v1/erp-order-headers`, params, {
+                withCredentials: true
+            })
+        },
         updateOne: async function (params) {
             return await axios.put(`${API_SERVER_ADDRESS}/api/v1/erp-order-headers`, params, {
+                withCredentials: true
+            })
+        },
+        updateOneSocket: async function (params) {
+            return await axios.put(`${API_SERVER_ADDRESS}/ws/v1/erp-order-headers`, params, {
                 withCredentials: true
             })
         }

@@ -112,6 +112,7 @@ const OperatorComponent = (props) => {
             {/* Modal */}
             <CommonModalComponent
                 open={singleAddModalOpen}
+                maxWidth={'sm'}
 
                 onClose={onActionCloseSingleAddModal}
             >
