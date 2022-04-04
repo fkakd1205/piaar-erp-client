@@ -39,6 +39,11 @@ const TableFieldWrapper = styled.div`
         font-weight: 700;
         padding: 10px;
         font-size: 12px;
+
+        @media all and (max-width: 992px){
+            font-size: 10px;
+            padding: 10px 5px;
+        }
     }
 
     table tbody tr{
@@ -61,6 +66,10 @@ const TableFieldWrapper = styled.div`
         font-weight: 500;
         line-height: 1.5;
         word-break: keep-all;
+
+        @media all and (max-width: 992px){
+            font-size: 10px;
+        }
 
         &:hover{
             background: #2C73D260;

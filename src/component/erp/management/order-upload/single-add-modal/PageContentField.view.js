@@ -4,7 +4,7 @@ export default function PageContentFieldView(props) {
     return (
         <PageContentFieldWrapper>
             <div style={{fontSize:'12px', color:'#2C73D2', fontWeight:'600'}}>
-                <span style={{color:'red'}}>[ * ]</span> 는 필수 항목 입니다.
+                <span style={{color:'red'}}>*</span> 는 필수 항목 입니다.
             </div>
             {props.allowedFields.map(detail => {
                 if (detail.requiredFlag) {
@@ -17,7 +17,7 @@ export default function PageContentFieldView(props) {
                                 className='input-label'
                                 style={{ color: 'red' }}
                             >
-                                * {detail.originCellName}
+                                {detail.originCellName} *
                             </div>
                             <input
                                 className='input-el'
@@ -29,6 +29,8 @@ export default function PageContentFieldView(props) {
                         </div>
                     );
                 }
+
+                return null;
             })}
             {props.allowedFields.map(detail => {
                 if (!detail.requiredFlag) {
@@ -52,6 +54,7 @@ export default function PageContentFieldView(props) {
                         </div>
                     );
                 }
+                return null;
             })}
 
         </PageContentFieldWrapper>

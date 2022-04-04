@@ -17,6 +17,9 @@ import { useBackdropHook, BackdropHookComponent } from '../../../../hooks/backdr
 import { getDefaultHeaderFields } from '../../../../static-data/staticData';
 import OrderItemTablePagenationComponent from './order-item-table-pagenation/OrderItemTablePagenation.component';
 import { sortFormatUtils } from '../../../../utils/sortFormatUtils';
+import useSocketClient from '../../../../web-hooks/socket/useSocketClient';
+import { erpOrderItemSocket } from '../../../../data_connect/socket/erpOrderItemSocket';
+import { erpOrderHeaderSocket } from '../../../../data_connect/socket/erpOrderHeaderSocket';
 
 const Container = styled.div`
     margin-bottom: 100px;
@@ -27,6 +30,13 @@ const DEFAULT_HEADER_FIELDS = getDefaultHeaderFields();
 const OrderComponent = (props) => {
     const location = useLocation();
     const query = qs.parse(location.search);
+
+    const {
+        connected,
+        onPublish,
+        onSubscribe,
+        onUnsubscribe,
+    } = useSocketClient();
 
     const {
         open: backdropOpen,
@@ -41,6 +51,7 @@ const OrderComponent = (props) => {
 
     const [headerSettingModalOpen, setHeaderSettingModalOpen] = useState(false);
 
+    // Search
     const __reqSearchOrderHeaderOne = async () => {
         await erpOrderHeaderDataConnect().searchOne()
             .then(res => {
@@ -53,32 +64,6 @@ const OrderComponent = (props) => {
             })
             .catch(err => {
                 console.log(err);
-            })
-    }
-
-    const __reqCreateOrderHeaderOne = async (params) => {
-        await erpOrderHeaderDataConnect().createOne(params)
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data.memo);
-            })
-    }
-
-    const __reqUpdateOrderHeaderOne = async (params) => {
-        await erpOrderHeaderDataConnect().updateOne(params)
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data.memo);
             })
     }
 
@@ -128,7 +113,7 @@ const OrderComponent = (props) => {
                     dispatchOrderItemPage({
                         type: 'INIT_DATA',
                         payload: res.data.data
-                    })
+                    });
                 }
             })
             .catch(err => {
@@ -137,8 +122,9 @@ const OrderComponent = (props) => {
             })
     }
 
-    const __reqChangeSalesYnForOrderItemList = async function (body) {
-        await erpOrderItemDataConnect().changeSalesYnForListInSales(body)
+    // Create
+    const __reqCreateOrderHeaderOneSocket = async (params) => {
+        await erpOrderHeaderSocket().createOne(params)
             .catch(err => {
                 let res = err.response;
                 if (res?.status === 500) {
@@ -150,8 +136,9 @@ const OrderComponent = (props) => {
             })
     }
 
-    const __reqDeleteOrderItemList = async function (params) {
-        await erpOrderItemDataConnect().deleteList(params)
+    // Update And Change
+    const __reqUpdateOrderHeaderOneSocket = async (params) => {
+        await erpOrderHeaderSocket().updateOne(params)
             .catch(err => {
                 let res = err.response;
                 if (res?.status === 500) {
@@ -163,8 +150,35 @@ const OrderComponent = (props) => {
             })
     }
 
-    const __reqChangeOptionCodeForOrderItemListInBatch = async function (body) {
-        await erpOrderItemDataConnect().changeOptionCodeForListInBatch(body)
+    const __reqUpdateOrderItemOneSocket = async (body) => {
+        await erpOrderItemSocket().updateOne(body)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data?.memo);
+            })
+    }
+
+    const __reqChangeSalesYnForOrderItemListSocket = async function (body) {
+        await erpOrderItemSocket().changeSalesYnForListInSales(body)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            })
+    }
+
+
+    const __reqChangeOptionCodeForOrderItemListInBatchSocket = async function (body) {
+        await erpOrderItemSocket().changeOptionCodeForListInBatch(body)
             .catch(err => {
                 let res = err.response;
                 if (res?.status === 500) {
@@ -174,6 +188,20 @@ const OrderComponent = (props) => {
 
                 alert(res?.data.memo);
             });
+    }
+
+    // Delete
+    const __reqDeleteOrderItemListSocket = async function (params) {
+        await erpOrderItemSocket().deleteList(params)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            })
     }
 
     useEffect(() => {
@@ -190,6 +218,60 @@ const OrderComponent = (props) => {
         fetchInit();
     }, [location]);
 
+    useEffect(() => {
+        async function subscribeSockets() {
+            if (!connected) {
+                return;
+            }
+
+            onSubscribe({
+                subscribes: [
+                    '/topic/erp.erp-order-item',
+                    '/topic/erp.erp-order-header'
+                ],
+                callback: async (e) => {
+                    let headers = e.headers;
+                    let body = JSON.parse(e.body);
+                    let destination = headers?.destination;
+                    if (body?.statusCode === 200) {
+                        switch (destination) {
+                            case '/topic/erp.erp-order-item':
+                                await __reqSearchOrderItemList();
+                                return;
+                            case '/topic/erp.erp-order-header':
+                                await __reqSearchOrderHeaderOne();
+                                return;
+                            default: return;
+                        }
+                    }
+                }
+            });
+        }
+        subscribeSockets();
+        return () => onUnsubscribe();
+    }, [connected]);
+
+    useEffect(() => {
+        if (!checkedOrderItemList || !orderItemPage) {
+            return;
+        }
+
+        let orderItemList = orderItemPage?.content;
+
+        let newData = [];
+        checkedOrderItemList.forEach(cOrderItem => {
+            let data = orderItemList.filter(orderItem => orderItem?.id === cOrderItem?.id);
+            if (data[0]) {
+                newData.push(data[0]);
+            }
+        })
+        
+        dispatchCheckedOrderItemList({
+            type: 'SET_DATA',
+            payload: newData
+        });
+
+    }, [orderItemPage])
 
     const _onAction_openHeaderSettingModal = () => {
         setHeaderSettingModalOpen(true);
@@ -266,7 +348,7 @@ const OrderComponent = (props) => {
                     details: headerDetails
                 }
             }
-            await __reqCreateOrderHeaderOne(params);
+            await __reqCreateOrderHeaderOneSocket(params);
         } else {
             params = {
                 ...viewHeader,
@@ -274,46 +356,45 @@ const OrderComponent = (props) => {
                     details: headerDetails
                 }
             }
-            await __reqUpdateOrderHeaderOne(params);
+            await __reqUpdateOrderHeaderOneSocket(params);
         }
 
         _onAction_closeHeaderSettingModal();
-        await __reqSearchOrderHeaderOne();
         onActionCloseBackdrop()
     }
 
     // 판매 전환 서밋
     const _onSubmit_changeSalesYnForOrderItemList = async (body) => {
         onActionOpenBackdrop()
-        await __reqChangeSalesYnForOrderItemList(body);
-        dispatchCheckedOrderItemList({
-            type: 'CLEAR'
-        })
-        await __reqSearchOrderItemList();
+        await __reqChangeSalesYnForOrderItemListSocket(body);
+        // dispatchCheckedOrderItemList({
+        //     type: 'CLEAR'
+        // })
+        // await __reqSearchOrderItemList();
         onActionCloseBackdrop()
     }
 
     // 데이터 삭제 서밋
     const _onSubmit_deleteOrderItemList = async function (params) {
         onActionOpenBackdrop()
-        await __reqDeleteOrderItemList(params);
-        dispatchCheckedOrderItemList({
-            type: 'CLEAR'
-        })
-        await __reqSearchOrderItemList();
+        await __reqDeleteOrderItemListSocket(params);
         onActionCloseBackdrop()
     }
 
     // 옵션 코드 변경
     const _onSubmit_changeOptionCodeForOrderItemListInBatch = async function (body) {
         onActionOpenBackdrop()
-        await __reqChangeOptionCodeForOrderItemListInBatch(body);
-        dispatchCheckedOrderItemList({
-            type: 'CLEAR'
-        })
-        await __reqSearchOrderItemList();
+        await __reqChangeOptionCodeForOrderItemListInBatchSocket(body);
         onActionCloseBackdrop()
     }
+
+    // 단일 erpOrderItem 업데이트
+    const _onSubmit_updateErpOrderItemOne = async (body) => {
+        onActionOpenBackdrop();
+        await __reqUpdateOrderItemOneSocket(body);
+        onActionCloseBackdrop();
+    }
+
     return (
         <>
             <Container>
@@ -331,6 +412,7 @@ const OrderComponent = (props) => {
                     _onAction_checkOrderItem={_onAction_checkOrderItem}
                     _onAction_checkOrderItemAll={_onAction_checkOrderItemAll}
                     _onAction_releaseOrderItemAll={_onAction_releaseOrderItemAll}
+                    _onSubmit_updateErpOrderItemOne={_onSubmit_updateErpOrderItemOne}
                 ></OrderItemTableComponent>
                 <OrderItemTablePagenationComponent
                     orderItemPage={orderItemPage}
