@@ -52,7 +52,7 @@ const OrderComponent = (props) => {
     const [headerSettingModalOpen, setHeaderSettingModalOpen] = useState(false);
 
     // Search
-    const __reqSearchOrderHeaderOne = async () => {
+    const __reqSearchViewHeaderOne = async () => {
         await erpOrderHeaderDataConnect().searchOne()
             .then(res => {
                 if (res.status === 200 && res.data.message === 'success') {
@@ -205,7 +205,7 @@ const OrderComponent = (props) => {
     }
 
     useEffect(() => {
-        __reqSearchOrderHeaderOne();
+        __reqSearchViewHeaderOne();
         __reqSearchProductOptionList();
     }, []);
 
@@ -224,28 +224,49 @@ const OrderComponent = (props) => {
                 return;
             }
 
-            onSubscribe({
-                subscribes: [
-                    '/topic/erp.erp-order-item',
-                    '/topic/erp.erp-order-header'
-                ],
-                callback: async (e) => {
-                    let headers = e.headers;
-                    let body = JSON.parse(e.body);
-                    let destination = headers?.destination;
-                    if (body?.statusCode === 200) {
-                        switch (destination) {
-                            case '/topic/erp.erp-order-item':
-                                await __reqSearchOrderItemList();
-                                return;
-                            case '/topic/erp.erp-order-header':
-                                await __reqSearchOrderHeaderOne();
-                                return;
-                            default: return;
+            // @Deprecated
+            // onSubscribe({
+            //     subscribes: [
+            //         '/topic/erp.erp-order-item',
+            //         '/topic/erp.erp-order-header'
+            //     ],
+            //     callback: async (e) => {
+            //         let headers = e.headers;
+            //         let body = JSON.parse(e.body);
+            //         let destination = headers?.destination;
+            //         if (body?.statusCode === 200) {
+            //             switch (destination) {
+            //                 case '/topic/erp.erp-order-item':
+            //                     await __reqSearchOrderItemList();
+            //                     return;
+            //                 case '/topic/erp.erp-order-header':
+            //                     await __reqSearchViewHeaderOne();
+            //                     return;
+            //                 default: return;
+            //             }
+            //         }
+            //     }
+            // });
+            onSubscribe([
+                {
+                    subscribeUrl: '/topic/erp.erp-order-item',
+                    callback: async (e) => {
+                        let body = JSON.parse(e.body);
+                        if (body?.statusCode === 200) {
+                            await __reqSearchOrderItemList();
+                        }
+                    }
+                },
+                {
+                    subscribeUrl: '/topic/erp.erp-order-header',
+                    callback: async (e) => {
+                        let body = JSON.parse(e.body);
+                        if (body?.statusCode === 200) {
+                            await __reqSearchViewHeaderOne();
                         }
                     }
                 }
-            });
+            ])
         }
         subscribeSockets();
         return () => onUnsubscribe();
@@ -265,7 +286,7 @@ const OrderComponent = (props) => {
                 newData.push(data[0]);
             }
         })
-        
+
         dispatchCheckedOrderItemList({
             type: 'SET_DATA',
             payload: newData
