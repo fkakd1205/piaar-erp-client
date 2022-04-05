@@ -4,6 +4,11 @@ const API_SERVER_ADDRESS = process.env.REACT_APP_API_HOST;
 
 const erpOrderItemSocket = () => {
     return {
+        createList: async function (params) {
+            return await axios.post(`${API_SERVER_ADDRESS}/ws/v1/erp-order-items/batch`, params, {
+                withCredentials: true
+            })
+        },
         updateOne: async function (body) {
             return await axios.put(`${API_SERVER_ADDRESS}/ws/v1/erp-order-items`, body, {
                 withCredentials: true

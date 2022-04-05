@@ -20,6 +20,7 @@ import { sortFormatUtils } from '../../../../utils/sortFormatUtils';
 import useSocketClient from '../../../../web-hooks/socket/useSocketClient';
 import { erpOrderItemSocket } from '../../../../data_connect/socket/erpOrderItemSocket';
 import { erpOrderHeaderSocket } from '../../../../data_connect/socket/erpOrderHeaderSocket';
+import BasicSnackbar from '../../../module/snackbar/BasicSnackbar';
 
 const Container = styled.div`
     margin-bottom: 100px;
@@ -50,6 +51,11 @@ const OrderComponent = (props) => {
     const [checkedOrderItemList, dispatchCheckedOrderItemList] = useReducer(checkedOrderItemListReducer, initialCheckedOrderItemList);
 
     const [headerSettingModalOpen, setHeaderSettingModalOpen] = useState(false);
+
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: '',
+    });
 
     // Search
     const __reqSearchViewHeaderOne = async () => {
@@ -254,6 +260,13 @@ const OrderComponent = (props) => {
                         let body = JSON.parse(e.body);
                         if (body?.statusCode === 200) {
                             await __reqSearchOrderItemList();
+                            if (body?.memo) {
+                                setSnackbar({
+                                    ...snackbar,
+                                    open: true,
+                                    message: body?.memo
+                                })
+                            }
                         }
                     }
                 },
@@ -471,6 +484,19 @@ const OrderComponent = (props) => {
             <BackdropHookComponent
                 open={backdropOpen}
             />
+
+            {/* Snackbar */}
+            {snackbar.open &&
+                <BasicSnackbar
+                    open={snackbar.open}
+                    message={snackbar.message}
+                    onClose={() => setSnackbar({ ...snackbar, open: false, message: '' })}
+                    severity={'success'}
+                    vertical={'top'}
+                    horizontal={'center'}
+                    duration={4000}
+                ></BasicSnackbar>
+            }
         </>
     );
 }
