@@ -294,28 +294,26 @@ const SalesComponent = (props) => {
                 return;
             }
 
-            onSubscribe({
-                subscribes: [
-                    '/topic/erp.erp-order-item',
-                    '/topic/erp.erp-sales-header',
-                ],
-                callback: async (e) => {
-                    let headers = e.headers;
-                    let body = JSON.parse(e.body);
-                    let destination = headers?.destination;
-                    if (body?.statusCode === 200) {
-                        switch (destination) {
-                            case '/topic/erp.erp-order-item':
-                                await __reqSearchOrderItemList();
-                                return;
-                            case '/topic/erp.erp-sales-header':
-                                await __reqSearchViewHeaderOne();
-                                return;
-                            default: return;
+            onSubscribe([
+                {
+                    subscribeUrl: '/topic/erp.erp-order-item',
+                    callback: async (e) => {
+                        let body = JSON.parse(e.body);
+                        if (body?.statusCode === 200) {
+                            await __reqSearchOrderItemList();
+                        }
+                    }
+                },
+                {
+                    subscribeUrl: '/topic/erp.erp-order-header',
+                    callback: async (e) => {
+                        let body = JSON.parse(e.body);
+                        if (body?.statusCode === 200) {
+                            await __reqSearchViewHeaderOne();
                         }
                     }
                 }
-            });
+            ])
         }
         subscribeSockets();
         return () => onUnsubscribe();

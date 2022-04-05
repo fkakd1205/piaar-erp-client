@@ -54,26 +54,45 @@ const useSocketClient = () => {
         client.current.deactivate();
     };
 
-    const onSubscribe = ({ subscribes, callback }) => {
+    // @Deprecated
+    // const onSubscribe = ({ subscribes, callback }) => {
+    //     if (!client.current.connected) {
+    //         return;
+    //     }
+
+    //     dispatchSubscribeItems({
+    //         type: 'SET_DATA',
+    //         payload: [
+    //             ...subscribeItems,
+    //             ...subscribes.map(r => {
+    //                 return client.current.subscribe(
+    //                     r,
+    //                     async (e) => {
+    //                         callback(e);
+    //                     }
+    //                 )
+    //             })
+    //         ]
+    //     })
+    // };
+    const onSubscribe = (subscribes) => {
         if (!client.current.connected) {
             return;
         }
 
         dispatchSubscribeItems({
             type: 'SET_DATA',
-            payload: [
-                ...subscribeItems,
-                ...subscribes.map(r => {
+            payload:
+                subscribes.map(r => {
                     return client.current.subscribe(
-                        r,
+                        r.subscribeUrl,
                         async (e) => {
-                            callback(e);
+                            r.callback(e);
                         }
                     )
                 })
-            ]
         })
-    };
+    }
 
     const onUnsubscribe = () => {
         subscribeItems.forEach(r => {

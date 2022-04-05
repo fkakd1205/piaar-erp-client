@@ -1,12 +1,21 @@
-import { useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { erpDownloadExcelHeaderDataConnect } from "../../../../data_connect/erpDownloadExcelHeaderDataConnect";
 import { erpOrderItemDataConnect } from "../../../../data_connect/erpOrderItemDataConnect";
+import { erpOrderItemSocket } from "../../../../data_connect/socket/erpOrderItemSocket";
 import { useBackdropHook, BackdropHookComponent } from "../../../../hooks/backdrop/useBackdropHook";
 import { dateToYYYYMMDDhhmmssFile } from "../../../../utils/dateFormatUtils";
+import useSocketClient from "../../../../web-hooks/socket/useSocketClient";
 import OperatorComponent from "./operator/Operator.component";
 import PreviewTableComponent from "./preview-table/PreviewTable.component";
 
 const ErpOrderUploadComponent = (props) => {
+    const {
+        connected,
+        onPublish,
+        onSubscribe,
+        onUnsubscribe,
+    } = useSocketClient();
+
     const {
         open: backdropOpen,
         onActionOpen: onActionOpenBackdrop,
@@ -47,8 +56,8 @@ const ErpOrderUploadComponent = (props) => {
             })
     }
 
-    const __reqCreateOrderItems = async function (params) {
-        await erpOrderItemDataConnect().createList(params)
+    const __reqCreateOrderItemsSocket = async function (params) {
+        await erpOrderItemSocket().createList(params)
             .then(res => {
                 if (res.status === 200 && res.data.message === 'success') {
                     dispatchExcelDataList({
@@ -95,6 +104,26 @@ const ErpOrderUploadComponent = (props) => {
             })
     }
 
+    useEffect(() => {
+        async function subscribeSockets() {
+            if (!connected) {
+                return;
+            }
+            onSubscribe([
+                {
+                    subscribeUrl: '/topic/erp.erp-order-item',
+                    callback: async (e) => {
+                        let body = JSON.parse(e.body);
+                        if (body?.statusCode === 200) {
+                        }
+                    }
+                }
+            ])
+        }
+        subscribeSockets();
+        return () => onUnsubscribe();
+    }, [connected]);
+
     const _onSubmit_uploadExcelFile = async (formData) => {
         onActionOpenBackdrop();
         await __reqUploadExcelFile(formData);
@@ -102,11 +131,11 @@ const ErpOrderUploadComponent = (props) => {
     }
 
     const _onSubmit_createOrderItems = async () => {
-        if(!excelDataList || excelDataList.length <= 0){
+        if (!excelDataList || excelDataList.length <= 0) {
             return;
         }
         onActionOpenBackdrop();
-        await __reqCreateOrderItems(excelDataList);
+        await __reqCreateOrderItemsSocket(excelDataList);
         onActionCloseBackdrop();
     }
 
