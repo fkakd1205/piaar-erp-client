@@ -18,6 +18,11 @@ import OrderItemTablePagenationComponent from './order-item-table-pagenation/Ord
 import { useBackdropHook, BackdropHookComponent } from '../../../../hooks/backdrop/useBackdropHook';
 import { getDefaultHeaderFields } from '../../../../static-data/staticData';
 import { sortFormatUtils } from '../../../../utils/sortFormatUtils';
+import useSocketClient from '../../../../web-hooks/socket/useSocketClient';
+import { useBasicSnackbarHook, BasicSnackbarHookComponent } from '../../../../hooks/snackbar/useBasicSnackbarHook';
+import { useSocketConnectLoadingHook, SocketConnectLoadingHookComponent } from '../../../../hooks/loading/useSocketConnectLoadingHook';
+import { erpOrderItemSocket } from '../../../../data_connect/socket/erpOrderItemSocket';
+import { erpReleaseCompleteHeaderSocket } from '../../../../data_connect/socket/erpReleaseCompleteHeaderSocket';
 
 const Container = styled.div`
     margin-bottom: 100px;
@@ -30,10 +35,30 @@ const ReleaseCompleteComponent = (props) => {
     const query = qs.parse(location.search);
 
     const {
+        connected,
+        onPublish,
+        onSubscribe,
+        onUnsubscribe,
+    } = useSocketClient();
+
+    const {
         open: backdropOpen,
         onActionOpen: onActionOpenBackdrop,
         onActionClose: onActionCloseBackdrop
     } = useBackdropHook();
+
+    const {
+        open: snackbarOpen,
+        message: snackbarMessage,
+        onActionOpen: onActionOpenSnackbar,
+        onActionClose: onActionCloseSnacbar,
+    } = useBasicSnackbarHook();
+
+    const {
+        open: socketConnectLoadingOpen,
+        onActionOpen: onActionOpenSocketConnectLoading,
+        onActionClose: onActionCloseSocketConnectLoading
+    } = useSocketConnectLoadingHook();
 
     const [viewHeader, dispatchViewHeader] = useReducer(viewHeaderReducer, initialViewHeader);
     const [productOptionList, dispatchProductOptionList] = useReducer(productOptionListReducer, initialProductOptionList);
@@ -43,7 +68,8 @@ const ReleaseCompleteComponent = (props) => {
 
     const [headerSettingModalOpen, setHeaderSettingModalOpen] = useState(false);
 
-    const __reqSearchOrderHeaderOne = async () => {
+    // Search
+    const __reqSearchViewHeaderOne = async () => {
         await erpReleaseCompleteHeaderDataConnect().searchOne()
             .then(res => {
                 if (res.status === 200 && res.data.message === 'success') {
@@ -55,32 +81,6 @@ const ReleaseCompleteComponent = (props) => {
             })
             .catch(err => {
                 console.log(err);
-            })
-    }
-
-    const __reqCreateOrderHeaderOne = async (params) => {
-        await erpReleaseCompleteHeaderDataConnect().createOne(params)
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data.memo);
-            })
-    }
-
-    const __reqUpdateOrderHeaderOne = async (params) => {
-        await erpReleaseCompleteHeaderDataConnect().updateOne(params)
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data.memo);
             })
     }
 
@@ -139,56 +139,25 @@ const ReleaseCompleteComponent = (props) => {
             })
     }
 
-    const __reqChangeSalesYnForOrderItemList = async function (body) {
-        await erpOrderItemDataConnect().changeSalesYnForListInSales(body)
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
+    const __reqRefreshOrderItemList = async (ids) => {
+        let params = {
+            ids: ids,
+            releaseYn: 'y',
+        }
 
-                alert(res?.data.memo);
+        await erpOrderItemDataConnect().refreshList(params)
+            .then(res => {
+                if (res.status === 200 && res.data.message === 'success') {
+                    dispatchCheckedOrderItemList({
+                        type: 'SET_DATA',
+                        payload: res.data.data
+                    });
+                }
             })
-    }
-
-    const __reqDeleteOrderItemList = async function (params) {
-        await erpOrderItemDataConnect().deleteList(params)
             .catch(err => {
                 let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data.memo);
+                console.log(res);
             })
-    }
-
-    const __reqChangeOptionCodeForOrderItemListInBatch = async function (body) {
-        await erpOrderItemDataConnect().changeOptionCodeForListInBatch(body)
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data.memo);
-            });
-    }
-
-    const __reqChangeReleaseOptionCodeForOrderItemListInBatch = async function (body) {
-        await erpOrderItemDataConnect().changeReleaseOptionCodeForListInBatch(body)
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data.memo);
-            });
     }
 
     const __reqSearchDownloadExcelHeaders = async () => {
@@ -207,6 +176,132 @@ const ReleaseCompleteComponent = (props) => {
             })
     }
 
+    // Create
+    const __reqCreateViewHeaderOneSocket = async (params) => {
+        await erpReleaseCompleteHeaderSocket().createOne(params)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            })
+    }
+
+    // Update And Change
+    const __reqUpdateViewHeaderOneSocket = async (params) => {
+        await erpReleaseCompleteHeaderSocket().updateOne(params)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            })
+    }
+
+    const __reqUpdateOrderItemOneSocket = async (body) => {
+        await erpOrderItemSocket().updateOne(body)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data?.memo);
+            })
+    }
+
+    const __reqChangeSalesYnForOrderItemListSocket = async function (body) {
+        await erpOrderItemSocket().changeSalesYnForListInSales(body)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            })
+    }
+
+    const __reqChangeOptionCodeForOrderItemListInBatchSocket = async function (body) {
+        await erpOrderItemSocket().changeOptionCodeForListInBatch(body)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            });
+    }
+
+    const __reqChangeReleaseOptionCodeForOrderItemListInBatchSocket = async function (body) {
+        await erpOrderItemSocket().changeReleaseOptionCodeForListInBatch(body)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            });
+    }
+
+    const __reqChangeReleaseYnForOrderItemListSocket = async (body) => {
+        await erpOrderItemSocket().changeReleaseYnForList(body)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            })
+    }
+
+    const __reqChangeWaybillForOrderItemsInBatch = async (formData) => {
+        await erpOrderItemDataConnect().changeWaybillForList(formData)
+            .then(res => {
+                if (res.status === 200 && res.data.message === 'success') {
+                    alert(res.data.memo);
+                }
+            })
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            })
+    }
+
+    // Delete
+    const __reqDeleteOrderItemListSocket = async function (params) {
+        await erpOrderItemSocket().deleteList(params)
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            })
+    }
+
+    // Action
     const __reqActionDownloadForDownloadOrderItems = async (id, downloadOrderItemsBody) => {
         await erpDownloadExcelHeaderDataConnect().actionDownloadForDownloadOrderItems(id, downloadOrderItemsBody)
             .then(res => {
@@ -222,19 +317,6 @@ const ReleaseCompleteComponent = (props) => {
                 link.click();
                 // }
             })
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data.memo);
-            })
-    }
-
-    const __reqChangeReleaseYnForOrderItemList = async (body) => {
-        await erpOrderItemDataConnect().changeReleaseYnForList(body)
             .catch(err => {
                 let res = err.response;
                 if (res?.status === 500) {
@@ -274,45 +356,8 @@ const ReleaseCompleteComponent = (props) => {
             ;
     }
 
-    const __reqChangeWaybillForOrderItemsInBatch = async (formData) => {
-        await erpOrderItemDataConnect().changeWaybillForList(formData)
-            .then(res => {
-                if (res.status === 200 && res.data.message === 'success') {
-                    alert(res.data.memo);
-                }
-            })
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data.memo);
-            })
-    }
-
-    const __reqUpdateOrderItemOne = async (body) => {
-        await erpOrderItemDataConnect().updateOne(body)
-            .then(res => {
-                if (res.status === 200 && res.data.message === 'success') {
-                    alert('수정되었습니다.');
-                    return;
-                }
-            })
-            .catch(err => {
-                let res = err.response;
-                if (res?.status === 500) {
-                    alert('undefined error.');
-                    return;
-                }
-
-                alert(res?.data?.memo);
-            })
-    }
-
     useEffect(() => {
-        __reqSearchOrderHeaderOne();
+        __reqSearchViewHeaderOne();
         __reqSearchProductOptionList();
         __reqSearchDownloadExcelHeaders();
     }, []);
@@ -325,6 +370,55 @@ const ReleaseCompleteComponent = (props) => {
         }
         fetchInit();
     }, [location]);
+
+    useEffect(() => {
+        async function subscribeSockets() {
+            onActionOpenSocketConnectLoading();
+            if (!connected) {
+                return;
+            }
+
+            onSubscribe([
+                {
+                    subscribeUrl: '/topic/erp.erp-order-item',
+                    callback: async (e) => {
+                        let body = JSON.parse(e.body);
+                        if (body?.statusCode === 200) {
+                            await __reqSearchOrderItemList();
+                            if (body?.socketMemo) {
+                                onActionOpenSnackbar(body?.socketMemo)
+                            }
+                        }
+                    }
+                },
+                {
+                    subscribeUrl: '/topic/erp.erp-release-complete-header',
+                    callback: async (e) => {
+                        let body = JSON.parse(e.body);
+                        if (body?.statusCode === 200) {
+                            await __reqSearchViewHeaderOne();
+                        }
+                    }
+                }
+            ]);
+            onActionCloseSocketConnectLoading();
+        }
+        subscribeSockets();
+        return () => onUnsubscribe();
+    }, [connected]);
+
+    useEffect(() => {
+        async function fetchCheckedOrderItems() {
+            if (!orderItemPage || !checkedOrderItemList || checkedOrderItemList?.length <= 0) {
+                return;
+            }
+
+            let ids = checkedOrderItemList.map(r => r.id);
+            await __reqRefreshOrderItemList(ids);
+        }
+
+        fetchCheckedOrderItems();
+    }, [orderItemPage])
 
     const _onAction_openHeaderSettingModal = () => {
         setHeaderSettingModalOpen(true);
@@ -393,7 +487,7 @@ const ReleaseCompleteComponent = (props) => {
 
     // 헤더 설정 서밋
     const _onSubmit_saveAndModifyViewHeader = async (headerDetails) => {
-        onActionOpenBackdrop();
+        onActionOpenBackdrop()
         let params = null;
         if (!viewHeader) {
             params = {
@@ -401,7 +495,7 @@ const ReleaseCompleteComponent = (props) => {
                     details: headerDetails
                 }
             }
-            await __reqCreateOrderHeaderOne(params);
+            await __reqCreateViewHeaderOneSocket(params);
         } else {
             params = {
                 ...viewHeader,
@@ -409,55 +503,38 @@ const ReleaseCompleteComponent = (props) => {
                     details: headerDetails
                 }
             }
-            await __reqUpdateOrderHeaderOne(params);
+            await __reqUpdateViewHeaderOneSocket(params);
         }
 
         _onAction_closeHeaderSettingModal();
-        await __reqSearchOrderHeaderOne();
-        onActionCloseBackdrop();
+        onActionCloseBackdrop()
     }
 
     // 판매 전환 서밋
     const _onSubmit_changeSalesYnForOrderItemList = async (body) => {
         onActionOpenBackdrop();
-        await __reqChangeSalesYnForOrderItemList(body);
-        dispatchCheckedOrderItemList({
-            type: 'CLEAR'
-        })
-        await __reqSearchOrderItemList();
+        await __reqChangeSalesYnForOrderItemListSocket(body);
         onActionCloseBackdrop();
     }
 
     // 데이터 삭제 서밋
     const _onSubmit_deleteOrderItemList = async function (params) {
         onActionOpenBackdrop();
-        await __reqDeleteOrderItemList(params);
-        dispatchCheckedOrderItemList({
-            type: 'CLEAR'
-        })
-        await __reqSearchOrderItemList();
+        await __reqDeleteOrderItemListSocket(params);
         onActionCloseBackdrop();
     }
 
     // 옵션 코드 변경
     const _onSubmit_changeOptionCodeForOrderItemListInBatch = async function (body) {
         onActionOpenBackdrop();
-        await __reqChangeOptionCodeForOrderItemListInBatch(body);
-        dispatchCheckedOrderItemList({
-            type: 'CLEAR'
-        })
-        await __reqSearchOrderItemList();
+        await __reqChangeOptionCodeForOrderItemListInBatchSocket(body);
         onActionCloseBackdrop();
     }
 
     // 출고 옵션 코드 변경
     const _onSubmit_changeReleaseOptionCodeForOrderItemListInBatch = async function (body) {
         onActionOpenBackdrop();
-        await __reqChangeReleaseOptionCodeForOrderItemListInBatch(body);
-        dispatchCheckedOrderItemList({
-            type: 'CLEAR'
-        })
-        await __reqSearchOrderItemList();
+        await __reqChangeReleaseOptionCodeForOrderItemListInBatchSocket(body);
         onActionCloseBackdrop();
     }
 
@@ -471,11 +548,7 @@ const ReleaseCompleteComponent = (props) => {
     // 출고 취소
     const _onSubmit_changeReleaseYnForOrderItemList = async (body) => {
         onActionOpenBackdrop();
-        await __reqChangeReleaseYnForOrderItemList(body);
-        dispatchCheckedOrderItemList({
-            type: 'CLEAR'
-        })
-        await __reqSearchOrderItemList();
+        await __reqChangeReleaseYnForOrderItemListSocket(body);
         onActionCloseBackdrop();
     }
 
@@ -500,11 +573,7 @@ const ReleaseCompleteComponent = (props) => {
     // 단일 erpOrderItem 업데이트
     const _onSubmit_updateErpOrderItemOne = async (body) => {
         onActionOpenBackdrop();
-        await __reqUpdateOrderItemOne(body);
-        dispatchCheckedOrderItemList({
-            type: 'CLEAR'
-        })
-        await __reqSearchOrderItemList();
+        await __reqUpdateOrderItemOneSocket(body);
         onActionCloseBackdrop();
     }
 
@@ -570,6 +639,23 @@ const ReleaseCompleteComponent = (props) => {
             <BackdropHookComponent
                 open={backdropOpen}
             />
+
+            {/* Snackbar */}
+            {snackbarOpen &&
+                <BasicSnackbarHookComponent
+                    open={snackbarOpen}
+                    message={snackbarMessage}
+                    onClose={onActionCloseSnacbar}
+                    severity={'success'}
+                    vertical={'top'}
+                    horizontal={'center'}
+                    duration={4000}
+                ></BasicSnackbarHookComponent>
+            }
+
+            <SocketConnectLoadingHookComponent
+                open={socketConnectLoadingOpen}
+            ></SocketConnectLoadingHookComponent>
         </>
     );
 }

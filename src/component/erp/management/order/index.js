@@ -20,7 +20,8 @@ import { sortFormatUtils } from '../../../../utils/sortFormatUtils';
 import useSocketClient from '../../../../web-hooks/socket/useSocketClient';
 import { erpOrderItemSocket } from '../../../../data_connect/socket/erpOrderItemSocket';
 import { erpOrderHeaderSocket } from '../../../../data_connect/socket/erpOrderHeaderSocket';
-import BasicSnackbar from '../../../module/snackbar/BasicSnackbar';
+import { useSocketConnectLoadingHook, SocketConnectLoadingHookComponent } from '../../../../hooks/loading/useSocketConnectLoadingHook';
+import { useBasicSnackbarHook, BasicSnackbarHookComponent } from '../../../../hooks/snackbar/useBasicSnackbarHook';
 
 const Container = styled.div`
     margin-bottom: 100px;
@@ -45,17 +46,25 @@ const OrderComponent = (props) => {
         onActionClose: onActionCloseBackdrop
     } = useBackdropHook();
 
+    const {
+        open: snackbarOpen,
+        message: snackbarMessage,
+        onActionOpen: onActionOpenSnackbar,
+        onActionClose: onActionCloseSnacbar,
+    } = useBasicSnackbarHook();
+
+    const {
+        open: socketConnectLoadingOpen,
+        onActionOpen: onActionOpenSocketConnectLoading,
+        onActionClose: onActionCloseSocketConnectLoading
+    } = useSocketConnectLoadingHook();
+
     const [viewHeader, dispatchViewHeader] = useReducer(viewHeaderReducer, initialViewHeader);
     const [productOptionList, dispatchProductOptionList] = useReducer(productOptionListReducer, initialProductOptionList);
     const [orderItemPage, dispatchOrderItemPage] = useReducer(orderItemPageReducer, initialOrderItemPage);
     const [checkedOrderItemList, dispatchCheckedOrderItemList] = useReducer(checkedOrderItemListReducer, initialCheckedOrderItemList);
 
     const [headerSettingModalOpen, setHeaderSettingModalOpen] = useState(false);
-
-    const [snackbar, setSnackbar] = useState({
-        open: false,
-        message: '',
-    });
 
     // Search
     const __reqSearchViewHeaderOne = async () => {
@@ -118,6 +127,28 @@ const OrderComponent = (props) => {
                 if (res.status === 200 && res.data.message === 'success') {
                     dispatchOrderItemPage({
                         type: 'INIT_DATA',
+                        payload: res.data.data
+                    });
+                }
+            })
+            .catch(err => {
+                let res = err.response;
+                console.log(res);
+            })
+    }
+
+    const __reqRefreshOrderItemList = async (ids) => {
+        let params = {
+            ids: ids,
+            salesYn: 'n',
+            releaseYn: 'n',
+        }
+
+        await erpOrderItemDataConnect().refreshList(params)
+            .then(res => {
+                if (res.status === 200 && res.data.message === 'success') {
+                    dispatchCheckedOrderItemList({
+                        type: 'SET_DATA',
                         payload: res.data.data
                     });
                 }
@@ -226,46 +257,21 @@ const OrderComponent = (props) => {
 
     useEffect(() => {
         async function subscribeSockets() {
+            onActionOpenSocketConnectLoading();
             if (!connected) {
                 return;
             }
 
-            // @Deprecated
-            // onSubscribe({
-            //     subscribes: [
-            //         '/topic/erp.erp-order-item',
-            //         '/topic/erp.erp-order-header'
-            //     ],
-            //     callback: async (e) => {
-            //         let headers = e.headers;
-            //         let body = JSON.parse(e.body);
-            //         let destination = headers?.destination;
-            //         if (body?.statusCode === 200) {
-            //             switch (destination) {
-            //                 case '/topic/erp.erp-order-item':
-            //                     await __reqSearchOrderItemList();
-            //                     return;
-            //                 case '/topic/erp.erp-order-header':
-            //                     await __reqSearchViewHeaderOne();
-            //                     return;
-            //                 default: return;
-            //             }
-            //         }
-            //     }
-            // });
             onSubscribe([
                 {
                     subscribeUrl: '/topic/erp.erp-order-item',
                     callback: async (e) => {
+                        console.log(e);
                         let body = JSON.parse(e.body);
                         if (body?.statusCode === 200) {
                             await __reqSearchOrderItemList();
-                            if (body?.memo) {
-                                setSnackbar({
-                                    ...snackbar,
-                                    open: true,
-                                    message: body?.memo
-                                })
+                            if (body?.socketMemo) {
+                                onActionOpenSnackbar(body?.socketMemo)
                             }
                         }
                     }
@@ -279,32 +285,26 @@ const OrderComponent = (props) => {
                         }
                     }
                 }
-            ])
+            ]);
+            onActionCloseSocketConnectLoading();
         }
         subscribeSockets();
-        return () => onUnsubscribe();
+        return () => {
+            onUnsubscribe();
+        };
     }, [connected]);
 
     useEffect(() => {
-        if (!checkedOrderItemList || !orderItemPage) {
-            return;
+        async function fetchCheckedOrderItems() {
+            if (!orderItemPage || !checkedOrderItemList || checkedOrderItemList?.length <= 0) {
+                return;
+            }
+
+            let ids = checkedOrderItemList.map(r => r.id);
+            await __reqRefreshOrderItemList(ids);
         }
 
-        let orderItemList = orderItemPage?.content;
-
-        let newData = [];
-        checkedOrderItemList.forEach(cOrderItem => {
-            let data = orderItemList.filter(orderItem => orderItem?.id === cOrderItem?.id);
-            if (data[0]) {
-                newData.push(data[0]);
-            }
-        })
-
-        dispatchCheckedOrderItemList({
-            type: 'SET_DATA',
-            payload: newData
-        });
-
+        fetchCheckedOrderItems();
     }, [orderItemPage])
 
     const _onAction_openHeaderSettingModal = () => {
@@ -401,10 +401,6 @@ const OrderComponent = (props) => {
     const _onSubmit_changeSalesYnForOrderItemList = async (body) => {
         onActionOpenBackdrop()
         await __reqChangeSalesYnForOrderItemListSocket(body);
-        // dispatchCheckedOrderItemList({
-        //     type: 'CLEAR'
-        // })
-        // await __reqSearchOrderItemList();
         onActionCloseBackdrop()
     }
 
@@ -431,40 +427,42 @@ const OrderComponent = (props) => {
 
     return (
         <>
-            <Container>
-                <HeaderComponent
-                    _onAction_openHeaderSettingModal={_onAction_openHeaderSettingModal}
-                ></HeaderComponent>
-                <SearchOperatorComponent
-                    viewHeader={viewHeader}
-                ></SearchOperatorComponent>
-                <OrderItemTableComponent
-                    viewHeader={viewHeader}
-                    orderItemList={orderItemPage?.content}
-                    checkedOrderItemList={checkedOrderItemList}
+            {connected &&
+                <Container>
+                    <HeaderComponent
+                        _onAction_openHeaderSettingModal={_onAction_openHeaderSettingModal}
+                    ></HeaderComponent>
+                    <SearchOperatorComponent
+                        viewHeader={viewHeader}
+                    ></SearchOperatorComponent>
+                    <OrderItemTableComponent
+                        viewHeader={viewHeader}
+                        orderItemList={orderItemPage?.content}
+                        checkedOrderItemList={checkedOrderItemList}
 
-                    _onAction_checkOrderItem={_onAction_checkOrderItem}
-                    _onAction_checkOrderItemAll={_onAction_checkOrderItemAll}
-                    _onAction_releaseOrderItemAll={_onAction_releaseOrderItemAll}
-                    _onSubmit_updateErpOrderItemOne={_onSubmit_updateErpOrderItemOne}
-                ></OrderItemTableComponent>
-                <OrderItemTablePagenationComponent
-                    orderItemPage={orderItemPage}
-                ></OrderItemTablePagenationComponent>
-                <CheckedOperatorComponent
-                    checkedOrderItemList={checkedOrderItemList}
-                    productOptionList={productOptionList}
+                        _onAction_checkOrderItem={_onAction_checkOrderItem}
+                        _onAction_checkOrderItemAll={_onAction_checkOrderItemAll}
+                        _onAction_releaseOrderItemAll={_onAction_releaseOrderItemAll}
+                        _onSubmit_updateErpOrderItemOne={_onSubmit_updateErpOrderItemOne}
+                    ></OrderItemTableComponent>
+                    <OrderItemTablePagenationComponent
+                        orderItemPage={orderItemPage}
+                    ></OrderItemTablePagenationComponent>
+                    <CheckedOperatorComponent
+                        checkedOrderItemList={checkedOrderItemList}
+                        productOptionList={productOptionList}
 
-                    _onAction_releaseCheckedOrderItemListAll={_onAction_releaseCheckedOrderItemListAll}
-                    _onSubmit_changeSalesYnForOrderItemList={_onSubmit_changeSalesYnForOrderItemList}
-                    _onSubmit_deleteOrderItemList={_onSubmit_deleteOrderItemList}
-                    _onSubmit_changeOptionCodeForOrderItemListInBatch={_onSubmit_changeOptionCodeForOrderItemListInBatch}
-                ></CheckedOperatorComponent>
-                <CheckedOrderItemTableComponent
-                    viewHeader={viewHeader}
-                    checkedOrderItemList={checkedOrderItemList}
-                ></CheckedOrderItemTableComponent>
-            </Container>
+                        _onAction_releaseCheckedOrderItemListAll={_onAction_releaseCheckedOrderItemListAll}
+                        _onSubmit_changeSalesYnForOrderItemList={_onSubmit_changeSalesYnForOrderItemList}
+                        _onSubmit_deleteOrderItemList={_onSubmit_deleteOrderItemList}
+                        _onSubmit_changeOptionCodeForOrderItemListInBatch={_onSubmit_changeOptionCodeForOrderItemListInBatch}
+                    ></CheckedOperatorComponent>
+                    <CheckedOrderItemTableComponent
+                        viewHeader={viewHeader}
+                        checkedOrderItemList={checkedOrderItemList}
+                    ></CheckedOrderItemTableComponent>
+                </Container>
+            }
 
             {/* Modal */}
             <CommonModalComponent
@@ -486,16 +484,22 @@ const OrderComponent = (props) => {
             />
 
             {/* Snackbar */}
-            {snackbar.open &&
-                <BasicSnackbar
-                    open={snackbar.open}
-                    message={snackbar.message}
-                    onClose={() => setSnackbar({ ...snackbar, open: false, message: '' })}
+            {snackbarOpen &&
+                <BasicSnackbarHookComponent
+                    open={snackbarOpen}
+                    message={snackbarMessage}
+                    onClose={onActionCloseSnacbar}
                     severity={'success'}
                     vertical={'top'}
                     horizontal={'center'}
                     duration={4000}
-                ></BasicSnackbar>
+                ></BasicSnackbarHookComponent>
+            }
+
+            {socketConnectLoadingOpen &&
+                <SocketConnectLoadingHookComponent
+                    open={socketConnectLoadingOpen}
+                ></SocketConnectLoadingHookComponent>
             }
         </>
     );
