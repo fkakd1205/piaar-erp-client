@@ -34,6 +34,11 @@ const erpOrderItemSocket = () => {
                 withCredentials: true
             })
         },
+        changeWaybillForList: async function (formData) {
+            return await axios.patch(`${API_SERVER_ADDRESS}/ws/v1/erp-order-items/batch/waybill`, formData, {
+                withCredentials: true
+            })
+        },
         deleteList: async function (params) {
             return await axios.post(`${API_SERVER_ADDRESS}/ws/v1/erp-order-items/batch-delete`, params, {
                 withCredentials: true

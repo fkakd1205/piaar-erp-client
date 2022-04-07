@@ -7,7 +7,7 @@ import ViewHeaderSettingModalComponent from './view-header-setting-modal/ViewHea
 import HeaderComponent from './header/Header.component';
 import { erpOrderHeaderDataConnect } from '../../../../data_connect/erpOrderHeaderDataConnect';
 import SearchOperatorComponent from './search-operator/SearchOperator.component';
-import { getEndDate, getStartDate } from '../../../../utils/dateFormatUtils';
+import { dateToYYYYMMDDhhmmssFile, getEndDate, getStartDate } from '../../../../utils/dateFormatUtils';
 import { erpOrderItemDataConnect } from '../../../../data_connect/erpOrderItemDataConnect';
 import { productOptionDataConnect } from '../../../../data_connect/productOptionDataConnect';
 import OrderItemTableComponent from './order-item-table/OrderItemTable.component';
@@ -22,6 +22,7 @@ import { erpOrderItemSocket } from '../../../../data_connect/socket/erpOrderItem
 import { erpOrderHeaderSocket } from '../../../../data_connect/socket/erpOrderHeaderSocket';
 import { useSocketConnectLoadingHook, SocketConnectLoadingHookComponent } from '../../../../hooks/loading/useSocketConnectLoadingHook';
 import { useBasicSnackbarHook, BasicSnackbarHookComponent } from '../../../../hooks/snackbar/useBasicSnackbarHook';
+import { erpDownloadExcelHeaderDataConnect } from '../../../../data_connect/erpDownloadExcelHeaderDataConnect';
 
 const Container = styled.div`
     margin-bottom: 100px;
@@ -63,6 +64,7 @@ const OrderComponent = (props) => {
     const [productOptionList, dispatchProductOptionList] = useReducer(productOptionListReducer, initialProductOptionList);
     const [orderItemPage, dispatchOrderItemPage] = useReducer(orderItemPageReducer, initialOrderItemPage);
     const [checkedOrderItemList, dispatchCheckedOrderItemList] = useReducer(checkedOrderItemListReducer, initialCheckedOrderItemList);
+    const [downloadExcelList, dispatchDownloadExcelList] = useReducer(downloadExcelListReducer, initialDownloadExcelList);
 
     const [headerSettingModalOpen, setHeaderSettingModalOpen] = useState(false);
 
@@ -159,6 +161,22 @@ const OrderComponent = (props) => {
             })
     }
 
+    const __reqSearchDownloadExcelHeaders = async () => {
+        await erpDownloadExcelHeaderDataConnect().searchList()
+            .then(res => {
+                if (res.status === 200 && res.data.message === 'success') {
+                    dispatchDownloadExcelList({
+                        type: 'SET_DATA',
+                        payload: res.data.data
+                    })
+                }
+            })
+            .catch(err => {
+                let res = err.response;
+                console.log(res);
+            })
+    }
+
     // Create
     const __reqCreateOrderHeaderOneSocket = async (params) => {
         await erpOrderHeaderSocket().createOne(params)
@@ -241,9 +259,37 @@ const OrderComponent = (props) => {
             })
     }
 
+    // Action
+    const __reqActionDownloadForDownloadOrderItems = async (id, downloadOrderItemsBody) => {
+        await erpDownloadExcelHeaderDataConnect().actionDownloadForDownloadOrderItems(id, downloadOrderItemsBody)
+            .then(res => {
+                // if (res.status === 200 && res.data.message === 'success') {
+                const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
+                const link = document.createElement('a');
+                link.href = url;
+
+                let date = dateToYYYYMMDDhhmmssFile(new Date());
+
+                link.setAttribute('download', date + '_주문수집_데이터_엑셀.xlsx');
+                document.body.appendChild(link);
+                link.click();
+                // }
+            })
+            .catch(err => {
+                let res = err.response;
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data.memo);
+            })
+    }
+
     useEffect(() => {
         __reqSearchViewHeaderOne();
         __reqSearchProductOptionList();
+        __reqSearchDownloadExcelHeaders();
     }, []);
 
     useEffect(() => {
@@ -425,6 +471,13 @@ const OrderComponent = (props) => {
         onActionCloseBackdrop();
     }
 
+    // 엑셀 다운로드
+    const _onSubmit_downloadOrderItemsExcel = async (downloadExcelHeader, downloadOrderItemList) => {
+        onActionOpenBackdrop();
+        await __reqActionDownloadForDownloadOrderItems(downloadExcelHeader.id, downloadOrderItemList);
+        onActionCloseBackdrop();
+    }
+
     return (
         <>
             {connected &&
@@ -449,13 +502,16 @@ const OrderComponent = (props) => {
                         orderItemPage={orderItemPage}
                     ></OrderItemTablePagenationComponent>
                     <CheckedOperatorComponent
+                        viewHeader={viewHeader}
                         checkedOrderItemList={checkedOrderItemList}
                         productOptionList={productOptionList}
+                        downloadExcelList={downloadExcelList}
 
                         _onAction_releaseCheckedOrderItemListAll={_onAction_releaseCheckedOrderItemListAll}
                         _onSubmit_changeSalesYnForOrderItemList={_onSubmit_changeSalesYnForOrderItemList}
                         _onSubmit_deleteOrderItemList={_onSubmit_deleteOrderItemList}
                         _onSubmit_changeOptionCodeForOrderItemListInBatch={_onSubmit_changeOptionCodeForOrderItemListInBatch}
+                        _onSubmit_downloadOrderItemsExcel={_onSubmit_downloadOrderItemsExcel}
                     ></CheckedOperatorComponent>
                     <CheckedOrderItemTableComponent
                         viewHeader={viewHeader}
@@ -511,6 +567,7 @@ const initialViewHeader = null;
 const initialProductOptionList = null;
 const initialOrderItemPage = null;
 const initialCheckedOrderItemList = [];
+const initialDownloadExcelList = null;
 
 const viewHeaderReducer = (state, action) => {
     switch (action.type) {
@@ -543,5 +600,15 @@ const checkedOrderItemListReducer = (state, action) => {
         case 'CLEAR':
             return [];
         default: return [];
+    }
+}
+
+const downloadExcelListReducer = (state, action) => {
+    switch (action.type) {
+        case 'SET_DATA':
+            return action.payload;
+        case 'CLEAR':
+            return null;
+        default: return null;
     }
 }

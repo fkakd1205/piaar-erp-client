@@ -26,6 +26,16 @@ export default function OperatorFieldView(props) {
                             <Ripple color={'#e0e0e0'} duration={1000}></Ripple>
                         </button>
                     </div>
+                    <div className='button-box'>
+                        <button
+                            type='button'
+                            className='button-el'
+                            onClick={props.onActionOpenDownloadExcelModal}
+                        >
+                            엑셀 다운로드
+                            <Ripple color={'#e0e0e0'} duration={1000}></Ripple>
+                        </button>
+                    </div>
                 </ButtonWrapper>
                 <ButtonWrapper>
                     <div className='button-box'>

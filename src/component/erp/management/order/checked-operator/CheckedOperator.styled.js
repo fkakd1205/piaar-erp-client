@@ -100,6 +100,9 @@ const ButtonWrapper = styled.div`
     .button-box{
         margin-top: 10px;
         margin-right: 10px;
+        @media all and (max-width:992px){
+            margin-right: 5px;
+        }
     }
 
     .button-box .button-el{
@@ -127,7 +130,8 @@ const ButtonWrapper = styled.div`
         @media all and (max-width:992px){
             font-size: 11px;
             height: 30px;
-            width: 130px;
+            width: auto;
+            padding: 0 10px;
         }
     }
 
@@ -154,7 +158,6 @@ const ButtonWrapper = styled.div`
         }
 
         @media all and (max-width:992px){
-            width: 130px;
             height: 30px;
         }
     }

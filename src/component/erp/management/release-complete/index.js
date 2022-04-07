@@ -269,8 +269,8 @@ const ReleaseCompleteComponent = (props) => {
             })
     }
 
-    const __reqChangeWaybillForOrderItemsInBatch = async (formData) => {
-        await erpOrderItemDataConnect().changeWaybillForList(formData)
+    const __reqChangeWaybillForOrderItemsInBatchSocket = async (formData) => {
+        await erpOrderItemSocket().changeWaybillForList(formData)
             .then(res => {
                 if (res.status === 200 && res.data.message === 'success') {
                     alert(res.data.memo);
@@ -312,7 +312,7 @@ const ReleaseCompleteComponent = (props) => {
 
                 let date = dateToYYYYMMDDhhmmssFile(new Date());
 
-                link.setAttribute('download', date + '_판매데이터_엑셀.xlsx');
+                link.setAttribute('download', date + '_출고상태_데이터_엑셀.xlsx');
                 document.body.appendChild(link);
                 link.click();
                 // }
@@ -562,11 +562,7 @@ const ReleaseCompleteComponent = (props) => {
     // 운송장 일괄 등록
     const _onSubmit_changeWaybillForOrderItemList = async (formData) => {
         onActionOpenBackdrop();
-        await __reqChangeWaybillForOrderItemsInBatch(formData);
-        dispatchCheckedOrderItemList({
-            type: 'CLEAR'
-        })
-        await __reqSearchOrderItemList();
+        await __reqChangeWaybillForOrderItemsInBatchSocket(formData);
         onActionCloseBackdrop();
     }
 

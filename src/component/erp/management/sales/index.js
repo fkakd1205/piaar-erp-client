@@ -293,7 +293,7 @@ const SalesComponent = (props) => {
 
                     let date = dateToYYYYMMDDhhmmssFile(new Date());
 
-                    link.setAttribute('download', date + '_판매데이터_엑셀.xlsx');
+                    link.setAttribute('download', date + '_판매상태_데이터_엑셀.xlsx');
                     document.body.appendChild(link);
                     link.click();
                 }
