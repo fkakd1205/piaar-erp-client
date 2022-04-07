@@ -2,25 +2,19 @@ import { useState } from "react";
 import Ripple from "../../../../module/button/Ripple";
 import CommonModalComponent from "../../../../module/modal/CommonModalComponent";
 import ConfirmModalComponent from "../../../../module/modal/ConfirmModalComponent";
-import ExcelDownloadModalComponent from "../excel-download-modal/ExcelDownloadModal.component";
 import OptionCodeModalComponent from "../option-code-modal/OptionCodeModal.component";
 import ReleaseOptionCodeModalComponent from "../release-option-code-modal/ReleaseOptionCodeModal.component";
 import WaybillModalComponent from "../waybill-modal/WaybillModal.component";
-import { Container, TitleWrapper } from "./CheckedOperator.styled";
+import { Container } from "./CheckedOperator.styled";
 import OperatorFieldView from "./OperatorField.view";
 
 const CheckedOperatorComponent = (props) => {
     const [salesConfirmModalOpen, setSalesConfirmModalOpen] = useState(false);
     const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] = useState(false);
     const [optionCodeModalOpen, setOptionCodeModalOpen] = useState(false);
-    const [downloadExcelModalOpen, setDownloadExcelModalOpen] = useState(false);
     const [releaseConfirmModalOpen, setReleaseConfirmModalOpen] = useState(false);
     const [releaseOptionCodeModalOpen, setReleaseOptionCodeModalOpen] = useState(false);
     const [waybillModalOpen, setWaybillModalOpen] = useState(false);
-
-    const onActionReleaseCheckedOrderItemListAll = () => {
-        props._onAction_releaseCheckedOrderItemListAll();
-    }
 
     const onActionOpenSalesConfirmModal = () => {
         if (props.checkedOrderItemList?.length <= 0) {
@@ -88,22 +82,6 @@ const CheckedOperatorComponent = (props) => {
         })
         props._onSubmit_changeOptionCodeForOrderItemListInBatch(data);
         onActionCloseOptionCodeModal();
-    }
-
-    const onActionOpenDownloadExcelModal = () => {
-        if (props.checkedOrderItemList?.length <= 0) {
-            alert('데이터를 먼저 선택해 주세요.');
-            return;
-        }
-        setDownloadExcelModalOpen(true);
-    }
-
-    const onActionCloseDownloadExcelModal = () => {
-        setDownloadExcelModalOpen(false);
-    }
-
-    const onActionDownloadExcel = (selectedExcelHeader, downloadOrderItemList) => {
-        props._onSubmit_downloadOrderItemsExcel(selectedExcelHeader, downloadOrderItemList);
     }
 
     const onActionOpenReleaseConfirmModal = () => {
@@ -183,27 +161,10 @@ const CheckedOperatorComponent = (props) => {
     return (
         <>
             <Container>
-                <TitleWrapper>
-                    <div className='title-box'>
-                        선택된 데이터 ({props.checkedOrderItemList?.length || 0})
-                    </div>
-                    <div className='button-box'>
-                        <button
-                            type='button'
-                            className='button-el'
-                            onClick={onActionReleaseCheckedOrderItemListAll}
-                        >
-                            전체 해제
-                            <Ripple color={'#d1d1d1'} duration={1000}></Ripple>
-                        </button>
-                    </div>
-                </TitleWrapper>
                 <OperatorFieldView
-                    onActionReleaseCheckedOrderItemListAll={onActionReleaseCheckedOrderItemListAll}
                     onActionOpenSalesConfirmModal={onActionOpenSalesConfirmModal}
                     onActionOpenDeleteConfirmModal={onActionOpenDeleteConfirmModal}
                     onActionOpenOptionCodeModal={onActionOpenOptionCodeModal}
-                    onActionOpenDownloadExcelModal={onActionOpenDownloadExcelModal}
                     onActionOpenReleaseConfirmModal={onActionOpenReleaseConfirmModal}
                     onActionOpenReleaseOptionCodeModal={onActionOpenReleaseOptionCodeModal}
                     onActionOpenWaybillModal={onActionOpenWaybillModal}
@@ -259,21 +220,6 @@ const CheckedOperatorComponent = (props) => {
 
                     onConfirm={(optionCode) => onActionChangeReleaseOptionCode(optionCode)}
                 ></ReleaseOptionCodeModalComponent>
-            </CommonModalComponent>
-            {/* 엑셀 다운로드 모달 */}
-            <CommonModalComponent
-                open={downloadExcelModalOpen}
-                maxWidth={'lg'}
-
-                onClose={onActionCloseDownloadExcelModal}
-            >
-                <ExcelDownloadModalComponent
-                    viewHeader={props.viewHeader}
-                    checkedOrderItemList={props.checkedOrderItemList}
-                    downloadExcelList={props.downloadExcelList}
-
-                    onActionDownloadExcel={onActionDownloadExcel}
-                ></ExcelDownloadModalComponent>
             </CommonModalComponent>
             {/* 운송장 등록 모달 */}
             <CommonModalComponent

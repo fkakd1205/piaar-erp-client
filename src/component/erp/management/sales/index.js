@@ -23,6 +23,7 @@ import { erpOrderItemSocket } from '../../../../data_connect/socket/erpOrderItem
 import { erpSalesHeaderSocket } from '../../../../data_connect/socket/erpSalesHeaderSocket';
 import { useSocketConnectLoadingHook, SocketConnectLoadingHookComponent } from '../../../../hooks/loading/useSocketConnectLoadingHook';
 import { useBasicSnackbarHook, BasicSnackbarHookComponent } from '../../../../hooks/snackbar/useBasicSnackbarHook';
+import CheckedHeadComponent from './checked-head/CheckedHead.component';
 
 const Container = styled.div`
     margin-bottom: 100px;
@@ -537,6 +538,18 @@ const SalesComponent = (props) => {
                     <OrderItemTablePagenationComponent
                         orderItemPage={orderItemPage}
                     ></OrderItemTablePagenationComponent>
+                    <CheckedHeadComponent
+                        viewHeader={viewHeader}
+                        checkedOrderItemList={checkedOrderItemList}
+                        downloadExcelList={downloadExcelList}
+
+                        _onAction_releaseCheckedOrderItemListAll={_onAction_releaseCheckedOrderItemListAll}
+                        _onSubmit_downloadOrderItemsExcel={_onSubmit_downloadOrderItemsExcel}
+                    />
+                    <CheckedOrderItemTableComponent
+                        viewHeader={viewHeader}
+                        checkedOrderItemList={checkedOrderItemList}
+                    ></CheckedOrderItemTableComponent>
                     <CheckedOperatorComponent
                         viewHeader={viewHeader}
                         checkedOrderItemList={checkedOrderItemList}
@@ -551,10 +564,6 @@ const SalesComponent = (props) => {
                         _onSubmit_downloadOrderItemsExcel={_onSubmit_downloadOrderItemsExcel}
                         _onSubmit_changeReleaseYnForOrderItemList={_onSubmit_changeReleaseYnForOrderItemList}
                     ></CheckedOperatorComponent>
-                    <CheckedOrderItemTableComponent
-                        viewHeader={viewHeader}
-                        checkedOrderItemList={checkedOrderItemList}
-                    ></CheckedOrderItemTableComponent>
                 </Container>
             }
 
