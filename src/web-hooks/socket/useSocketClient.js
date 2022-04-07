@@ -29,15 +29,14 @@ const useSocketClient = () => {
                 // console.log(str);
             },
             reconnectDelay: 5000,
-            heartbeatIncoming: 25000,
-            heartbeatOutgoing: 25000,
+            heartbeatIncoming: 10000,
+            heartbeatOutgoing: 10000,
             onConnect: (e) => {
                 console.log('connected socket.');
                 setConnected(true);
             },
             onDisconnect: (e) => {
                 console.log('disconnected socket.');
-                setConnected(false);
             },
             onStompError: (frame) => {
                 console.error(frame);

@@ -12,7 +12,7 @@ const OrderItemTablePagenationComponent = (props) => {
                     isFirst={props.orderItemPage?.first}
                     isLast={props.orderItemPage?.last}
                     totalElements={props.orderItemPage?.totalElements}
-                    sizeElements={[10, 50, 100]}
+                    sizeElements={[300, 500, 1000]}
                 ></PagenationComponent>
             }
         </Container>

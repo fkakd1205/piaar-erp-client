@@ -21,6 +21,8 @@ import { sortFormatUtils } from '../../../../utils/sortFormatUtils';
 import useSocketClient from '../../../../web-hooks/socket/useSocketClient';
 import { erpOrderItemSocket } from '../../../../data_connect/socket/erpOrderItemSocket';
 import { erpSalesHeaderSocket } from '../../../../data_connect/socket/erpSalesHeaderSocket';
+import { useSocketConnectLoadingHook, SocketConnectLoadingHookComponent } from '../../../../hooks/loading/useSocketConnectLoadingHook';
+import { useBasicSnackbarHook, BasicSnackbarHookComponent } from '../../../../hooks/snackbar/useBasicSnackbarHook';
 
 const Container = styled.div`
     margin-bottom: 100px;
@@ -44,6 +46,19 @@ const SalesComponent = (props) => {
         onActionOpen: onActionOpenBackdrop,
         onActionClose: onActionCloseBackdrop
     } = useBackdropHook();
+
+    const {
+        open: snackbarOpen,
+        message: snackbarMessage,
+        onActionOpen: onActionOpenSnackbar,
+        onActionClose: onActionCloseSnacbar,
+    } = useBasicSnackbarHook();
+
+    const {
+        open: socketConnectLoadingOpen,
+        onActionOpen: onActionOpenSocketConnectLoading,
+        onActionClose: onActionCloseSocketConnectLoading
+    } = useSocketConnectLoadingHook();
 
     const [viewHeader, dispatchViewHeader] = useReducer(viewHeaderReducer, initialViewHeader);
     const [productOptionList, dispatchProductOptionList] = useReducer(productOptionListReducer, initialProductOptionList);
@@ -123,6 +138,27 @@ const SalesComponent = (props) => {
             })
     }
 
+    const __reqRefreshOrderItemList = async (ids) => {
+        let params = {
+            ids: ids,
+            salesYn: 'y',
+        }
+
+        await erpOrderItemDataConnect().refreshList(params)
+            .then(res => {
+                if (res.status === 200 && res.data.message === 'success') {
+                    dispatchCheckedOrderItemList({
+                        type: 'SET_DATA',
+                        payload: res.data.data
+                    });
+                }
+            })
+            .catch(err => {
+                let res = err.response;
+                console.log(res);
+            })
+    }
+
     const __reqSearchDownloadExcelHeaders = async () => {
         await erpDownloadExcelHeaderDataConnect().searchList()
             .then(res => {
@@ -140,7 +176,7 @@ const SalesComponent = (props) => {
     }
 
     // Create
-    const __reqCreateHeaderOneSocket = async (params) => {
+    const __reqCreateViewHeaderOneSocket = async (params) => {
         await erpSalesHeaderSocket().createOne(params)
             .catch(err => {
                 let res = err.response;
@@ -154,7 +190,7 @@ const SalesComponent = (props) => {
     }
 
     // Update And Change
-    const __reqUpdateHeaderOneSocket = async (params) => {
+    const __reqUpdateViewHeaderOneSocket = async (params) => {
         await erpSalesHeaderSocket().updateOne(params)
             .catch(err => {
                 let res = err.response;
@@ -257,7 +293,7 @@ const SalesComponent = (props) => {
 
                     let date = dateToYYYYMMDDhhmmssFile(new Date());
 
-                    link.setAttribute('download', date + '_판매데이터_엑셀.xlsx');
+                    link.setAttribute('download', date + '_판매상태_데이터_엑셀.xlsx');
                     document.body.appendChild(link);
                     link.click();
                 }
@@ -290,6 +326,7 @@ const SalesComponent = (props) => {
 
     useEffect(() => {
         async function subscribeSockets() {
+            onActionOpenSocketConnectLoading();
             if (!connected) {
                 return;
             }
@@ -301,11 +338,14 @@ const SalesComponent = (props) => {
                         let body = JSON.parse(e.body);
                         if (body?.statusCode === 200) {
                             await __reqSearchOrderItemList();
+                            if (body?.socketMemo) {
+                                onActionOpenSnackbar(body?.socketMemo)
+                            }
                         }
                     }
                 },
                 {
-                    subscribeUrl: '/topic/erp.erp-order-header',
+                    subscribeUrl: '/topic/erp.erp-sales-header',
                     callback: async (e) => {
                         let body = JSON.parse(e.body);
                         if (body?.statusCode === 200) {
@@ -313,32 +353,24 @@ const SalesComponent = (props) => {
                         }
                     }
                 }
-            ])
+            ]);
+            onActionCloseSocketConnectLoading();
         }
         subscribeSockets();
         return () => onUnsubscribe();
     }, [connected]);
 
     useEffect(() => {
-        if (!checkedOrderItemList || !orderItemPage) {
-            return;
+        async function fetchCheckedOrderItems() {
+            if (!orderItemPage || !checkedOrderItemList || checkedOrderItemList?.length <= 0) {
+                return;
+            }
+
+            let ids = checkedOrderItemList.map(r => r.id);
+            await __reqRefreshOrderItemList(ids);
         }
 
-        let orderItemList = orderItemPage?.content;
-
-        let newData = [];
-        checkedOrderItemList.forEach(cOrderItem => {
-            let data = orderItemList.filter(orderItem => orderItem?.id === cOrderItem?.id);
-            if (data[0]) {
-                newData.push(data[0]);
-            }
-        })
-
-        dispatchCheckedOrderItemList({
-            type: 'SET_DATA',
-            payload: newData
-        });
-
+        fetchCheckedOrderItems();
     }, [orderItemPage])
 
     const _onAction_openHeaderSettingModal = () => {
@@ -416,7 +448,7 @@ const SalesComponent = (props) => {
                     details: headerDetails
                 }
             }
-            await __reqCreateHeaderOneSocket(params);
+            await __reqCreateViewHeaderOneSocket(params);
         } else {
             params = {
                 ...viewHeader,
@@ -424,7 +456,7 @@ const SalesComponent = (props) => {
                     details: headerDetails
                 }
             }
-            await __reqUpdateHeaderOneSocket(params);
+            await __reqUpdateViewHeaderOneSocket(params);
         }
 
         _onAction_closeHeaderSettingModal();
@@ -483,45 +515,48 @@ const SalesComponent = (props) => {
 
     return (
         <>
-            <Container>
-                <HeaderComponent
-                    _onAction_openHeaderSettingModal={_onAction_openHeaderSettingModal}
-                ></HeaderComponent>
-                <SearchOperatorComponent
-                    viewHeader={viewHeader}
-                ></SearchOperatorComponent>
-                <OrderItemTableComponent
-                    viewHeader={viewHeader}
-                    orderItemList={orderItemPage?.content}
-                    checkedOrderItemList={checkedOrderItemList}
+            {connected &&
 
-                    _onAction_checkOrderItem={_onAction_checkOrderItem}
-                    _onAction_checkOrderItemAll={_onAction_checkOrderItemAll}
-                    _onAction_releaseOrderItemAll={_onAction_releaseOrderItemAll}
-                    _onSubmit_updateErpOrderItemOne={_onSubmit_updateErpOrderItemOne}
-                ></OrderItemTableComponent>
-                <OrderItemTablePagenationComponent
-                    orderItemPage={orderItemPage}
-                ></OrderItemTablePagenationComponent>
-                <CheckedOperatorComponent
-                    viewHeader={viewHeader}
-                    checkedOrderItemList={checkedOrderItemList}
-                    productOptionList={productOptionList}
-                    downloadExcelList={downloadExcelList}
+                <Container>
+                    <HeaderComponent
+                        _onAction_openHeaderSettingModal={_onAction_openHeaderSettingModal}
+                    ></HeaderComponent>
+                    <SearchOperatorComponent
+                        viewHeader={viewHeader}
+                    ></SearchOperatorComponent>
+                    <OrderItemTableComponent
+                        viewHeader={viewHeader}
+                        orderItemList={orderItemPage?.content}
+                        checkedOrderItemList={checkedOrderItemList}
 
-                    _onAction_releaseCheckedOrderItemListAll={_onAction_releaseCheckedOrderItemListAll}
-                    _onSubmit_changeSalesYnForOrderItemList={_onSubmit_changeSalesYnForOrderItemList}
-                    _onSubmit_deleteOrderItemList={_onSubmit_deleteOrderItemList}
-                    _onSubmit_changeOptionCodeForOrderItemListInBatch={_onSubmit_changeOptionCodeForOrderItemListInBatch}
-                    _onSubmit_changeReleaseOptionCodeForOrderItemListInBatch={_onSubmit_changeReleaseOptionCodeForOrderItemListInBatch}
-                    _onSubmit_downloadOrderItemsExcel={_onSubmit_downloadOrderItemsExcel}
-                    _onSubmit_changeReleaseYnForOrderItemList={_onSubmit_changeReleaseYnForOrderItemList}
-                ></CheckedOperatorComponent>
-                <CheckedOrderItemTableComponent
-                    viewHeader={viewHeader}
-                    checkedOrderItemList={checkedOrderItemList}
-                ></CheckedOrderItemTableComponent>
-            </Container>
+                        _onAction_checkOrderItem={_onAction_checkOrderItem}
+                        _onAction_checkOrderItemAll={_onAction_checkOrderItemAll}
+                        _onAction_releaseOrderItemAll={_onAction_releaseOrderItemAll}
+                        _onSubmit_updateErpOrderItemOne={_onSubmit_updateErpOrderItemOne}
+                    ></OrderItemTableComponent>
+                    <OrderItemTablePagenationComponent
+                        orderItemPage={orderItemPage}
+                    ></OrderItemTablePagenationComponent>
+                    <CheckedOperatorComponent
+                        viewHeader={viewHeader}
+                        checkedOrderItemList={checkedOrderItemList}
+                        productOptionList={productOptionList}
+                        downloadExcelList={downloadExcelList}
+
+                        _onAction_releaseCheckedOrderItemListAll={_onAction_releaseCheckedOrderItemListAll}
+                        _onSubmit_changeSalesYnForOrderItemList={_onSubmit_changeSalesYnForOrderItemList}
+                        _onSubmit_deleteOrderItemList={_onSubmit_deleteOrderItemList}
+                        _onSubmit_changeOptionCodeForOrderItemListInBatch={_onSubmit_changeOptionCodeForOrderItemListInBatch}
+                        _onSubmit_changeReleaseOptionCodeForOrderItemListInBatch={_onSubmit_changeReleaseOptionCodeForOrderItemListInBatch}
+                        _onSubmit_downloadOrderItemsExcel={_onSubmit_downloadOrderItemsExcel}
+                        _onSubmit_changeReleaseYnForOrderItemList={_onSubmit_changeReleaseYnForOrderItemList}
+                    ></CheckedOperatorComponent>
+                    <CheckedOrderItemTableComponent
+                        viewHeader={viewHeader}
+                        checkedOrderItemList={checkedOrderItemList}
+                    ></CheckedOrderItemTableComponent>
+                </Container>
+            }
 
             {/* Modal */}
             <CommonModalComponent
@@ -541,6 +576,23 @@ const SalesComponent = (props) => {
             <BackdropHookComponent
                 open={backdropOpen}
             ></BackdropHookComponent>
+
+            {/* Snackbar */}
+            {snackbarOpen &&
+                <BasicSnackbarHookComponent
+                    open={snackbarOpen}
+                    message={snackbarMessage}
+                    onClose={onActionCloseSnacbar}
+                    severity={'success'}
+                    vertical={'top'}
+                    horizontal={'center'}
+                    duration={4000}
+                ></BasicSnackbarHookComponent>
+            }
+
+            <SocketConnectLoadingHookComponent
+                open={socketConnectLoadingOpen}
+            ></SocketConnectLoadingHookComponent>
         </>
     );
 }

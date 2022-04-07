@@ -3,6 +3,7 @@ import { erpDownloadExcelHeaderDataConnect } from "../../../../data_connect/erpD
 import { erpOrderItemDataConnect } from "../../../../data_connect/erpOrderItemDataConnect";
 import { erpOrderItemSocket } from "../../../../data_connect/socket/erpOrderItemSocket";
 import { useBackdropHook, BackdropHookComponent } from "../../../../hooks/backdrop/useBackdropHook";
+import { useSocketConnectLoadingHook, SocketConnectLoadingHookComponent } from "../../../../hooks/loading/useSocketConnectLoadingHook";
 import { dateToYYYYMMDDhhmmssFile } from "../../../../utils/dateFormatUtils";
 import useSocketClient from "../../../../web-hooks/socket/useSocketClient";
 import OperatorComponent from "./operator/Operator.component";
@@ -21,6 +22,12 @@ const ErpOrderUploadComponent = (props) => {
         onActionOpen: onActionOpenBackdrop,
         onActionClose: onActionCloseBackdrop
     } = useBackdropHook();
+
+    const {
+        open: socketConnectLoadingOpen,
+        onActionOpen: onActionOpenSocketConnectLoading,
+        onActionClose: onActionCloseSocketConnectLoading
+    } = useSocketConnectLoadingHook();
 
     const [excelDataList, dispatchExcelDataList] = useReducer(excelDataListReducer, initialExcelDataList);
 
@@ -106,6 +113,7 @@ const ErpOrderUploadComponent = (props) => {
 
     useEffect(() => {
         async function subscribeSockets() {
+            onActionOpenSocketConnectLoading();
             if (!connected) {
                 return;
             }
@@ -118,7 +126,8 @@ const ErpOrderUploadComponent = (props) => {
                         }
                     }
                 }
-            ])
+            ]);
+            onActionCloseSocketConnectLoading();
         }
         subscribeSockets();
         return () => onUnsubscribe();
@@ -175,22 +184,30 @@ const ErpOrderUploadComponent = (props) => {
 
     return (
         <>
-            <OperatorComponent
-                _onSubmit_uploadExcelFile={(formData) => _onSubmit_uploadExcelFile(formData)}
-                _onSubmit_createOrderItems={() => _onSubmit_createOrderItems()}
-                _onSubmit_downloadUploadExcelSample={_onSubmit_downloadUploadExcelSample}
-                _onSubmit_addSingleExcelData={_onSubmit_addSingleExcelData}
-            ></OperatorComponent>
-            <PreviewTableComponent
-                excelDataList={excelDataList}
+            {connected &&
+                <>
+                    <OperatorComponent
+                        _onSubmit_uploadExcelFile={(formData) => _onSubmit_uploadExcelFile(formData)}
+                        _onSubmit_createOrderItems={() => _onSubmit_createOrderItems()}
+                        _onSubmit_downloadUploadExcelSample={_onSubmit_downloadUploadExcelSample}
+                        _onSubmit_addSingleExcelData={_onSubmit_addSingleExcelData}
+                    ></OperatorComponent>
+                    <PreviewTableComponent
+                        excelDataList={excelDataList}
 
-                _onAction_deleteDataOne={_onAction_deleteDataOne}
-            ></PreviewTableComponent>
+                        _onAction_deleteDataOne={_onAction_deleteDataOne}
+                    ></PreviewTableComponent>
+                </>
+            }
 
             {/* Backdrop Loading */}
             <BackdropHookComponent
                 open={backdropOpen}
             />
+
+            <SocketConnectLoadingHookComponent
+                open={socketConnectLoadingOpen}
+            ></SocketConnectLoadingHookComponent>
         </>
     );
 }
