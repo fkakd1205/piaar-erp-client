@@ -42,13 +42,13 @@ const ButtonWrapper = styled.div`
         position: relative;
         overflow: hidden;
         padding: 3px 7px;
-        border: 1px solid #2C73D2;
+        border: 1px solid #e0e0e0;
         background: white;
         border-radius: 0;
 
         font-size: 14px;
-        font-weight: 600;
-        color: #2C73D2;
+        font-weight: 500;
+        color: #000;
 
         cursor: pointer;
 
