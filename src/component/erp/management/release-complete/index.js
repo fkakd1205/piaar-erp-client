@@ -357,6 +357,21 @@ const ReleaseCompleteComponent = (props) => {
             ;
     }
 
+    const __reqActionReflectStock = async (body) => {
+        await erpOrderItemSocket().actionReflectStock(body)
+            .catch(err => {
+                let res = err.response;
+
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data?.memo);
+            })
+            ;
+    }
+
     useEffect(() => {
         __reqSearchViewHeaderOne();
         __reqSearchProductOptionList();
@@ -574,6 +589,12 @@ const ReleaseCompleteComponent = (props) => {
         onActionCloseBackdrop();
     }
 
+    // 선택된 데이터 재고 반영
+    const _onAction_reflectStock = async () => {
+        onActionOpenBackdrop();
+        await __reqActionReflectStock(checkedOrderItemList);
+        onActionCloseBackdrop();
+    }
     return (
         <>
             <Container>
@@ -623,6 +644,7 @@ const ReleaseCompleteComponent = (props) => {
                     _onSubmit_changeReleaseYnForOrderItemList={_onSubmit_changeReleaseYnForOrderItemList}
                     _onAction_downloadWaybillExcelSample={_onAction_downloadWaybillExcelSample}
                     _onSubmit_changeWaybillForOrderItemList={_onSubmit_changeWaybillForOrderItemList}
+                    _onAction_reflectStock={_onAction_reflectStock}
                 ></CheckedOperatorComponent>
             </Container>
 

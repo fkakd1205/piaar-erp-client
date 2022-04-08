@@ -50,7 +50,7 @@ export default function OperatorFieldView(props) {
                         <button
                             type='button'
                             className='button-el'
-                            onClick={props.onActionOpenReleaseConfirmModal}
+                            onClick={props.onActionOpenReflectStockConfirmModal}
                         >
                             재고 반영
                             <Ripple color={'#e0e0e0'} duration={1000}></Ripple>
@@ -85,78 +85,6 @@ export default function OperatorFieldView(props) {
                     </div>
                 </ButtonWrapper>
             </ControlWrapper>
-            {/* <ButtonWrapper>
-                <div className='title-box'>
-                    재고 관리
-                </div>
-                <div className='splitter'>|</div>
-                <ButtonWrapper>
-                    <div className='button-box'>
-                        <button
-                            type='button'
-                            className='button-el'
-                            onClick={props.onActionOpenReleaseConfirmModal}
-                        >
-                            재고 반영
-                            <Ripple color={'#e0e0e0'} duration={1000}></Ripple>
-                        </button>
-                    </div>
-                    <div className='button-box'>
-                        <button
-                            type='button'
-                            className='button-el'
-                            onClick={props.onActionOpenReleaseConfirmModal}
-                        >
-                            재고 반영 취소
-                            <Ripple color={'#e0e0e0'} duration={1000}></Ripple>
-                        </button>
-                    </div>
-                </ButtonWrapper>
-                <ButtonWrapper>
-                    <div className='button-box'>
-                        <button
-                            type='button'
-                            className='button-el'
-                            onClick={props.onActionOpenOptionCodeModal}
-                        >
-                            옵션 코드 변경
-                            <Ripple color={'#e0e0e0'} duration={1000}></Ripple>
-                        </button>
-                    </div>
-                    <div className='button-box'>
-                        <button
-                            type='button'
-                            className='button-el'
-                            onClick={props.onActionOpenReleaseOptionCodeModal}
-                        >
-                            출고 옵션 코드 변경
-                            <Ripple color={'#e0e0e0'} duration={1000}></Ripple>
-                        </button>
-                    </div>
-                </ButtonWrapper>
-                <ButtonWrapper>
-                    <div className='button-box'>
-                        <button
-                            type='button'
-                            className='button-el'
-                            onClick={props.onActionOpenWaybillModal}
-                        >
-                            운송장 일괄 등록
-                            <Ripple color={'#e0e0e0'} duration={1000}></Ripple>
-                        </button>
-                    </div>
-                    <div className='button-box'>
-                        <button
-                            type='button'
-                            className='button-el'
-                            onClick={props.onActionOpenDownloadExcelModal}
-                        >
-                            엑셀 다운로드
-                            <Ripple color={'#e0e0e0'} duration={1000}></Ripple>
-                        </button>
-                    </div>
-                </ButtonWrapper>
-            </ButtonWrapper> */}
         </OperatorFieldWrapper>
     );
 }
