@@ -2,6 +2,28 @@ import { dateToYYYYMMDDhhmmss } from '../../../../../utils/dateFormatUtils';
 import InfiniteScrollObserver from '../../../../module/observer/InfiniteScrollObserver';
 import { TableFieldWrapper } from './CheckedOrderItemTable.styled';
 
+function CorrectIcon() {
+    return (
+        <img
+            src='/assets/icon/correct_icon.png'
+            style={{ width: '15px', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }}
+            alt=""
+            loading='lazy'
+        ></img>
+    );
+}
+
+function FailedIcon() {
+    return (
+        <img
+            src='/assets/icon/failed_icon.png'
+            style={{ width: '15px', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }}
+            alt=""
+            loading='lazy'
+        ></img>
+    );
+}
+
 export default function TableFieldView(props) {
     return (
         <TableFieldWrapper>
@@ -10,6 +32,7 @@ export default function TableFieldView(props) {
             >
                 <table cellSpacing="0">
                     <colgroup>
+                        <col className='col-5-3'></col>
                         {props.viewHeader?.headerDetail.details?.map((r, index) => {
                             return (
                                 <col key={index} className='col-15-13'></col>
@@ -18,6 +41,12 @@ export default function TableFieldView(props) {
                     </colgroup>
                     <thead>
                         <tr>
+                            <th
+                                className="fixed-header fixed-col-left"
+                                style={{ cursor: 'pointer', zIndex: '12' }}
+                            >
+                                재고 반영
+                            </th>
                             {props.viewHeader?.headerDetail.details?.map((r, index) => {
                                 return (
                                     <th key={index} className="fixed-header" scope="col">{r.customCellName}</th>
@@ -34,6 +63,14 @@ export default function TableFieldView(props) {
                                         <tr
                                             key={rowIndex}
                                         >
+                                            <td className={`fixed-col-left`}>
+                                                {r1.stockReflectYn === 'y' &&
+                                                    <CorrectIcon />
+                                                }
+                                                {r1.stockReflectYn === 'n' &&
+                                                    <FailedIcon />
+                                                }
+                                            </td>
                                             {props.viewHeader?.headerDetail.details?.map(r2 => {
                                                 let matchedColumnName = r2.matchedColumnName;
                                                 if (matchedColumnName === 'createdAt') {

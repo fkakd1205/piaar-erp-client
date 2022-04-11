@@ -3,7 +3,7 @@ import SortButton from '../../../../module/button/SortButton';
 import InfiniteScrollObserver from '../../../../module/observer/InfiniteScrollObserver';
 import { TableFieldWrapper } from './OrderItemTable.styled';
 
-function CollectIcon() {
+function CorrectIcon() {
     return (
         <img
             src='/assets/icon/correct_icon.png'
@@ -108,7 +108,7 @@ export default function TableFieldView(props) {
                                                 className={`fixed-col-left`}
                                             >
                                                 {r1.releaseYn === 'y' &&
-                                                    <CollectIcon />
+                                                    <CorrectIcon />
                                                 }
                                             </td>
                                             <td

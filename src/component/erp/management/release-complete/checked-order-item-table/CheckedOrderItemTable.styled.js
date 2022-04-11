@@ -29,6 +29,14 @@ const TableFieldWrapper = styled.div`
         border: none;
     }
 
+    table .col-5-3 {
+        width:50px;
+
+        @media all and (max-width:992px){
+            width:30px;
+        }
+    }
+    
     table .col-15-13{
         width:150px;
 
@@ -93,6 +101,24 @@ const TableFieldWrapper = styled.div`
         position: sticky;
         top: 0;
         z-index:10;
+    }
+
+    .table-box .fixed-col-left {
+        position: sticky;
+        background: white;
+        left: 0;
+        z-index:10;
+        border-right: 1px solid #e0e0e060;
+        box-shadow: 6px 0 10px -7px #e0e0e0;
+    }
+
+    .table-box .fixed-col-right {
+        position: sticky;
+        background: white;
+        right: 0;
+        z-index:10;
+        border-left: 1px solid #e0e0e060;
+        box-shadow: -6px 0 10px -7px #e0e0e0;
     }
 
     .table-box::-webkit-scrollbar{
