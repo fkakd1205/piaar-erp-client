@@ -7,6 +7,12 @@ import ErpManagementSalesPage from './pages/erp/management/sales/ErpManagementSa
 import ErpManagementExcelFormPage from './pages/erp/management/excel/ErpManagementExcelFormPage';
 import ErpManagementReleaseCompletePage from './pages/erp/management/release-complete/ErpManagementReleaseCompletePage';
 
+/**
+ * color palette
+ * primary blue : #2C73D2
+ * danger red : #FF605C
+ * 
+ */
 function App() {
     return (
         <Routes>

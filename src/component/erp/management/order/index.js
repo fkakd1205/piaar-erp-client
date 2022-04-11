@@ -23,6 +23,7 @@ import { erpOrderHeaderSocket } from '../../../../data_connect/socket/erpOrderHe
 import { useSocketConnectLoadingHook, SocketConnectLoadingHookComponent } from '../../../../hooks/loading/useSocketConnectLoadingHook';
 import { useBasicSnackbarHook, BasicSnackbarHookComponent } from '../../../../hooks/snackbar/useBasicSnackbarHook';
 import { erpDownloadExcelHeaderDataConnect } from '../../../../data_connect/erpDownloadExcelHeaderDataConnect';
+import CheckedHeadComponent from './checked-head/CheckedHead.component';
 
 const Container = styled.div`
     margin-bottom: 100px;
@@ -501,22 +502,28 @@ const OrderComponent = (props) => {
                     <OrderItemTablePagenationComponent
                         orderItemPage={orderItemPage}
                     ></OrderItemTablePagenationComponent>
+                    <CheckedHeadComponent
+                        viewHeader={viewHeader}
+                        checkedOrderItemList={checkedOrderItemList}
+                        downloadExcelList={downloadExcelList}
+
+                        _onAction_releaseCheckedOrderItemListAll={_onAction_releaseCheckedOrderItemListAll}
+                        _onSubmit_downloadOrderItemsExcel={_onSubmit_downloadOrderItemsExcel}
+                    />
+                    <CheckedOrderItemTableComponent
+                        viewHeader={viewHeader}
+                        checkedOrderItemList={checkedOrderItemList}
+                    ></CheckedOrderItemTableComponent>
                     <CheckedOperatorComponent
                         viewHeader={viewHeader}
                         checkedOrderItemList={checkedOrderItemList}
                         productOptionList={productOptionList}
-                        downloadExcelList={downloadExcelList}
 
                         _onAction_releaseCheckedOrderItemListAll={_onAction_releaseCheckedOrderItemListAll}
                         _onSubmit_changeSalesYnForOrderItemList={_onSubmit_changeSalesYnForOrderItemList}
                         _onSubmit_deleteOrderItemList={_onSubmit_deleteOrderItemList}
                         _onSubmit_changeOptionCodeForOrderItemListInBatch={_onSubmit_changeOptionCodeForOrderItemListInBatch}
-                        _onSubmit_downloadOrderItemsExcel={_onSubmit_downloadOrderItemsExcel}
                     ></CheckedOperatorComponent>
-                    <CheckedOrderItemTableComponent
-                        viewHeader={viewHeader}
-                        checkedOrderItemList={checkedOrderItemList}
-                    ></CheckedOrderItemTableComponent>
                 </Container>
             }
 

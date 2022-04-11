@@ -23,6 +23,7 @@ import { useBasicSnackbarHook, BasicSnackbarHookComponent } from '../../../../ho
 import { useSocketConnectLoadingHook, SocketConnectLoadingHookComponent } from '../../../../hooks/loading/useSocketConnectLoadingHook';
 import { erpOrderItemSocket } from '../../../../data_connect/socket/erpOrderItemSocket';
 import { erpReleaseCompleteHeaderSocket } from '../../../../data_connect/socket/erpReleaseCompleteHeaderSocket';
+import CheckedHeadComponent from './checked-head/CheckedHead.component';
 
 const Container = styled.div`
     margin-bottom: 100px;
@@ -356,6 +357,21 @@ const ReleaseCompleteComponent = (props) => {
             ;
     }
 
+    const __reqActionReflectStock = async (body) => {
+        await erpOrderItemSocket().actionReflectStock(body)
+            .catch(err => {
+                let res = err.response;
+
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data?.memo);
+            })
+            ;
+    }
+
     useEffect(() => {
         __reqSearchViewHeaderOne();
         __reqSearchProductOptionList();
@@ -573,6 +589,12 @@ const ReleaseCompleteComponent = (props) => {
         onActionCloseBackdrop();
     }
 
+    // 선택된 데이터 재고 반영
+    const _onAction_reflectStock = async () => {
+        onActionOpenBackdrop();
+        await __reqActionReflectStock(checkedOrderItemList);
+        onActionCloseBackdrop();
+    }
     return (
         <>
             <Container>
@@ -595,26 +617,35 @@ const ReleaseCompleteComponent = (props) => {
                 <OrderItemTablePagenationComponent
                     orderItemPage={orderItemPage}
                 ></OrderItemTablePagenationComponent>
+                <CheckedHeadComponent
+                    viewHeader={viewHeader}
+                    checkedOrderItemList={checkedOrderItemList}
+                    downloadExcelList={downloadExcelList}
+
+                    _onAction_releaseCheckedOrderItemListAll={_onAction_releaseCheckedOrderItemListAll}
+                    _onSubmit_downloadOrderItemsExcel={_onSubmit_downloadOrderItemsExcel}
+                />
+                <CheckedOrderItemTableComponent
+                    viewHeader={viewHeader}
+                    checkedOrderItemList={checkedOrderItemList}
+
+                    _onAction_releaseCheckedOrderItemListAll={_onAction_releaseCheckedOrderItemListAll}
+                ></CheckedOrderItemTableComponent>
                 <CheckedOperatorComponent
                     viewHeader={viewHeader}
                     checkedOrderItemList={checkedOrderItemList}
                     productOptionList={productOptionList}
-                    downloadExcelList={downloadExcelList}
 
                     _onAction_releaseCheckedOrderItemListAll={_onAction_releaseCheckedOrderItemListAll}
                     _onSubmit_changeSalesYnForOrderItemList={_onSubmit_changeSalesYnForOrderItemList}
                     _onSubmit_deleteOrderItemList={_onSubmit_deleteOrderItemList}
                     _onSubmit_changeOptionCodeForOrderItemListInBatch={_onSubmit_changeOptionCodeForOrderItemListInBatch}
                     _onSubmit_changeReleaseOptionCodeForOrderItemListInBatch={_onSubmit_changeReleaseOptionCodeForOrderItemListInBatch}
-                    _onSubmit_downloadOrderItemsExcel={_onSubmit_downloadOrderItemsExcel}
                     _onSubmit_changeReleaseYnForOrderItemList={_onSubmit_changeReleaseYnForOrderItemList}
                     _onAction_downloadWaybillExcelSample={_onAction_downloadWaybillExcelSample}
                     _onSubmit_changeWaybillForOrderItemList={_onSubmit_changeWaybillForOrderItemList}
+                    _onAction_reflectStock={_onAction_reflectStock}
                 ></CheckedOperatorComponent>
-                <CheckedOrderItemTableComponent
-                    viewHeader={viewHeader}
-                    checkedOrderItemList={checkedOrderItemList}
-                ></CheckedOrderItemTableComponent>
             </Container>
 
             {/* Modal */}

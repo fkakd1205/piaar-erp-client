@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useReducer, useState } from "react";
 import { Container } from "./CheckedOrderItemTable.styled";
 import TableFieldView from "./TableField.view";
 
