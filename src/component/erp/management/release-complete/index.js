@@ -359,6 +359,33 @@ const ReleaseCompleteComponent = (props) => {
 
     const __reqActionReflectStock = async (body) => {
         await erpOrderItemSocket().actionReflectStock(body)
+            .then(res => {
+                if (res.status === 200) {
+                    alert(res.data.memo);
+                    return;
+                }
+            })
+            .catch(err => {
+                let res = err.response;
+
+                if (res?.status === 500) {
+                    alert('undefined error.');
+                    return;
+                }
+
+                alert(res?.data?.memo);
+            })
+            ;
+    }
+
+    const __reqActionCancelStock = async (body) => {
+        await erpOrderItemSocket().actionCancelStock(body)
+            .then(res => {
+                if (res.status === 200) {
+                    alert(res.data.memo);
+                    return;
+                }
+            })
             .catch(err => {
                 let res = err.response;
 
@@ -595,6 +622,13 @@ const ReleaseCompleteComponent = (props) => {
         await __reqActionReflectStock(checkedOrderItemList);
         onActionCloseBackdrop();
     }
+
+    // 선택된 데이터 재고 취소
+    const _onAction_cancelStock = async () => {
+        onActionOpenBackdrop();
+        await __reqActionCancelStock(checkedOrderItemList);
+        onActionCloseBackdrop();
+    }
     return (
         <>
             <Container>
@@ -645,6 +679,7 @@ const ReleaseCompleteComponent = (props) => {
                     _onAction_downloadWaybillExcelSample={_onAction_downloadWaybillExcelSample}
                     _onSubmit_changeWaybillForOrderItemList={_onSubmit_changeWaybillForOrderItemList}
                     _onAction_reflectStock={_onAction_reflectStock}
+                    _onAction_cancelStock={_onAction_cancelStock}
                 ></CheckedOperatorComponent>
             </Container>
 

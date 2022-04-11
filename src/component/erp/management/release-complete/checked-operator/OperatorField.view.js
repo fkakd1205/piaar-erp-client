@@ -60,7 +60,7 @@ export default function OperatorFieldView(props) {
                         <button
                             type='button'
                             className='button-el'
-                            onClick={props.onActionOpenReleaseConfirmModal}
+                            onClick={props.onActionOpenCancelStockConfirmModal}
                         >
                             재고 반영 취소
                             <Ripple color={'#e0e0e0'} duration={1000}></Ripple>

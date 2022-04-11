@@ -3,6 +3,28 @@ import SortButton from '../../../../module/button/SortButton';
 import InfiniteScrollObserver from '../../../../module/observer/InfiniteScrollObserver';
 import { TableFieldWrapper } from './OrderItemTable.styled';
 
+function CorrectIcon() {
+    return (
+        <img
+            src='/assets/icon/correct_icon.png'
+            style={{ width: '15px', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }}
+            alt=""
+            loading='lazy'
+        ></img>
+    );
+}
+
+function FailedIcon() {
+    return (
+        <img
+            src='/assets/icon/failed_icon.png'
+            style={{ width: '15px', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }}
+            alt=""
+            loading='lazy'
+        ></img>
+    );
+}
+
 const HIGHLIGHT_FIELDS = [
     'releaseOptionCode',
     'categoryName',
@@ -23,6 +45,7 @@ export default function TableFieldView(props) {
                 <table cellSpacing="0">
                     <colgroup>
                         <col className='col-5-3'></col>
+                        <col className='col-5-3'></col>
                         {props.viewHeader?.headerDetail.details?.map((r, index) => {
                             return (
                                 <col
@@ -35,6 +58,12 @@ export default function TableFieldView(props) {
                     </colgroup>
                     <thead>
                         <tr>
+                            <th
+                                className="fixed-header fixed-col-left"
+                                style={{ cursor: 'pointer', zIndex:'12' }}
+                            >
+                                재고 반영
+                            </th>
                             <th
                                 className="fixed-header"
                                 style={{ cursor: 'pointer' }}
@@ -84,6 +113,14 @@ export default function TableFieldView(props) {
                                             className={`${checked && 'tr-active'}`}
                                             onClick={(e) => props.onActionCheckOrderItem(e, r1)}
                                         >
+                                            <td className={`fixed-col-left`}>
+                                                {r1.stockReflectYn === 'y' &&
+                                                    <CorrectIcon />
+                                                }
+                                                {r1.stockReflectYn === 'n' &&
+                                                    <FailedIcon />
+                                                }
+                                            </td>
                                             <td style={{ cursor: 'pointer' }}>
                                                 <input type='checkbox' checked={checked} onChange={(e) => props.onActionCheckOrderItem(e, r1)}></input>
                                             </td>

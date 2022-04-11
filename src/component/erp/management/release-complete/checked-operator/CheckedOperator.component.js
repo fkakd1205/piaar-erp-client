@@ -16,6 +16,7 @@ const CheckedOperatorComponent = (props) => {
     const [releaseOptionCodeModalOpen, setReleaseOptionCodeModalOpen] = useState(false);
     const [waybillModalOpen, setWaybillModalOpen] = useState(false);
     const [reflectStockConfirmModalOpen, setReflectStockConfirmModalOpen] = useState(false);
+    const [cancelStockConfirmModalOpen, setCancelStockConfirmModalOpen] = useState(false);
 
     const onActionOpenSalesConfirmModal = () => {
         if (props.checkedOrderItemList?.length <= 0) {
@@ -178,8 +179,7 @@ const CheckedOperatorComponent = (props) => {
         let uniqueCodes = [];
         props.checkedOrderItemList.forEach(r => {
             if (r.stockReflectYn === 'y') {
-                console.log(r);
-                uniqueCodes.push(r.uniqueCodes);
+                uniqueCodes.push(r.uniqueCode);
             }
         });
 
@@ -193,6 +193,37 @@ const CheckedOperatorComponent = (props) => {
         onActionCloseReflectStockConfirmModal();
     }
 
+    // 재고 취소 모달 OPEN
+    const onActionOpenCancelStockConfirmModal = () => {
+        if (props.checkedOrderItemList?.length <= 0) {
+            alert('데이터를 먼저 선택해 주세요.');
+            return;
+        }
+        setCancelStockConfirmModalOpen(true);
+    }
+
+    // 재고 취소 모달 CLOSE
+    const onActionCloseCancelStockConfirmModal = () => {
+        setCancelStockConfirmModalOpen(false);
+    }
+
+    const onSubmitCancelStock = () => {
+        let uniqueCodes = [];
+        props.checkedOrderItemList.forEach(r => {
+            if (r.stockReflectYn === 'n') {
+                uniqueCodes.push(r.uniqueCode);
+            }
+        });
+
+        if (uniqueCodes.length > 0) {
+            alert(`재고에 반영되지 않은 데이터가 있습니다.\n재고 반영되지 않은 데이터를 제외 후 다시 시도해 주세요.\n\n고유번호:\n${uniqueCodes.join('\n')}`);
+            onActionCloseCancelStockConfirmModal();
+            return;
+        }
+        props._onAction_cancelStock();
+        onActionCloseCancelStockConfirmModal();
+    }
+
     return (
         <>
             <Container>
@@ -204,6 +235,7 @@ const CheckedOperatorComponent = (props) => {
                     onActionOpenReleaseOptionCodeModal={onActionOpenReleaseOptionCodeModal}
                     onActionOpenWaybillModal={onActionOpenWaybillModal}
                     onActionOpenReflectStockConfirmModal={onActionOpenReflectStockConfirmModal}
+                    onActionOpenCancelStockConfirmModal={onActionOpenCancelStockConfirmModal}
                 />
             </Container>
 
@@ -281,6 +313,15 @@ const CheckedOperatorComponent = (props) => {
 
                 onConfirm={onSubmitReflectStock}
                 onClose={onActionCloseReflectStockConfirmModal}
+            />
+            {/* 재고 취소 모달 */}
+            <ConfirmModalComponent
+                open={cancelStockConfirmModalOpen}
+                title={'재고 취소 확인 메세지'}
+                message={`[ ${props.checkedOrderItemList?.length || 0} ] 건의 데이터를 재고 취소 하시겠습니까?`}
+
+                onConfirm={onSubmitCancelStock}
+                onClose={onActionCloseCancelStockConfirmModal}
             />
         </>
     );
